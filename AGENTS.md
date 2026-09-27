@@ -13,6 +13,7 @@ and the TL;DR for both workflows. This file only tells you *what to open when*.
 | TTS / voiceover (OmniVoice default, Piper fallback, **engine-specific number rules**) | [`.docs/04-tts-voice-playbook.md`](.docs/04-tts-voice-playbook.md) |
 | **VO script / hook / script structure** — mandatory before any TTS run (`/yt-script`) | YouTube skills pack, installed globally; install recipe in [`README.md`](README.md) → "Other reference" |
 | Hard-won lessons — read before the next run | [`.docs/07-lessons-evidence.md`](.docs/07-lessons-evidence.md) (newest) and [`.docs/03-purbaya-lessons-learned.md`](.docs/03-purbaya-lessons-learned.md) |
+| **Captions + delivery** — .srt sidecar after render, then send video/captions/package to Telegram | `scripts/captions_srt.py`, then `scripts/telegram-deliver.sh <video> --srt auto --text <package.txt>` (one command; creds from `.env`) |
 
 ## 2. Per-topic logs — open only when working that topic
 
@@ -41,6 +42,9 @@ npx hyperframes check
 ```
 
 - SFX: copy the existing 19-file library from any `videos/*/assets/audio/` — never regenerate.
+- Delivery: `.env` holds `TELEGRAM_TOKEN` + `TELEGRAM_CHAT_ID` — never echo the token; the
+  delivery script reads it itself. Final step of every run: render → captions →
+  `scripts/telegram-deliver.sh` (details in README TL;DR steps 8–9).
 - Colab: `~/.local/bin/colab`; always `colab stop`; re-upload inputs per session.
 - Docs have reversals: when a run overturns an older rule, update the old doc in the same
   change (see the SUPERSEDED banner in `.docs/03`).

@@ -40,7 +40,13 @@ Learning-process repo: turn a topic into a short video, or a short clip from a l
                       don't regenerate. Only run `scripts/gen-sfx-library.sh <dir>` if none exists.
 7. Author + render:    npx hyperframes init videos/<project> → index.html → npx hyperframes check → render
    (rules: PLAYBOOK-concept-to-video.md)
-8. Freeze recipe:      videos/<project>/.media/recipes/<name>/  (frame.md + recipe.json + skeletons)
+8. Captions (.srt):    python3 scripts/captions_srt.py <video> --json <video>.transcript.json
+                       word-timed Bahasa sidecar for YouTube; medium model takes ~14 min on this Mac,
+                       re-exporting the .json to .srt is instant. `--srt auto` in step 9 does this.
+9. Deliver to Telegram: scripts/telegram-deliver.sh <video> --srt auto --text <package.txt>
+                       ONE command = captions + video + .srt + title/description message.
+                       Creds from `.env` (`TELEGRAM_TOKEN`, `TELEGRAM_CHAT_ID`) — token never printed.
+10. Freeze recipe:      videos/<project>/.media/recipes/<name>/  (frame.md + recipe.json + skeletons)
 ```
 
 Full detail: [`PLAYBOOK-concept-to-video.md`](PLAYBOOK-concept-to-video.md).
@@ -55,6 +61,8 @@ Full detail: [`PLAYBOOK-concept-to-video.md`](PLAYBOOK-concept-to-video.md).
                       from any project that has it, or `scripts/gen-sfx-library.sh <dir>` if none
 5. Verify:            rerun lint, grep facts vs source, check asset paths
 6. Check → Studio → user approves → render (background nohup)
+7. Deliver:            `scripts/telegram-deliver.sh <clip> --srt auto --text <package.txt>`
+                       (same one-command delivery as TL;DR A step 9 — captions, clip, package text)
 ```
 
 Full detail: [`PLAYBOOK-longform-to-clip.md`](PLAYBOOK-longform-to-clip.md).
@@ -80,6 +88,10 @@ Full detail: [`PLAYBOOK-longform-to-clip.md`](PLAYBOOK-longform-to-clip.md).
   - `scripts/tts_piper.py` — Piper TTS / voice-clone runner (edit `lines` dict, run on Colab)
   - `scripts/tts_omnivoice.py` — OmniVoice zero-shot clone runner (upload lines + `ref-voice.m4a/.srt`, never edit code)
   - `scripts/gen-sfx-library.sh <dir>` — 19-sound offline SFX generator
+  - `scripts/captions_srt.py <media|transcript.json> -o out.srt [--json]` — word-timed Bahasa
+    caption sidecar (faster-whisper medium; `--json` keeps the word transcript for instant re-export)
+  - `scripts/telegram-deliver.sh <video> --srt auto --text <package.txt>` — the delivery step:
+    captions + video + .srt + title/description message to Telegram in one command
   - See `scripts/README.md` for quick-start commands + Piper API notes.
 - **VO samples:** `voices/*.m4a` — reference clips for voice cloning (Colab).
 - **YouTube skills (`/yt-*`)** — the 11-skill pack that writes the VO script, packages

@@ -47,6 +47,15 @@ colab stop -s <topic>-cpu
 #    the 19-file library, just copy it: cp -r videos/<existing>/assets/audio videos/<new>/
 #    Only regenerate if no project has it:
 #    scripts/gen-sfx-library.sh videos/<new>/assets/audio
+
+# 5. CAPTIONS + DELIVER (after npx hyperframes check + render succeed)
+#    One command = caption sidecar (.srt) + video + title/description text -> Telegram:
+scripts/telegram-deliver.sh videos/<project>/renders/<project>.mp4 \
+  --srt auto --text <package.txt>
+#    --srt auto runs scripts/captions_srt.py (faster-whisper, Bahasa): first run does the ASR
+#    (~14 min, medium model) and keeps <video>.transcript.json; later runs re-export .srt in 0.5s.
+#    --text sends the /yt-package output (titles, thumbnail brief, description, tags) above the files.
+#    Add --dry-run first to see exactly what would be sent. Creds: .env (TELEGRAM_TOKEN, TELEGRAM_CHAT_ID).
 ```
 
 See `PLAYBOOK-longform-to-clip.md` for the other production path (short clips cut from a long-form video: word-timed VO + ASS/SRT captions).

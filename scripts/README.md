@@ -28,6 +28,32 @@ colab exec -s karhutla-cpu -f scripts/caption_assets.py  # default blip-base (ne
 - `/tmp/run_git_base.py` — GIT-base coco (707MB, fastest, ~2s/img)
 - `/tmp/run_florence2_colab.py` — Florence-2-base (requires transformers==4.38, currently fails on Colab image 4.55 — needs kernel restart + pip install)
 - Original: `/tmp/caption_assets.py` — first BLIP-base run (44 images, captions-blip-base.json)
+- `scripts/captions_srt.py` — **post-render caption sidecar (runs locally, no Colab)**: faster-whisper → word-timed `.srt` + word-level `.json` transcript (the input HyperFrames captions consume). Default `--model medium --language id`.
+- `scripts/telegram-deliver.sh` — **delivery**: captions + video + title/description message → Telegram in one command (reads `.env`, never prints the token).
+
+## Delivery (post-render: captions → Telegram)
+
+The final two steps of every run (README TL;DR A steps 8–9):
+
+```bash
+# one command does it all: make the .srt, send the text package, then video + .srt
+scripts/telegram-deliver.sh videos/<project>/renders/<project>.mp4 \
+  --srt auto --text raws/<topic>/package.txt
+
+# pieces, if you want them separate
+python3 scripts/captions_srt.py <video> --json <video>.transcript.json   # .srt + word transcript
+scripts/telegram-deliver.sh <video> --srt <video>.srt --text <package.txt>
+scripts/telegram-deliver.sh <video> --dry-run                            # preview, sends nothing
+```
+
+- **Captions:** `faster-whisper medium` on CPU ≈ 14 min for a 72 s video; `--json` keeps the
+  words, so any later `.srt` re-export is 0.5 s (`--srt auto` reuses it only when it is newer
+  than the video). Cue rules: ≤5 words, ≤3.5 s, break on punctuation or a 0.6 s gap.
+- **Auth:** `.env` in the repo root → `TELEGRAM_TOKEN` + `TELEGRAM_CHAT_ID` (numeric id, no
+  prefix). The bot can only message a chat that has `/start`ed it first.
+- **Order:** text message first (so the package sits above the files), then documents.
+- **Limit:** Telegram bots cap uploads at 50 MB — renders above that need a YouTube/Drive link
+  in the text message instead.
 
 ## Results (29 Aug 2026, karhutla-cpu CPU)
 
