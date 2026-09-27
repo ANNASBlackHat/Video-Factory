@@ -156,6 +156,8 @@ JetBrains Mono, Source Code Pro, Noto Sans JP). Ref: hyperframes-creative/refere
 
 ## 8. QA gates checklist (every run)
 
+- [ ] **VO script passed `/yt-script`** before TTS: scored hook + retention beats, saved as
+      `raws/<topic>/VO-SCRIPT*.md`. Raw LLM prose in `tts-lines.json` = AI-slop on air (README step 4)
 - [ ] Factual audit: every number/name/date in composition greps true against source MDs
 - [ ] No invented company names, tickers, figures (agent fact-lock prompt + post audit)
 - [ ] All asset paths resolve (grep assets/img + assets/audio refs vs disk)

@@ -185,3 +185,7 @@ for old, new, exp in pairs:
 5. **Audit seams, not just scenes** — one hstack across each hard cut.
 6. **Docs record reversals** — when this run overturned doc 03's Piper rule, update the old doc
    too, or the next run will follow a dead rule.
+7. **Script structure before TTS** — the recurring failure across runs is AI-slop prose: flat
+   hook, no turn, no retention beats. Write every VO script with **`/yt-script`** (scored hooks
+   off 21 formulas) and save it as `raws/<topic>/VO-SCRIPT.md`; `tts-lines.json` is built from
+   *that*, never from a raw chat draft. See README step 4 + doc 04 step 0.

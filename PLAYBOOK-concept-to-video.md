@@ -19,7 +19,17 @@ colab exec -s <topic>-cpu -f scripts/caption_assets.py  # or /tmp/run_*.py wrapp
 colab download -s <topic>-cpu /content/captions-*.json raws/<topic>/
 colab stop -s <topic>-cpu
 
-# 4a. VO (Bahasa Indonesia) — pluggable runners (no code edits)
+# 4a. VO SCRIPT — write it with /yt-script BEFORE any TTS. This is a gate, not a suggestion.
+#   Why: every video whose script was raw LLM prose came back as AI-slop — flat hook,
+#   no turn, no reason to stay past second 15. The TTS engine reads whatever it is given.
+#     /yt-script <idea>  -> 5 hooks scored off 21 formulas -> spoken script + retention beats
+#   Skill: ~/.agents/skills/yt-*  (install recipe: README -> "Other reference")
+#   Voice profile: ~/.claude/youtube/voice.md  (copy templates/voice.md from that repo once,
+#   fill it in — every yt-* skill reads it; without it the skill asks for 3 of your videos)
+#   Save the approved script: raws/<topic>/VO-SCRIPT.md  (existing convention: VO-SCRIPT-*.txt,
+#   VIDEO-SCRIPT-*.md, *Script*.md)  ->  that file is what tts-lines.json is built from.
+
+# 4b. VO TTS (Bahasa Indonesia) — pluggable runners (no code edits)
 #   DEFAULT: OmniVoice (zero-shot clone of a voices/*.m4a):
 #     colab new -s <topic>-tts --gpu T4 ; colab install -s <topic>-tts omnivoice
 #     colab upload ... voices/female-medium-pace.m4a /content/ref-voice.m4a
@@ -33,7 +43,7 @@ colab stop -s <topic>-cpu
 #   Full recipe + voice transcripts + model URLs: .docs/04-tts-voice-playbook.md
 #   NOTE: write numbers in natural form ("65 miliar"); spelled-out words mangle TTS.
 
-# 4b. SFX: check existing first — if any videos/<project>/assets/audio/ already has
+# 4c. SFX: check existing first — if any videos/<project>/assets/audio/ already has
 #    the 19-file library, just copy it: cp -r videos/<existing>/assets/audio videos/<new>/
 #    Only regenerate if no project has it:
 #    scripts/gen-sfx-library.sh videos/<new>/assets/audio

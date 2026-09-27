@@ -63,6 +63,12 @@ Find the strongest 60-90s segment. Viral hooks for this genre:
 
 Pick ONE angle. Don't try to fit everything in.
 
+> **Score the opening line before you commit to it.** The table above is genre intuition;
+> `/yt-script`'s panel (or `python3 ~/.agents/skills/yt-script/hookscore.py --hook "..."`)
+> rates any hook off 21 formulas. The written first line — the one you overlay and the
+> caption that opens the Short — is a script, so it goes through `/yt-script` like every
+> other VO/overlay line. Raw LLM phrasing reads as AI-slop (README step 4).
+
 ### 3. B-Roll Strategy (this is the key trick)
 
 **The single biggest improvement over naive podcast clips:** extract B-roll from DIFFERENT timestamps of the same source video.

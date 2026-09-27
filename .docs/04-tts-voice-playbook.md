@@ -4,6 +4,15 @@
 and `scripts/tts_omnivoice.py` are now pluggable — you upload 2–4 small files and run them;
 the Python never changes.
 
+> **⚠️ Step 0 — the script itself.** TTS only reads what you hand it, and every video whose
+> script was raw LLM prose came back as **AI-slop**: a flat opening, no turn, nobody still
+> watching at second 15. So before anything on this page runs, write the script with
+> **`/yt-script`** (YouTube skills pack — install recipe in `README.md` → "Other reference").
+> It gives 5 hook options scored off 21 formulas, then the spoken script with retention beats,
+> in the voice from `~/.claude/youtube/voice.md`. Save the approved cut as
+> `raws/<topic>/VO-SCRIPT.md`; **that file**, not a chat transcript, is what `tts-lines.json`
+> is built from. Structure first, engine second.
+
 ## The two engines
 
 | Engine | `scripts/` file | How it works | When to use |

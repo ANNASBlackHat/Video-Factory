@@ -23,18 +23,24 @@ Learning-process repo: turn a topic into a short video, or a short clip from a l
 2. Expand + assets:    websearch + chrome-devtools → raws/<topic>/REPORT-*.md + assets-collected/
    (template: .docs/00-workflow-template.md §2–4)
 3. Captions (Colab):   scripts/caption_assets.py   (see PLAYBOOK-concept-to-video.md §3)
-4. VO:                 pluggable — put the script in raws/<topic>/tts-lines.json, run a runner:
+4. VO script:          **write it with `/yt-script` — this is a gate, not a suggestion.**
+                       One idea → 5 hook options scored off 21 formulas → the spoken script
+                       with retention beats marked, in your voice (`~/.claude/youtube/voice.md`).
+                       Why: every video written by pasting raw LLM prose into TTS came back
+                       as AI-slop with a flat structure. Never hand the LLM's first draft to
+                       the TTS engine. (skill install: "Other reference" below)
+5. VO (TTS):           pluggable — put THAT script in raws/<topic>/tts-lines.json, run a runner:
                        - OmniVoice (DEFAULT, clone of a voice): upload ref .m4a + matching .srt +
                          tts-lines.json → scripts/tts_omnivoice.py
                        - Piper (Bahasa fallback): upload tts-lines.json → scripts/tts_piper.py
                        (see .docs/04-tts-voice-playbook.md)
                        — OR user-supplied WAV(s) in videos/<project>/assets/vo/
-5. SFX:               **check existing first** — `ls videos/*/assets/audio/ | wc -l`; if any project
+6. SFX:               **check existing first** — `ls videos/*/assets/audio/ | wc -l`; if any project
                       has the 19-file library, copy it (`cp -r videos/<existing>/assets/audio .`),
                       don't regenerate. Only run `scripts/gen-sfx-library.sh <dir>` if none exists.
-6. Author + render:    npx hyperframes init videos/<project> → index.html → npx hyperframes check → render
+7. Author + render:    npx hyperframes init videos/<project> → index.html → npx hyperframes check → render
    (rules: PLAYBOOK-concept-to-video.md)
-7. Freeze recipe:      videos/<project>/.media/recipes/<name>/  (frame.md + recipe.json + skeletons)
+8. Freeze recipe:      videos/<project>/.media/recipes/<name>/  (frame.md + recipe.json + skeletons)
 ```
 
 Full detail: [`PLAYBOOK-concept-to-video.md`](PLAYBOOK-concept-to-video.md).
@@ -76,6 +82,16 @@ Full detail: [`PLAYBOOK-longform-to-clip.md`](PLAYBOOK-longform-to-clip.md).
   - `scripts/gen-sfx-library.sh <dir>` — 19-sound offline SFX generator
   - See `scripts/README.md` for quick-start commands + Piper API notes.
 - **VO samples:** `voices/*.m4a` — reference clips for voice cloning (Colab).
+- **YouTube skills (`/yt-*`)** — the 11-skill pack that writes the VO script, packages
+  title+thumbnail, cuts Shorts, reads retention. **Installed globally, not vendored here**
+  (so it stays out of the repo and keeps updating from upstream). Restore on a new machine:
+  ```bash
+  git clone --depth 1 https://github.com/Jakeschincariol/youtube-agent-skill.git /tmp/yas
+  cp -r /tmp/yas/skills/yt-* ~/.agents/skills/ && rm -rf /tmp/yas
+  ```
+  First use: copy `templates/voice.md` from that repo → `~/.claude/youtube/voice.md` and fill
+  it in (every `yt-*` skill reads it). The one that matters for this pipeline is
+  **`/yt-script`** — see TL;DR step 4.
 
 ## Structure
 
