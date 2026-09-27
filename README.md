@@ -10,6 +10,7 @@ Learning-process repo: turn a topic into a short video, or a short clip from a l
 |---|---|---|
 | [`PLAYBOOK-concept-to-video.md`](PLAYBOOK-concept-to-video.md) | **Build-from-nothing:** web-search the facts, freeze images, caption assets on Colab, author a HyperFrames composition from scratch. | You have only a topic; no pre-existing footage. |
 | [`PLAYBOOK-longform-to-clip.md`](PLAYBOOK-longform-to-clip.md) | **Cut-a-clip:** produce short vertical clips from a long-form source (word-timed VO, ASS/SRT captions, SFX library, 3-concept scaffold). | You already have a long video / recorded VO + captions to cut down. |
+| [`PLAYBOOK-podcast-to-short.md`](PLAYBOOK-podcast-to-short.md) | **Podcast → viral short:** cut a 60-90s vertical short from a long podcast/interview MP4 + transcript. | You have a long Indonesian podcast/interview and want one viral clip. |
 
 *More playbooks will be added here as new use-cases emerge — each is one repeatable process.*
 
@@ -81,9 +82,12 @@ Full detail: [`PLAYBOOK-longform-to-clip.md`](PLAYBOOK-longform-to-clip.md).
 ```
 PLAYBOOK-concept-to-video.md      # build-from-nothing process
 PLAYBOOK-longform-to-clip.md      # clip-from-longform process
+PLAYBOOK-podcast-to-short.md      # podcast/interview → viral vertical short
 README.md                         # THIS index
+AGENTS.md                         # agent router → starts here
 .docs/<n>-<topic>.md             # per-topic logs + lessons
-raws/<topic>/                    # research + assets + reports
+ideas/                            # loose motion/video idea notes (not yet playbooks)
+raws/<topic>/                     # research + assets + reports
 scripts/caption_assets.py        # image captioning (Colab)
 scripts/tts_piper.py            # Piper TTS / voice-clone runner (Colab)
 scripts/gen-sfx-library.sh      # SFX generator (reusable)

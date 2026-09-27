@@ -9,6 +9,7 @@ and the TL;DR for both workflows. This file only tells you *what to open when*.
 |---|---|
 | Build-from-nothing pipeline (research → assets → captions → VO → SFX → render) | [`PLAYBOOK-concept-to-video.md`](PLAYBOOK-concept-to-video.md) |
 | Cut clips from long-form footage | [`PLAYBOOK-longform-to-clip.md`](PLAYBOOK-longform-to-clip.md) |
+| Cut a viral vertical short from a podcast/interview MP4 + transcript | [`PLAYBOOK-podcast-to-short.md`](PLAYBOOK-podcast-to-short.md) |
 | TTS / voiceover (OmniVoice default, Piper fallback, **engine-specific number rules**) | [`.docs/04-tts-voice-playbook.md`](.docs/04-tts-voice-playbook.md) |
 | Hard-won lessons — read before the next run | [`.docs/07-lessons-evidence.md`](.docs/07-lessons-evidence.md) (newest) and [`.docs/03-purbaya-lessons-learned.md`](.docs/03-purbaya-lessons-learned.md) |
 

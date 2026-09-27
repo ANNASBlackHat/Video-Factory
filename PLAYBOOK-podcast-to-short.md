@@ -7,7 +7,7 @@ Reusable reference for cutting a viral vertical short from a long Indonesian pod
 
 ## Quick Start (what to tell the agent)
 
-> Read `videos/PODCAST-SHORT-WORKFLOW.md`. Here's my folder path:
+> Read `PLAYBOOK-podcast-to-short.md`. Here's my folder path:
 > `raws/<name>/` — it has an `.mp4` and a transcript `.txt`. Make a 60-90s viral vertical short.
 
 That's it. The agent handles everything below.

@@ -146,7 +146,7 @@ Bagi investor ritel maupun institusi, terdapat empat poin krusial yang memerluka
 
 ## 8. Rekomendasi Alur Produksi Video (Motion Graphics Blueprint)
 
-Berdasarkan aset visual yang telah diunduh di [`raws/ipo/assets/`](file:///Users/annasblackhat/Documents/Experiment/remotion-skill-experiments/raws/ipo/assets) dan indeks media di [`ASSETS_INDEX.md`](file:///Users/annasblackhat/Documents/Experiment/remotion-skill-experiments/raws/ipo/ASSETS_INDEX.md), video motion graphics dapat diproduksi dengan struktur 5 babak (Scene 1 s/d 5):
+Berdasarkan aset visual yang telah diunduh di [`raws/ipo/assets/`](assets/) dan indeks media di [`ASSETS_INDEX.md`](ASSETS_INDEX.md), video motion graphics dapat diproduksi dengan struktur 5 babak (Scene 1 s/d 5):
 
 1. **Scene 1: Hook & Fenomena Bursa (0–6 detik)**  
    * *Visual:* Live capture `e_ipo_index.png` + HUD Ticker `SWAP` + Badge "Syariah Healthcare" + Tanggal Listing 10 September 2026.
