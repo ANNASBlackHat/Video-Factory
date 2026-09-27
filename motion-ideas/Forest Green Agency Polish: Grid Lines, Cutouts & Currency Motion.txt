@@ -1,0 +1,95 @@
+**Title:** Forest Green Agency Polish: Grid Lines, Cutouts & Currency 
+Motion
+
+---
+
+### 1. Visual Theme & Layout Architecture
+
+* **Brand & Aesthetic:** High-end agency portfolio showcase 
+(@rovix.studios) using a light textured background, clean white rounded 
+cards, and vivid forest green accent typography (`#1B8C3E` / `#22C55E`).
+* **Side-by-Side Comparison Layout:** Left side displays the raw/budget 
+edit ("5$ Edit"), while the right primary container houses "Our Work" with 
+high-framerate kinetic cutouts and motion typography.
+* **Typography Blend:** Clean modern sans-serif paired with custom green 
+italic serif emphasis words (e.g., *"business tool"*, *"marketing"*).
+
+---
+
+### 2. Scene-by-Scene Motion Breakdown
+
+**00:00 - 00:02 | Technical Grid & 3D Rotating Gear**
+
+* **Background Grid Card:** A full white card emerges with technical 
+node-and-line vectors connecting in an asymmetrical modern grid pattern.
+* **Central 3D Gear Asset:**
+* **Entrance:** Spring scale pop (`scale: 0.8 -> 1.05 -> 1.0`).
+* **Idle Motion:** Continuous, smooth mechanical rotation along the Z-axis 
+(`transform: rotateZ(...)` ~45° per second).
+
+
+* **Kinetic Text:** Green bold headline *"business tool"* fades and slides 
+up with a subtle letter-spacing snap.
+
+**00:03 - 00:04 | Smartphone Hand Cutout & Click Cursor**
+
+* **Cutout Entrance:** High-resolution cutout of a hand holding a modern 
+smartphone slides up from the bottom edge (`translateY(60px) -> 0px`, with 
+elastic dampening).
+* **Floating Badges:** Instagram and Facebook icon pills hover on thin 
+connecting connector lines extending from the device.
+* **Cursor Tap:** A stylized yellow pointer arrow glides to the *"Social 
+Media"* header and executes a quick scale-down tap animation.
+
+**00:04 - 00:07 | Speaker Card Return & Highlight Captions**
+
+* **Transition:** Smooth cut/cross-fade back to the full talking-head 
+speaker card.
+* **Text Animation:** Dynamic center-locked captions where the primary 
+keyword (*"marketing"*) shifts into bold green cursive/italic serif 
+script.
+
+**00:08 - 00:11 | Blank Card Bridge & Punch Re-frame**
+
+* **Visual Breather:** The speaker is briefly replaced by a minimal white 
+card carrying transitional kinetic text (*"but also the"*), then cuts back 
+to an intensified medium close-up punch zoom on the speaker.
+
+**00:12 - 00:15 | Currency Cutout & Dollar Amount Pop**
+
+* **Layered Cutouts:** Realistic torn USD $100 bill slides horizontally 
+across the upper third.
+* **Cash Stack & Green Number Counter:**
+* Isometric stack of dollar bills slides in from bottom-left.
+* Oversized bold green amount (`$1,795`) pops in at the top with a spring 
+bounce (`scale: 0.7 -> 1.15 -> 1.0`).
+
+
+
+**00:15 - 00:17 | Minimalist Line-by-Line Type Reveal**
+
+* **Closing Typography:** Crisp black lower-third lines reveal 
+sequentially per syllable (*"for millions of people / to see your"*) over 
+the framed speaker.
+
+---
+
+### 3. Programmatic Motion Specs (For Remotion / Hyperframes)
+
+* **Continuous Gear Spin:**
+```javascript
+const rotation = (frame * 1.5) % 360;
+// style={{ transform: `rotate(${rotation}deg)` }}
+
+```
+
+
+* **Cutout Slide-Up Physics:** Fast cubic deceleration curve: 
+`Easing.bezier(0.16, 1, 0.3, 1)` across 12–14 frames at 30fps.
+* **Interactive Cursor Click Timeline:**
+* Frames 0–10: Interpolate `x, y` position along bezier path.
+* Frames 11–13: Scale down to `0.85`.
+* Frames 14–17: Spring back to `1.0`.
+
+
+

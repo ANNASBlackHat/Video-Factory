@@ -1,0 +1,782 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>PAPER TRAIL — Bedah IPO Saham SWAP</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #e6dfd0; }
+      body { font-family: "Inter", sans-serif; color: #141210; }
+      :root {
+        --ink: #141210;
+        --paper: #f6f3ec;
+        --card: #fffdf7;
+        --yellow: #ffd23f;
+        --blue: #2563eb;
+        --red: #c9402e;
+        --manila: #ecd2a0;
+        --manila-dark: #dfbe82;
+        --faint: #8a8177;
+      }
+      #root {
+        position: relative;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background:
+          radial-gradient(1200px 800px at 50% 6%, #fbf8f1 0%, rgba(251,248,241,0) 62%),
+          radial-gradient(1400px 1000px at 50% 102%, #ece4d3 0%, rgba(236,228,211,0) 58%),
+          var(--paper);
+      }
+      /* ---------- clip convention ---------- */
+      .clip { position: absolute; inset: 0; display: grid; place-items: center; }
+
+      /* ---------- font utilities ---------- */
+      .pf   { font-family: "Playfair Display", serif; }
+      .gm   { font-family: "EB Garamond", serif; }
+      .mono { font-family: "JetBrains Mono", monospace; font-variant-numeric: tabular-nums; }
+      .ab   { font-family: "Archivo Black", sans-serif; font-weight: 400; }
+      .osw  { font-family: "Oswald", sans-serif; }
+      .hand { font-family: "EB Garamond", serif; font-style: italic; font-weight: 700; }
+
+      /* ---------- paper components ---------- */
+      .card {
+        background: var(--card);
+        box-shadow: 0 26px 52px rgba(28,22,12,.20), 0 4px 12px rgba(28,22,12,.10);
+        border: 1px solid rgba(28,22,12,.07);
+        position: relative;
+      }
+      .tape {
+        position: absolute;
+        width: 148px; height: 42px;
+        background: linear-gradient(180deg, rgba(255,225,148,.78), rgba(246,209,124,.66));
+        box-shadow: 0 3px 8px rgba(28,22,12,.12);
+      }
+      .hl-y {
+        background: linear-gradient(100deg, transparent 3%, var(--yellow) 9%, var(--yellow) 91%, transparent 97%);
+        padding: .02em .18em;
+        -webkit-box-decoration-break: clone;
+        box-decoration-break: clone;
+      }
+      .pen-circle {
+        position: absolute;
+        border: 7px solid var(--red);
+        border-radius: 50%;
+        mix-blend-mode: multiply;
+        opacity: .92;
+      }
+      .stampbox {
+        display: inline-block;
+        font-family: "Archivo Black", sans-serif;
+        color: var(--red);
+        border: 6px solid var(--red);
+        border-radius: 14px;
+        padding: 10px 26px;
+        text-transform: uppercase;
+        letter-spacing: .1em;
+        background: rgba(255,255,255,.72);
+        mix-blend-mode: multiply;
+      }
+      .grain-overlay {
+        position: absolute; inset: 0;
+        z-index: 90;
+        pointer-events: none;
+        mix-blend-mode: multiply;
+        background-image:
+          repeating-linear-gradient(0deg,  rgba(30,24,16,.024) 0 1px, transparent 1px 3px),
+          repeating-linear-gradient(90deg, rgba(30,24,16,.017) 0 1px, transparent 1px 4px),
+          repeating-linear-gradient(45deg, rgba(30,24,16,.012) 0 2px, transparent 2px 7px),
+          radial-gradient(closest-side at 50% 50%, transparent 74%, rgba(87,66,38,.08) 100%);
+      }
+      .reg-cross { position: absolute; width: 26px; height: 26px; opacity: .45; z-index: 95; }
+      .reg-cross::before { content:""; position:absolute; left:11px; top:0; width:4px; height:26px; background:var(--red); }
+      .reg-cross::after  { content:""; position:absolute; top:11px; left:0; height:4px; width:26px; background:var(--red); }
+      /* bottom page-stack shadow */
+      .pagestack { position:absolute; left:0; bottom:0; width:100%; height:130px; z-index:4; pointer-events:none; }
+      .pagestack i { position:absolute; left:50%; transform:translateX(-50%); background:#efe9db; border-top:2px solid rgba(28,22,12,.09); box-shadow:0 -12px 26px rgba(28,22,12,.13); }
+
+      /* floating paper scraps */
+      .scrap { position:absolute; z-index:6; pointer-events:none; }
+      .scrap i { display:block; background:#fdfaf2; border:1px solid rgba(28,22,12,.06); box-shadow: 0 12px 24px rgba(28,22,12,.17); }
+
+      /* caption band */
+      .caption { position:absolute; left:0; right:0; top:1385px; display:flex; justify-content:center; z-index:70; pointer-events:none; }
+      .caption-pill {
+        max-width: 900px;
+        background: var(--ink);
+        color: #f6f3ec;
+        font-family: "EB Garamond", serif;
+        font-style: italic;
+        font-size: 58px;
+        line-height: 1.32;
+        padding: 24px 46px;
+        border-radius: 999px;
+        text-align: center;
+        box-shadow: 0 16px 34px rgba(20,18,16,.30);
+      }
+
+      /* SVG ink strokes that draw on (pathLength normalized) */
+      .draw { stroke-dasharray: 1; stroke-dashoffset: 1; fill: none; }
+
+      /* ledger ruled paper */
+      .ruled {
+        background-image: repeating-linear-gradient(180deg, transparent 0 56px, rgba(37,99,235,.14) 56px 58px);
+      }
+
+      /* thermal receipt zigzag */
+      .zigzag-bottom {
+        clip-path: polygon(0 0, 100% 0, 100% calc(100% - 22px),
+          96.67% 100%, 93.33% calc(100% - 22px), 90% 100%, 86.67% calc(100% - 22px),
+          83.33% 100%, 80% calc(100% - 22px), 76.67% 100%, 73.33% calc(100% - 22px),
+          70% 100%, 66.67% calc(100% - 22px), 63.33% 100%, 60% calc(100% - 22px),
+          56.67% 100%, 53.33% calc(100% - 22px), 50% 100%, 46.67% calc(100% - 22px),
+          43.33% 100%, 40% calc(100% - 22px), 36.67% 100%, 33.33% calc(100% - 22px),
+          30% 100%, 26.67% calc(100% - 22px), 23.33% 100%, 20% calc(100% - 22px),
+          16.67% 100%, 13.33% calc(100% - 22px), 10% 100%, 6.67% calc(100% - 22px),
+          3.33% 100%, 0 calc(100% - 22px));
+      }
+
+      /* calendar spiral holes */
+      .spiral { display:flex; justify-content:center; gap:38px; margin-top:-12px; }
+      .spiral b { width:22px; height:22px; border-radius:50%; background:#d9d2c2; box-shadow:inset 0 2px 4px rgba(28,22,12,.35), 0 1px 0 rgba(255,255,255,.8); }
+
+      /* wax seal */
+      .seal {
+        width: 190px; height: 190px;
+        border-radius: 47% 53% 51% 49% / 52% 48% 53% 47%;
+        background: radial-gradient(circle at 36% 32%, #e05a44 0%, #b33323 46%, #8c2114 78%, #77180d 100%);
+        box-shadow: 0 14px 28px rgba(120,20,10,.35), inset 0 4px 10px rgba(255,255,255,.22), inset 0 -8px 14px rgba(70,10,4,.5);
+        display:grid; place-items:center;
+        color:#ffe9dd;
+      }
+
+      /* checkbox squares */
+      .chk { width:64px; height:64px; border:7px solid var(--ink); border-radius:8px; flex:none; background:rgba(255,255,255,.85); }
+
+      /* magnifier glass */
+      #mag {
+        position:absolute; width:290px; height:290px; border-radius:50%;
+        border:10px solid var(--ink);
+        background: radial-gradient(circle at 38% 34%, rgba(255,255,255,.42), rgba(210,225,245,.16) 60%);
+        box-shadow: 0 18px 34px rgba(28,22,12,.25), inset 0 0 26px rgba(120,150,200,.18);
+      }
+      #mag::after { content:""; position:absolute; right:-58px; bottom:-44px; width:20px; height:150px; background:var(--ink); border-radius:10px; transform:rotate(-45deg); }
+/* @CSS */
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="63" data-width="1080" data-height="1920">
+      <!-- ===== PERSISTENT DECOR ===== -->
+      <div id="pagestack" class="clip" data-start="0" data-duration="63" data-track-index="1">
+        <div class="pagestack" aria-hidden="true">
+          <i style="width:1044px;height:44px;bottom:0;border-radius:10px 10px 0 0;"></i>
+          <i style="width:1002px;height:36px;bottom:38px;"></i>
+          <i style="width:962px;height:30px;bottom:68px;opacity:.85;"></i>
+        </div>
+      </div>
+      <div id="grain" class="clip" data-start="0" data-duration="63" data-track-index="2">
+        <div class="grain-overlay" aria-hidden="true"></div>
+        <div class="reg-cross" style="left:34px;top:40px;" aria-hidden="true"></div>
+        <div class="reg-cross" style="right:34px;top:40px;" aria-hidden="true"></div>
+        <div class="reg-cross" style="left:34px;bottom:190px;" aria-hidden="true"></div>
+        <div class="reg-cross" style="right:34px;bottom:190px;" aria-hidden="true"></div>
+      </div>
+
+      <div id="scrap1" class="scrap clip" data-start="2.2"   data-duration="0.85" data-track-index="3" data-layout-allow-overflow="true"><i style="width:120px;height:86px;"></i></div>
+      <div id="scrap2" class="scrap clip" data-start="10.3"  data-duration="0.8"  data-track-index="4" data-layout-allow-overflow="true"><i style="width:88px;height:120px;"></i></div>
+      <div id="scrap3" class="scrap clip" data-start="16.9"  data-duration="0.8"  data-track-index="5" data-layout-allow-overflow="true"><i style="width:130px;height:78px;"></i></div>
+      <div id="scrap4" class="scrap clip" data-start="23.9"  data-duration="0.8"  data-track-index="6" data-layout-allow-overflow="true"><i style="width:76px;height:110px;"></i></div>
+      <div id="scrap5" class="scrap clip" data-start="32.25" data-duration="0.8"  data-track-index="7" data-layout-allow-overflow="true"><i style="width:112px;height:82px;"></i></div>
+      <div id="scrap6" class="scrap clip" data-start="40.6"  data-duration="0.85" data-track-index="8" data-layout-allow-overflow="true"><i style="width:94px;height:126px;"></i></div>
+      <div id="scrap7" class="scrap clip" data-start="52.4"  data-duration="0.8"  data-track-index="9" data-layout-allow-overflow="true"><i style="width:124px;height:80px;"></i></div>
+
+      <!-- ===== S1 · HOOK (0–8) ===== -->
+      <section id="s1-headline" class="clip" data-start="0" data-duration="2.45" data-track-index="10" style="z-index:12;">
+        <div style="position:relative;text-align:center;width:100%;">
+          <div id="hl-kicker" class="mono" style="font-size:30px;letter-spacing:.32em;color:#8a8177;margin-bottom:42px;">BERKAS DIGOLAR • EDISI EMISI</div>
+          <h1 class="pf" style="font-weight:900;font-size:118px;line-height:1.06;letter-spacing:-.01em;">
+            <span id="hl-l1" style="display:inline-block;">PERTAMA<br/>KALINYA</span><br/>
+            <span id="hl-l2" style="display:inline-block;">DALAM SEJARAH</span>
+          </h1>
+          <div id="hl-rule" class="mono" style="margin-top:46px;font-size:26px;color:#c9402e;letter-spacing:.22em;">◉ BERKAS IPO DIBUKA</div>
+        </div>
+      </section>
+
+      <section id="s1-letterhead" class="clip" data-start="2.35" data-duration="2.55" data-track-index="10" style="z-index:12;">
+        <div id="lh-wrap" style="position:relative;">
+          <div id="lh-card" class="card ruled" style="width:900px;height:1010px;padding:64px 70px;display:flex;flex-direction:column;">
+            <div class="tape" style="top:-20px;left:-44px;transform:rotate(-7deg);"></div>
+            <div class="tape" style="top:-20px;right:-44px;transform:rotate(6deg);"></div>
+            <div class="mono" style="font-size:24px;letter-spacing:.24em;color:#8a8177;">EDISI KHUSUS — PASAR MODAL</div>
+            <img src="assets/img/ugm_logo.png" alt="UGM" style="height:250px;object-fit:contain;margin:26px auto 12px;display:block;" />
+            <hr style="border:none;height:6px;background:var(--ink);margin:16px 0 5px;" />
+            <hr style="border:none;height:2px;background:var(--ink);" />
+            <h2 class="pf" id="lh-headline" style="font-weight:700;font-size:74px;line-height:1.14;text-align:center;margin-top:44px;">Kampus UGM melepas anak usahanya</h2>
+            <p class="gm" id="lh-sub" style="font-size:42px;line-height:1.5;text-align:center;margin-top:30px;color:#3d382f;">Melalui penawaran umum perdana saham di Bursa Efek Indonesia.</p>
+            <div style="flex:1;"></div>
+            <div id="lh-foot" class="mono" style="font-size:23px;letter-spacing:.14em;color:#141210;text-align:center;">PT SWAYASA PRAKARSA TBK (SWAP) • VIA HOLDING GMUM</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="s1-folder" class="clip" data-start="4.9" data-duration="3.15" data-track-index="10" style="z-index:12;">
+        <div style="position:relative;">
+          <div id="fold-back" style="width:960px;height:1130px;background:var(--manila);border-radius:20px;box-shadow:0 30px 60px rgba(28,22,12,.25);"></div>
+          <div id="fold-tab" class="osw" style="position:absolute;top:-52px;left:56px;background:var(--manila-dark);padding:16px 54px;border-radius:14px 14px 0 0;font-weight:700;font-size:40px;letter-spacing:.08em;color:#3a2e18;">IPO SAHAM — SWAP</div>
+          <div id="swap-card" class="card" style="position:absolute;top:105px;left:105px;width:750px;height:905px;padding:52px;display:flex;flex-direction:column;align-items:center;">
+            <div class="tape" style="top:-22px;left:50%;margin-left:-74px;"></div>
+            <div class="mono" id="exhibit-a1" style="align-self:flex-start;font-size:23px;letter-spacing:.18em;color:#8a8177;">EKSHIBIT A-01</div>
+            <img src="assets/img/swap_logo_eipo.jpg" alt="SWAP e-IPO" style="width:100%;height:600px;object-fit:cover;border:2px solid rgba(28,22,12,.12);margin-top:26px;" />
+            <div class="gm" style="font-size:38px;font-style:italic;margin-top:28px;">Saham PT Swayasa Prakarsa Tbk</div>
+            <div class="pen-circle" id="swap-circle" style="width:200px;height:200px;right:-46px;top:-40px;transform:rotate(-10deg);"></div>
+          </div>
+          <div id="date-stamp" class="stampbox mono" style="position:absolute;bottom:52px;right:-30px;font-family:'JetBrains Mono',monospace;font-size:38px;letter-spacing:.06em;">10 SEPTEMBER 2026</div>
+        </div>
+      </section>
+
+      <!-- ===== S2 · PRODUCT (8–17) ===== -->
+      <section id="s2-note" class="clip" data-start="8" data-duration="2.5" data-track-index="11" style="z-index:13;">
+        <div style="position:relative;width:100%;text-align:center;">
+          <p class="hand" style="font-size:92px;line-height:1.25;color:var(--blue);">
+            <span class="wn">Produknya</span> <span class="wn">bukan</span><br/>
+            <span class="wn">kaleng-kaleng.</span>
+          </p>
+          <svg id="wn-squiggle" width="700" height="40" viewBox="0 0 700 40" style="margin-top:26px;">
+            <path d="M8 26 Q 60 6 116 24 T 232 24 T 348 24 T 464 24 T 580 24 T 692 22" pathLength="1" fill="none" stroke="#2563eb" stroke-width="11" stroke-linecap="round" class="draw"/>
+          </svg>
+          <div class="mono" id="wn-tag" style="margin-top:40px;font-size:27px;letter-spacing:.26em;color:#8a8177;">CATATAN MARGIN — HAL. 3</div>
+        </div>
+      </section>
+
+      <section id="s2-pol-a" class="clip" data-start="10.4" data-duration="3.35" data-track-index="11" style="z-index:13;">
+        <div id="polA-swing" style="position:relative;">
+          <div class="card" style="width:720px;padding:30px 30px 34px;">
+            <div class="tape" style="top:-20px;left:-38px;transform:rotate(-8deg);"></div>
+            <div class="tape" style="top:-20px;right:-38px;transform:rotate(8deg);"></div>
+            <img src="assets/img/surgery_medical_implant.jpg" alt="Implan otak" style="width:660px;height:660px;object-fit:cover;display:block;" />
+            <div class="hand" id="polA-cap" style="font-size:58px;color:var(--blue);text-align:center;margin-top:24px;">Implan otak</div>
+            <div class="mono" style="font-size:23px;letter-spacing:.2em;color:#8a8177;text-align:center;margin-top:6px;">FOTO LEMPIRAN #1</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="s2-pol-b" class="clip" data-start="13.7" data-duration="3.35" data-track-index="11" style="z-index:13;">
+        <div style="position:relative;">
+          <div class="card" id="polB-card" style="width:700px;padding:28px 28px 30px;">
+            <div class="tape" style="top:-20px;left:-36px;transform:rotate(-9deg);"></div>
+            <div class="tape" style="top:-20px;right:-36px;transform:rotate(9deg);"></div>
+            <img src="assets/img/gamacha_product_box.jpg" alt="Produk Gama-CHA" style="width:644px;height:644px;object-fit:cover;display:block;" />
+            <div class="mono" style="font-size:23px;letter-spacing:.2em;color:#8a8177;text-align:center;margin-top:22px;">FOTO LEMPIRAN #2 — GAMA-CHA</div>
+          </div>
+          <div id="halal-stamp" style="position:absolute;top:-120px;right:-150px;width:430px;height:430px;">
+            <div class="pen-circle" style="inset:0;transform:rotate(-12deg);"></div>
+            <div class="ab" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--red);font-size:46px;line-height:1.26;padding:52px;mix-blend-mode:multiply;">HALAL PERTAMA DI&nbsp;DUNIA</div>
+          </div>
+          <div id="import-note" class="card" style="position:absolute;bottom:-135px;left:-175px;width:540px;padding:34px 38px;background:#fdf6dc;">
+            <div class="gm" style="font-size:44px;line-height:1.3;">pengganti produk impor</div>
+            <div style="display:flex;align-items:center;gap:16px;margin-top:18px;">
+              <span style="width:54px;height:38px;border-radius:5px;overflow:hidden;display:inline-block;border:2px solid rgba(28,22,12,.25);"><span style="display:block;height:19px;background:#d0342c;"></span><span style="display:block;height:19px;background:#fff;"></span></span>
+              <span class="mono" style="font-size:24px;color:#8a8177;">PRODUK LOKAL • SERTIFIKAT HALAL</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== S3 · PROBLEM (17–28.96) ===== -->
+      <section id="s3-turn" class="clip" data-start="17" data-duration="2.25" data-track-index="12" style="z-index:14;">
+        <div id="s3-page" style="position:relative;text-align:center;width:100%;">
+          <div class="hand" id="s3-tapi" style="font-size:80px;color:#5d5750;">Tapi&hellip;</div>
+          <h2 class="pf" id="s3-masalah" style="font-weight:900;font-size:112px;line-height:1.08;margin-top:18px;">ini masalahnya.</h2>
+          <svg id="s3-underline" width="760" height="34" viewBox="0 0 760 34" style="margin-top:22px;">
+            <path d="M10 24 Q 100 8 210 20 T 420 22 T 640 20 T 750 24" pathLength="1" fill="none" stroke="#c9402e" stroke-width="13" stroke-linecap="round" class="draw"/>
+          </svg>
+        </div>
+      </section>
+
+      <section id="s3-chart" class="clip" data-start="19.25" data-duration="2.75" data-track-index="12" style="z-index:13;">
+        <div id="chart-card" class="card ruled" style="width:920px;height:900px;padding:56px 60px;border-left:10px solid #c9402e;">
+          <div class="mono" style="font-size:28px;letter-spacing:.2em;color:#141210;">BUKU BESAR — LABA BERSIH</div>
+          <div class="mono" style="font-size:23px;color:#8a8177;margin-top:8px;">PT SWAYASA PRAKARSA TBK (SWAP)</div>
+          <div style="position:relative;width:800px;height:470px;margin-top:30px;">
+            <svg width="800" height="470" viewBox="0 0 800 470">
+              <line x1="40" y1="20" x2="40" y2="430" stroke="#141210" stroke-width="4"/>
+              <line x1="40" y1="430" x2="770" y2="430" stroke="#141210" stroke-width="4"/>
+              <polyline points="60,80 220,150 360,170 520,280 750,400" pathLength="1" fill="none" stroke="#c9402e" stroke-width="13" stroke-linecap="round" stroke-linejoin="round" class="draw" id="chart-line"/>
+            </svg>
+            <div id="chart-val" class="pf hl-y" style="position:absolute;right:-10px;top:330px;font-weight:900;font-size:96px;">-59%</div>
+          </div>
+          <div id="anjlok" class="ab hand" style="position:absolute;top:130px;right:40px;color:#c9402e;font-size:84px;transform-origin:center;">Anjlok?!</div>
+        </div>
+      </section>
+
+      <section id="s3-receipt" class="clip" data-start="21.95" data-duration="2.2" data-track-index="12" style="z-index:13;">
+        <div id="receipt" class="card zigzag-bottom mono" style="width:760px;background:#fffefb;padding:58px 64px 88px;">
+          <div id="rc-row1" style="text-align:center;font-size:32px;font-weight:700;letter-spacing:.06em;">PT SWAYASA PRAKARSA TBK</div>
+          <div id="rc-row2" style="text-align:center;font-size:26px;color:#8a8177;margin-top:10px;">LAPORAN LABA RUGI (UNAUDITED)<br/>PERIODE : JAN–FEB 2026</div>
+          <hr style="border:none;border-top:4px dashed #b9b0a2;margin:28px 0;" />
+          <div id="rc-row3" style="display:flex;justify-content:space-between;font-size:30px;"><span>TREN LABA .......</span><span style="color:#c9402e;font-weight:700;">-59%</span></div>
+          <div id="rc-row4" style="display:flex;justify-content:space-between;font-size:30px;margin-top:16px;"><span>STATUS ..........</span><span style="color:#c9402e;font-weight:700;">RUGI</span></div>
+          <div id="rc-big" style="border:6px double #c9402e;margin-top:34px;padding:26px 20px;text-align:center;">
+            <div style="font-size:25px;color:#c9402e;letter-spacing:.14em;">RUGI BERSIH</div>
+            <div style="font-size:62px;font-weight:700;color:#c9402e;margin-top:6px;">Rp570.590.000</div>
+          </div>
+          <div id="rc-barcode" style="height:74px;margin-top:36px;background:repeating-linear-gradient(90deg,#141210 0 5px,transparent 5px 9px,#141210 9px 15px,transparent 15px 19px);"></div>
+          <div id="rc-thanks" style="text-align:center;font-size:27px;margin-top:26px;">*** MOHON DIPERIKSA KEMBALI ***</div>
+        </div>
+      </section>
+      <!-- ===== S3 · VALUATION (24.15–28.9) ===== -->
+      <section id="s3-val" class="clip" data-start="24.15" data-duration="4.75" data-track-index="16" style="z-index:14;" data-layout-allow-overflow="true">
+        <div style="position:relative;width:900px;top:-100px;">
+          <div id="exh-page" class="card ruled" style="width:900px;height:1060px;padding:62px 68px;background:#fbf7ee;">
+            <div class="mono" style="font-size:23px;letter-spacing:.2em;color:#8a8177;">PROSPEKTUS — LAMPIRAN II · RENCANA PENGGUNAAN DANA</div>
+            <hr style="border:none;height:5px;background:var(--ink);margin:22px 0 30px;" />
+            <p class="gm" style="font-size:31px;line-height:1.78;text-align:justify;color:#2e2921;">Bahwa Perseroan akan menerbitkan <b>323.000.000 lembar saham emissi baru</b> dengan nilai nominal Rp10,-- (sepuluh rupiah) per lembar saham dalam rangka Penawaran Umum Perdana bagi PT Swayasa Prakarsa Tbk. Bahwa rendemen penerbitan saham dimanfaatkan untuk pendanaan modal kerja, pembelian mesin produksi material tulang, serta pelunasan kewajiban kepada pemegang saham pengendali sebagaimana diatur pada Bab VI Prospektus ini. Seluruh rangkaian penawaran umum dilaksanakan melalui mekanisme bookbuilding di Bursa Efek Indonesia.</p>
+          </div>
+          <div id="mag" style="left:90px;top:140px;z-index:3;"></div>
+          <div id="val-callout" class="pf" style="position:absolute;left:0;top:596px;width:900px;text-align:center;font-weight:900;font-size:124px;line-height:1.04;color:var(--ink);z-index:4;"><span class="hl-y">VALUASI:<br/>105&times; LABA</span></div>
+          <div id="val-circle" class="pen-circle" style="width:560px;height:400px;left:180px;top:578px;z-index:5;"></div>
+        </div>
+      </section>
+
+      <!-- ===== S4 · USE OF FUNDS (28.95–40.75) ===== -->
+      <section id="s4-fund" class="clip" data-start="28.95" data-duration="3.45" data-track-index="13" style="z-index:14;">
+        <div style="position:relative;">
+          <div id="fund-card" class="card" style="width:900px;padding:44px 48px 52px;display:flex;gap:40px;align-items:center;">
+            <div class="tape" style="top:-20px;left:-40px;transform:rotate(-8deg);"></div>
+            <div class="tape" style="top:-20px;right:-40px;transform:rotate(8deg);"></div>
+            <img id="fund-photo" src="assets/img/rupiah_cash_real.jpg" alt="Tumpukan uang rupiah" style="width:330px;height:460px;object-fit:cover;border:2px solid rgba(28,22,12,.14);" />
+            <div style="flex:1;">
+              <div class="mono" style="font-size:22px;letter-spacing:.18em;color:#8a8177;">BUKTI SETOR — DANA KUMPULAN</div>
+              <svg id="tally" width="386" height="256" viewBox="0 0 368 250" style="margin-top:14px;display:block;">
+                <g stroke="#141210" stroke-width="7" stroke-linecap="round" fill="none">
+                  <path pathLength="1" class="draw" d="M12 8V70M28 8V70M44 8V70M60 8V70M6 60L66 18"/>
+                  <path pathLength="1" class="draw" d="M158 8V70M174 8V70M190 8V70M206 8V70M152 60L212 18"/>
+                  <path pathLength="1" class="draw" d="M304 8V70M320 8V70M336 8V70M352 8V70M298 60L358 18"/>
+                  <path pathLength="1" class="draw" d="M12 94V156M28 94V156M44 94V156M60 94V156M6 146L66 104"/>
+                  <path pathLength="1" class="draw" d="M158 94V156M174 94V156M190 94V156M206 94V156M152 146L212 104"/>
+                  <path pathLength="1" class="draw" d="M304 94V156M320 94V156M336 94V156M352 94V156M298 146L358 104"/>
+                  <path pathLength="1" class="draw" d="M12 180V242M28 180V242M44 180V242M60 180V242M6 232L66 190"/>
+                  <path pathLength="1" class="draw" d="M158 180V242M174 180V242M190 180V242M206 180V242M152 232L212 190"/>
+                  <path pathLength="1" class="draw" d="M304 180V242M320 180V242M336 180V242M352 180V242M298 232L358 190"/>
+                </g>
+              </svg>
+              <div id="fund-count" class="pf" style="font-weight:900;font-size:84px;margin-top:16px;letter-spacing:-.01em;">Rp0 MILIAR</div>
+              <div class="hand" id="fund-anno" style="font-size:33px;color:#5d5750;margin-top:8px;">dana pemimpin: Rp41,99–45,22 M</div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="s4-pie" class="clip" data-start="32.4" data-duration="4.95" data-track-index="13" style="z-index:13;" data-layout-allow-overflow="true">
+        <div id="pie-card" class="card" style="width:900px;padding:44px 40px 48px;">
+          <div class="mono" style="text-align:center;font-size:25px;letter-spacing:.22em;">ALOKASI DANA PENAWARAN UMUM</div>
+          <div style="position:relative;width:800px;height:620px;margin:8px auto 0;">
+            <svg width="800" height="620" viewBox="0 0 800 620">
+              <circle cx="400" cy="310" r="230" fill="rgba(28,22,12,.045)"/>
+              <path id="pie-y" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" style="fill:var(--yellow);fill-opacity:0;" stroke="#141210" stroke-width="6" stroke-linejoin="round" d="M400 310 L400 80 A230 230 0 0 1 541 491.7 Z"/>
+              <path id="pie-b" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" style="fill:var(--blue);fill-opacity:0;" stroke="#141210" stroke-width="6" stroke-linejoin="round" d="M400 310 L541 491.7 A230 230 0 0 1 181.2 381.1 Z"/>
+              <path id="pie-r" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" style="fill:var(--red);fill-opacity:0;" stroke="#141210" stroke-width="6" stroke-linejoin="round" d="M400 310 L181.2 381.1 A230 230 0 0 1 400 80 Z"/>
+            </svg>
+          </div>
+          <div id="pie-legend" style="display:flex;justify-content:center;gap:34px;margin-top:4px;">
+            <div class="lg" style="display:flex;align-items:center;gap:12px;"><span style="width:30px;height:30px;background:var(--yellow);border:4px solid #141210;border-radius:6px;flex:none;"></span><span class="mono" style="font-size:24px;">Modal Kerja 39,5%</span></div>
+            <div class="lg" style="display:flex;align-items:center;gap:12px;"><span style="width:30px;height:30px;background:var(--blue);border:4px solid #141210;border-radius:6px;flex:none;"></span><span class="mono" style="font-size:24px;">Capex 30,5%</span></div>
+            <div class="lg" style="display:flex;align-items:center;gap:12px;"><span style="width:30px;height:30px;background:var(--red);border:4px solid #141210;border-radius:6px;flex:none;"></span><span class="mono" style="font-size:24px;">Bayar Utang 30%</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="s4-flow" class="clip" data-start="37.35" data-duration="3.4" data-track-index="13" style="z-index:15;" data-layout-allow-overflow="true">
+        <div style="position:relative;width:920px;height:1010px;top:-95px;">
+          <div style="text-align:center;"><span id="flow-chip" class="mono" style="background:var(--ink);color:#f6f3ec;font-size:28px;letter-spacing:.14em;padding:16px 38px;border-radius:999px;display:inline-block;">DANA PUBLIK — Rp45 MILIAR</span></div>
+          <svg id="flow-arrow" width="360" height="480" viewBox="0 0 360 480" style="position:absolute;left:282px;top:78px;">
+            <path pathLength="1" class="draw" d="M180 12 C 148 158 208 290 213 414" stroke="#c9402e" stroke-width="16" stroke-linecap="round" fill="none"/>
+            <path id="arrow-head" pathLength="1" class="draw" d="M154 372 L215 446 L264 372" stroke="#c9402e" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
+          <div class="hand" id="flow-cap" style="position:absolute;left:56px;top:250px;font-size:40px;color:#5d5750;transform:rotate(-4deg);">&rarr; lunasi utang induk</div>
+          <div id="flow-folder" style="position:absolute;left:0;bottom:0;width:920px;height:440px;background:var(--manila);border-radius:22px;box-shadow:0 30px 60px rgba(28,22,12,.28);">
+            <div id="flow-tab" class="osw" style="position:absolute;top:-52px;left:60px;background:var(--manila-dark);padding:14px 46px;border-radius:14px 14px 0 0;font-weight:700;font-size:36px;letter-spacing:.06em;color:#3a2e18;">GMUM &amp; Yayasan UGM</div>
+            <div class="osw" style="position:absolute;inset:74px 40px 38px;border:5px dashed rgba(58,46,24,.4);border-radius:14px;display:grid;place-items:center;font-size:28px;color:rgba(58,46,24,.5);letter-spacing:.2em;">BERKAS KONSOLIDASI</div>
+          </div>
+          <svg id="flow-wedge" width="240" height="220" viewBox="0 0 240 220" style="position:absolute;left:356px;top:462px;z-index:2;">
+            <path d="M120 130 L120 16 A118 118 0 0 1 216 184 Z" fill="#c9402e" stroke="#141210" stroke-width="7" stroke-linejoin="round"/>
+          </svg>
+          <div id="flow-seal" class="seal" style="position:absolute;right:22px;bottom:24px;z-index:3;">
+            <div class="ab" style="font-size:38px;letter-spacing:.04em;transform:rotate(-8deg);text-align:center;line-height:1.12;">RED<br/>FLAG</div>
+          </div>
+        </div>
+      </section>
+      <!-- ===== S5 · THE VERDICT (40.76–52.5) ===== -->
+      <section id="s5-cards" class="clip" data-start="40.76" data-duration="3.54" data-track-index="14" style="z-index:14;">
+        <div style="position:relative;display:flex;gap:60px;align-items:flex-start;">
+          <div id="card-innov" class="card" style="width:400px;height:560px;padding:46px 40px;transform-origin:50% 14%;">
+            <div class="tape" style="top:-22px;left:50%;margin-left:-74px;"></div>
+            <div class="mono" style="font-size:22px;letter-spacing:.2em;color:#8a8177;">CATATAN #A</div>
+            <div class="pf" style="font-weight:700;font-size:78px;margin-top:20px;">Inovasi</div>
+            <div class="ab" style="font-size:116px;color:#1e7a46;margin-top:4px;">✓</div>
+            <div class="gm" style="font-size:52px;line-height:1.3;margin-top:10px;"><span class="hl-y">berharga</span></div>
+          </div>
+          <div id="card-harga" class="card" style="width:400px;height:560px;padding:46px 40px;transform-origin:50% 14%;background:#fbeee9;">
+            <div class="tape" style="top:-22px;left:50%;margin-left:-74px;"></div>
+            <div class="mono" style="font-size:22px;letter-spacing:.2em;color:#8a8177;">CATATAN #B</div>
+            <div class="pf" style="font-weight:700;font-size:78px;margin-top:20px;">Harga</div>
+            <div class="ab" style="font-size:116px;color:var(--red);margin-top:4px;">✗</div>
+            <div class="gm hand" style="font-size:52px;line-height:1.3;margin-top:10px;color:var(--red);">agresif</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="s5-price" class="clip" data-start="44.3" data-duration="4.7" data-track-index="14" style="z-index:14;" data-layout-allow-overflow="true">
+        <div style="position:relative;width:1080px;height:1920px;">
+          <svg id="exp-curve" width="1080" height="960" viewBox="0 0 1080 960" style="position:absolute;left:0;top:370px;">
+            <path id="exp-line" pathLength="1" class="draw" d="M30 920 C 300 900 540 850 700 720 C 845 606 946 420 1022 88" stroke="#c9402e" stroke-width="14" stroke-linecap="round" fill="none"/>
+            <path id="exp-head" pathLength="1" class="draw" d="M958 148 L1026 70 L1042 168" stroke="#c9402e" stroke-width="14" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <div id="tag-drop" style="position:absolute;left:50%;top:236px;margin-left:-420px;">
+            <div id="tag-swing" style="transform-origin:top center;">
+              <div style="width:6px;height:84px;background:var(--ink);margin:0 auto;"></div>
+              <div id="price-tag" class="card" style="width:840px;padding:50px 46px 52px;text-align:center;border-radius:26px;position:relative;">
+                <span style="position:absolute;left:50%;top:-8px;margin-left:-35px;width:64px;height:64px;border-radius:50%;background:var(--paper);border:9px solid var(--ink);display:inline-block;"></span>
+                <div class="mono" style="font-size:25px;letter-spacing:.24em;color:#8a8177;margin-top:36px;">HARGA PENAWARAN</div>
+                <div class="pf" style="font-weight:900;font-size:112px;margin-top:10px;">Rp130 – Rp140</div>
+                <div class="gm" style="font-size:44px;font-style:italic;color:#5d5750;margin-top:4px;">per lembar saham</div>
+              </div>
+              <div class="hand" id="pt-note" style="font-size:44px;color:#5d5750;text-align:center;margin-top:28px;">(butuh pertumbuhan luar biasa)</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="s5-big" class="clip" data-start="49" data-duration="3.5" data-track-index="14" style="z-index:16;">
+        <div style="text-align:center;position:relative;top:-60px;">
+          <h2 id="big-stmt" class="pf" style="font-weight:900;font-size:196px;line-height:1.02;letter-spacing:-.015em;">Super<br/><span style="color:var(--red);">Agresif.</span></h2>
+          <p id="big-note" class="gm" style="font-size:48px;font-style:italic;color:#5d5750;margin-top:42px;">(butuh pertumbuhan luar biasa)</p>
+        </div>
+      </section>
+      <!-- ===== S6 · LISTING & OUTRO (52.53–63) ===== -->
+      <section id="s6-listing" class="clip" data-start="52.53" data-duration="3.77" data-track-index="15" style="z-index:14;">
+        <div style="position:relative;top:-70px;text-align:center;">
+          <div id="cal-card" class="card" style="width:800px;padding:0 0 44px;">
+            <div class="spiral"><b></b><b></b><b></b><b></b><b></b><b></b></div>
+            <div class="mono" style="font-size:30px;letter-spacing:.34em;color:#8a8177;margin-top:4px;">SEPTEMBER 2026</div>
+            <hr style="border:none;height:3px;background:var(--ink);margin:24px 56px 10px;" />
+            <div class="mono" id="cal-days" style="display:flex;justify-content:center;gap:28px;font-size:25px;color:#b3aa9d;">
+              <span>SEN</span><span>SEL</span><span>RAB</span><span style="color:#141210;font-weight:700;">KAM</span><span>JUM</span><span>SAB</span><span>MIN</span>
+            </div>
+            <div style="position:relative;display:inline-block;margin-top:2px;">
+              <div id="cal-day" class="pf" style="font-weight:900;font-size:280px;line-height:1;">10</div>
+              <div id="cal-circle" class="pen-circle" style="width:320px;height:320px;left:-16px;top:-8px;"></div>
+            </div>
+            <div class="mono" style="font-size:29px;letter-spacing:.3em;color:#141210;">KAMIS</div>
+            <div id="listing-stamp" class="stampbox" style="font-size:44px;margin-top:24px;">LISTING</div>
+          </div>
+          <div id="listing-logos" class="card" style="display:flex;align-items:center;justify-content:center;gap:44px;padding:20px 48px;width:fit-content;margin:50px auto 0;">
+            <img src="assets/img/idx_logo.png" alt="Bursa Efek Indonesia" style="height:92px;object-fit:contain;" />
+            <span class="mono" style="font-size:30px;color:#b3aa9d;">&times;</span>
+            <img src="assets/img/ojk_logo.png" alt="OJK" style="height:92px;object-fit:contain;" />
+          </div>
+        </div>
+      </section>
+
+      <section id="s6-poll" class="clip" data-start="56.3" data-duration="4.05" data-track-index="15" style="z-index:14;">
+        <div id="ballot" class="card" style="width:860px;padding:56px 64px 46px;">
+          <div class="mono" style="font-size:23px;letter-spacing:.26em;color:#8a8177;text-align:center;">LEMBAR SUARA PEMEGANG SAHAM RETAIL</div>
+          <hr style="border:none;border-top:6px double var(--ink);margin:30px 0 0;" />
+          <div id="poll-a" style="display:flex;align-items:center;gap:32px;margin-top:42px;">
+            <span class="chk" id="chk-a"></span>
+            <span class="gm" style="font-size:58px;">Ikutan pesan</span>
+          </div>
+          <div id="poll-b" style="display:flex;align-items:center;gap:32px;margin-top:32px;">
+            <span class="chk" id="chk-b"></span>
+            <span class="gm" style="font-size:58px;color:#5d5750;">Skip dulu</span>
+          </div>
+          <hr style="border:none;border-top:6px double var(--ink);margin:42px 0 0;" />
+          <div class="mono" style="font-size:21px;color:#8a8177;margin-top:18px;text-align:right;">SWAP • PENAWARAN UMUM PERDANA 2026</div>
+        </div>
+      </section>
+
+      <section id="s6-end" class="clip" data-start="60.35" data-duration="2.65" data-track-index="15" style="z-index:15;">
+        <div id="end-card" class="card ruled" style="width:880px;height:720px;padding:64px 70px;display:flex;flex-direction:column;">
+          <div class="tape" style="top:-20px;left:-42px;transform:rotate(-8deg);"></div>
+          <div class="tape" style="top:-20px;right:-42px;transform:rotate(7deg);"></div>
+          <div class="mono" style="font-size:24px;letter-spacing:.26em;color:#8a8177;">BEDAH IPO • EDISI EMISI</div>
+          <h2 id="end-headline" class="pf" style="font-weight:700;font-size:86px;line-height:1.18;margin-top:32px;">Follow &#9656;<br/>Bedah IPO berikutnya</h2>
+          <div style="flex:1;"></div>
+          <svg id="end-flourish" width="560" height="130" viewBox="0 0 560 130">
+            <path pathLength="1" class="draw" d="M16 96 C 66 22 100 18 90 68 C 82 106 140 98 178 58 C 198 38 188 86 220 86 C 252 86 262 44 288 50 C 318 58 328 92 356 80 C 400 62 408 96 544 76" fill="none" stroke="#141210" stroke-width="8" stroke-linecap="round"/>
+          </svg>
+          <hr style="border:none;height:3px;background:var(--ink);margin:6px 0 14px;" />
+          <div class="mono" id="end-foot" style="font-size:21px;letter-spacing:.14em;color:#8a8177;">TANDA TANGAN REDAKSI — SAMPAI JUMPA DI PROSPEKTUS BERIKUTNYA</div>
+        </div>
+      </section>
+      <!-- ===== BURNED-IN CAPTIONS (0–63) ===== -->
+      <section id="cap-1" class="clip" data-start="0.03" data-duration="2.32" data-track-index="20"><div class="caption"><div class="caption-pill">Untuk pertama kalinya dalam sejarah,</div></div></section>
+      <section id="cap-2" class="clip" data-start="2.39" data-duration="2.16" data-track-index="21"><div class="caption"><div class="caption-pill">kampus UGM resmi lepas anak usahanya</div></div></section>
+      <section id="cap-3" class="clip" data-start="4.59" data-duration="2.41" data-track-index="22"><div class="caption"><div class="caption-pill">ke bursa efek lewat IPO saham SWAP.</div></div></section>
+      <section id="cap-4" class="clip" data-start="8.27" data-duration="1.93" data-track-index="23"><div class="caption"><div class="caption-pill">Produknya bukan kaleng-kaleng.</div></div></section>
+      <section id="cap-5" class="clip" data-start="10.25" data-duration="2.1" data-track-index="24"><div class="caption"><div class="caption-pill">Mereka bikin implan otak dan material tulang halal</div></div></section>
+      <section id="cap-6" class="clip" data-start="12.37" data-duration="3.9" data-track-index="25"><div class="caption"><div class="caption-pill">pertama di dunia, pengganti produk impor.</div></div></section>
+      <section id="cap-7" class="clip" data-start="17.01" data-duration="1.89" data-track-index="26"><div class="caption"><div class="caption-pill">Tapi ini masalahnya.</div></div></section>
+      <section id="cap-8" class="clip" data-start="18.97" data-duration="3.43" data-track-index="20"><div class="caption"><div class="caption-pill">Di saat labanya anjlok 59%</div></div></section>
+      <section id="cap-9" class="clip" data-start="22.47" data-duration="1.52" data-track-index="21"><div class="caption"><div class="caption-pill">dan rugi di awal 2 bulan Rp570 juta,</div></div></section>
+      <section id="cap-10" class="clip" data-start="24.07" data-duration="3.83" data-track-index="22"><div class="caption"><div class="caption-pill">saham ini dijual dengan valuasi setembus 105 kali laba.</div></div></section>
+      <section id="cap-11" class="clip" data-start="28.96" data-duration="2.49" data-track-index="23"><div class="caption"><div class="caption-pill">Gak cuma itu,</div></div></section>
+      <section id="cap-12" class="clip" data-start="31.5" data-duration="1.96" data-track-index="24"><div class="caption"><div class="caption-pill">dari dana 45 miliar yang dikumpulkan,</div></div></section>
+      <section id="cap-13" class="clip" data-start="33.8" data-duration="2.7" data-track-index="25"><div class="caption"><div class="caption-pill">12 miliar atau 30 persennya ternyata</div></div></section>
+      <section id="cap-14" class="clip" data-start="36.52" data-duration="3.33" data-track-index="26"><div class="caption"><div class="caption-pill">dipakai buat melunasi utang ke induknya sendiri.</div></div></section>
+      <section id="cap-15" class="clip" data-start="40.76" data-duration="2.24" data-track-index="20"><div class="caption"><div class="caption-pill">Maka inovasinya memang berharga,</div></div></section>
+      <section id="cap-16" class="clip" data-start="43.06" data-duration="4.34" data-track-index="21"><div class="caption"><div class="caption-pill">tapi harga penawarannya 130–140 rupiah</div></div></section>
+      <section id="cap-17" class="clip" data-start="47.45" data-duration="4.29" data-track-index="22"><div class="caption"><div class="caption-pill">menuntut ekspektasi pertumbuhan yang super agresif.</div></div></section>
+      <section id="cap-18" class="clip" data-start="52.53" data-duration="2.45" data-track-index="23"><div class="caption"><div class="caption-pill">Saham SWAP listing 10 September ini.</div></div></section>
+      <section id="cap-19" class="clip" data-start="55.35" data-duration="2.12" data-track-index="24"><div class="caption"><div class="caption-pill">Kamu bakal ikutan pesan atau skip dulu?</div></div></section>
+      <section id="cap-20" class="clip" data-start="57.95" data-duration="2.45" data-track-index="25"><div class="caption"><div class="caption-pill">Tulis analisismu di komentar</div></div></section>
+      <section id="cap-21" class="clip" data-start="60.42" data-duration="2.53" data-track-index="26"><div class="caption"><div class="caption-pill">dan follow untuk bedah IPO berikutnya.</div></div></section>
+
+      <!-- ===== AUDIO — VO + SFX (unique ids, one lane per clip) -->
+      <audio id="vo" class="clip" src="assets/audio/voiceover.wav" data-start="0" data-track-index="30"></audio>
+      <audio id="aud-page_flip-0.05" src="assets/audio/sfx/page_flip.wav" data-start="0.05" data-duration="0.235" data-track-index="40"></audio>
+      <audio id="aud-page_flip-2.42" src="assets/audio/sfx/page_flip.wav" data-start="2.42" data-duration="0.235" data-track-index="41"></audio>
+      <audio id="aud-page_flip-8.02" src="assets/audio/sfx/page_flip.wav" data-start="8.02" data-duration="0.235" data-track-index="42"></audio>
+      <audio id="aud-page_flip-10.42" src="assets/audio/sfx/page_flip.wav" data-start="10.42" data-duration="0.235" data-track-index="43"></audio>
+      <audio id="aud-page_flip-13.72" src="assets/audio/sfx/page_flip.wav" data-start="13.72" data-duration="0.235" data-track-index="44"></audio>
+      <audio id="aud-page_flip-17.02" src="assets/audio/sfx/page_flip.wav" data-start="17.02" data-duration="0.235" data-track-index="45"></audio>
+      <audio id="aud-page_flip-24.17" src="assets/audio/sfx/page_flip.wav" data-start="24.17" data-duration="0.235" data-track-index="46"></audio>
+      <audio id="aud-page_flip-40.78" src="assets/audio/sfx/page_flip.wav" data-start="40.78" data-duration="0.235" data-track-index="47"></audio>
+      <audio id="aud-page_flip-44.32" src="assets/audio/sfx/page_flip.wav" data-start="44.32" data-duration="0.235" data-track-index="48"></audio>
+      <audio id="aud-page_flip-52.55" src="assets/audio/sfx/page_flip.wav" data-start="52.55" data-duration="0.235" data-track-index="49"></audio>
+      <audio id="aud-pen_scratch-8.35" src="assets/audio/sfx/pen_scratch.wav" data-start="8.35" data-duration="0.32" data-track-index="50"></audio>
+      <audio id="aud-pen_scratch-19.35" src="assets/audio/sfx/pen_scratch.wav" data-start="19.35" data-duration="0.32" data-track-index="51"></audio>
+      <audio id="aud-pen_scratch-26.65" src="assets/audio/sfx/pen_scratch.wav" data-start="26.65" data-duration="0.32" data-track-index="52"></audio>
+      <audio id="aud-pen_scratch-29.1" src="assets/audio/sfx/pen_scratch.wav" data-start="29.1" data-duration="0.32" data-track-index="53"></audio>
+      <audio id="aud-pen_scratch-61.35" src="assets/audio/sfx/pen_scratch.wav" data-start="61.35" data-duration="0.32" data-track-index="54"></audio>
+      <audio id="aud-stamp_thud-6.55" src="assets/audio/sfx/stamp_thud.wav" data-start="6.55" data-duration="0.45" data-track-index="55"></audio>
+      <audio id="aud-stamp_thud-14.7" src="assets/audio/sfx/stamp_thud.wav" data-start="14.7" data-duration="0.45" data-track-index="56"></audio>
+      <audio id="aud-stamp_thud-26.1" src="assets/audio/sfx/stamp_thud.wav" data-start="26.1" data-duration="0.45" data-track-index="57"></audio>
+      <audio id="aud-stamp_thud-49.05" src="assets/audio/sfx/stamp_thud.wav" data-start="49.05" data-duration="0.45" data-track-index="58"></audio>
+      <audio id="aud-typewriter_key-20.7" src="assets/audio/sfx/typewriter_key.wav" data-start="20.7" data-duration="0.3" data-track-index="59"></audio>
+      <audio id="aud-typewriter_key-22.5" src="assets/audio/sfx/typewriter_key.wav" data-start="22.5" data-duration="0.3" data-track-index="60"></audio>
+      <audio id="aud-typewriter_key-23.0" src="assets/audio/sfx/typewriter_key.wav" data-start="23.0" data-duration="0.3" data-track-index="61"></audio>
+      <audio id="aud-typewriter_key-31.85" src="assets/audio/sfx/typewriter_key.wav" data-start="31.85" data-duration="0.3" data-track-index="62"></audio>
+      <audio id="aud-typewriter_key-56.5" src="assets/audio/sfx/typewriter_key.wav" data-start="56.5" data-duration="0.3" data-track-index="63"></audio>
+      <audio id="aud-paper_rustle-4.92" src="assets/audio/sfx/paper_rustle.wav" data-start="4.92" data-duration="0.38" data-track-index="64"></audio>
+      <audio id="aud-paper_rustle-22.02" src="assets/audio/sfx/paper_rustle.wav" data-start="22.02" data-duration="0.38" data-track-index="65"></audio>
+      <audio id="aud-paper_rustle-36.1" src="assets/audio/sfx/paper_rustle.wav" data-start="36.1" data-duration="0.38" data-track-index="66"></audio>
+      <audio id="aud-paper_rustle-37.42" src="assets/audio/sfx/paper_rustle.wav" data-start="37.42" data-duration="0.38" data-track-index="67"></audio>
+      <audio id="aud-paper_rustle-60.4" src="assets/audio/sfx/paper_rustle.wav" data-start="60.4" data-duration="0.38" data-track-index="68"></audio>
+      <audio id="aud-seal_pop-39.5" src="assets/audio/sfx/seal_pop.wav" data-start="39.5" data-duration="0.16" data-track-index="69"></audio>
+      <audio id="aud-soft_riser-32.42" src="assets/audio/sfx/soft_riser.wav" data-start="32.42" data-duration="2.3" data-track-index="70"></audio>
+      <audio id="aud-soft_riser-44.4" src="assets/audio/sfx/soft_riser.wav" data-start="44.4" data-duration="2.3" data-track-index="71"></audio>
+    </div>
+    <script>
+      window.__timelines = window.__timelines || {};
+      (function () {
+        var tl = gsap.timeline({ paused: true });
+
+        // Every timed visual clip starts hidden immediately (not via the
+        // timeline, so frame 0 renders the correct pre-roll state).
+        gsap.utils.toArray("#root section.clip, #root .scrap").forEach(function (el) {
+          el.style.visibility = "hidden";
+        });
+
+        // Reveal a scene at t0, run its entrance, fade/kill it at t1.
+        function scene(sel, t0, t1, enter) {
+          tl.set(sel, { visibility: "visible" }, t0);
+          if (enter) enter(t0);
+          var fo = Math.min(0.3, (t1 - t0) * 0.3);
+          tl.to(sel, { y: -30, opacity: 0, duration: fo, ease: "power2.in" }, t1 - fo);
+          tl.set(sel, { visibility: "hidden" }, t1);
+        }
+
+        // ---------- floating paper scraps ----------
+        [["#scrap1", 2.2, 0.85], ["#scrap2", 10.3, 0.8], ["#scrap3", 16.9, 0.8],
+         ["#scrap4", 23.9, 0.8], ["#scrap5", 32.25, 0.8], ["#scrap6", 40.6, 0.85],
+         ["#scrap7", 52.4, 0.8]].forEach(function (s, i) {
+          tl.set(s[0], { visibility: "visible" }, s[1]);
+          tl.fromTo(s[0], { y: -420, x: (i % 2 ? -170 : 170), rotation: ((i * 37) % 50) - 25, opacity: 0 },
+            { y: 0, x: 0, rotation: (i % 2 ? 9 : -9), opacity: 1, duration: 0.45, ease: "power2.out" }, s[1]);
+          tl.to(s[0], { y: 44, rotation: "+=7", opacity: 0, duration: 0.28, ease: "power1.in" }, s[1] + s[2] - 0.28);
+        });
+
+        // ===== S1 · HOOK =====
+        scene("#s1-headline", 0, 2.45, function () {
+          tl.fromTo("#hl-kicker", { y: 26, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "power2.out" }, 0.08);
+          tl.fromTo("#hl-l1", { y: 130, opacity: 0, rotate: -3 }, { y: 0, opacity: 1, rotate: 0, duration: 0.7, ease: "back.out(1.2)" }, 0.22);
+          tl.fromTo("#hl-l2", { y: 130, opacity: 0, rotate: 3 }, { y: 0, opacity: 1, rotate: 0, duration: 0.7, ease: "back.out(1.2)" }, 0.42);
+          tl.fromTo("#hl-rule", { scale: 0.4, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.45, ease: "back.out(2)" }, 0.95);
+        });
+
+        scene("#s1-letterhead", 2.35, 4.9, function () {
+          tl.fromTo("#lh-card", { y: 240, rotate: 2.5, opacity: 0 }, { y: 0, rotate: 0, opacity: 1, duration: 0.7, ease: "power3.out" }, 2.45);
+          tl.fromTo("#lh-headline", { y: 46, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "power2.out" }, 3.05);
+          tl.fromTo("#lh-sub", { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "power2.out" }, 3.3);
+          tl.fromTo("#lh-foot", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 3.65);
+        });
+
+        scene("#s1-folder", 4.9, 8.05, function () {
+          tl.fromTo("#fold-back", { y: -560, opacity: 0 }, { y: 0, opacity: 1, duration: 0.55, ease: "power3.out" }, 4.95);
+          tl.fromTo("#fold-tab", { x: -90, opacity: 0 }, { x: 0, opacity: 1, duration: 0.4, ease: "power2.out" }, 5.15);
+          tl.fromTo("#swap-card", { y: 360, opacity: 0 }, { y: 0, opacity: 1, duration: 0.65, ease: "back.out(1.1)" }, 5.35);
+          tl.fromTo("#exhibit-a1", { opacity: 0 }, { opacity: 1, duration: 0.35 }, 5.85);
+          tl.fromTo("#date-stamp", { scale: 3, opacity: 0, rotate: -24 }, { scale: 1, opacity: 1, rotate: -6, duration: 0.38, ease: "expo.out" }, 6.55);
+          tl.fromTo("#swap-circle", { scale: 2, opacity: 0, rotate: 0 }, { scale: 1, opacity: 0.92, rotate: -10, duration: 0.35, ease: "power3.out" }, 6.95);
+        });
+
+        // ===== S2 · PRODUCT =====
+        scene("#s2-note", 8, 10.5, function () {
+          tl.fromTo("#s2-note .wn", { y: 76, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45, stagger: 0.14, ease: "power2.out" }, 8.12);
+          tl.to("#wn-squiggle .draw", { strokeDashoffset: 0, duration: 0.6, ease: "none" }, 8.85);
+          tl.fromTo("#wn-tag", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 9.55);
+        });
+
+        scene("#s2-pol-a", 10.4, 13.75, function () {
+          tl.fromTo("#polA-swing", { y: -520, rotate: -5, opacity: 0 }, { y: 0, rotate: 0, opacity: 1, duration: 0.6, ease: "power3.out" }, 10.48);
+          tl.to("#polA-swing", { rotate: 1.3, duration: 0.62, yoyo: true, repeat: 2, ease: "sine.inOut" }, 11.25);
+          tl.fromTo("#polA-cap", { clipPath: "inset(0% 100% 0% 0%)", opacity: 1 }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.7, ease: "none" }, 11.4);
+        });
+
+        scene("#s2-pol-b", 13.7, 17.05, function () {
+          tl.fromTo("#polB-card", { y: -480, rotate: 3, opacity: 0 }, { y: 0, rotate: 0, opacity: 1, duration: 0.6, ease: "power3.out" }, 13.78);
+          tl.fromTo("#halal-stamp", { scale: 2.8, opacity: 0, rotate: 12 }, { scale: 1, opacity: 1, rotate: 0, duration: 0.34, ease: "expo.out" }, 14.7);
+          tl.fromTo("#import-note", { x: -430, y: 120, opacity: 0 }, { x: 0, y: 0, opacity: 1, duration: 0.5, ease: "power2.out" }, 15.25);
+        });
+
+        // ===== S3 · PROBLEM =====
+        scene("#s3-turn", 17, 19.25, function () {
+          tl.fromTo("#s3-tapi", { y: 34, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45, ease: "power2.out" }, 17.1);
+          tl.fromTo("#s3-masalah", { y: 100, opacity: 0 }, { y: 0, opacity: 1, duration: 0.55, ease: "power3.out" }, 17.35);
+          tl.to("#s3-underline .draw", { strokeDashoffset: 0, duration: 0.5, ease: "none" }, 18.05);
+        });
+
+        scene("#s3-chart", 19.25, 22, function () {
+          tl.fromTo("#chart-card", { y: 300, rotate: 1.5, opacity: 0 }, { y: 0, rotate: 0, opacity: 1, duration: 0.6, ease: "power3.out" }, 19.32);
+          tl.to("#chart-line", { strokeDashoffset: 0, duration: 1.05, ease: "none" }, 19.95);
+          tl.fromTo("#anjlok", { scale: 1.7, opacity: 0, rotate: 8 }, { scale: 1, opacity: 1, rotate: -4, duration: 0.35, ease: "expo.out" }, 20.4);
+          tl.to("#anjlok", { rotation: 4, duration: 0.28, yoyo: true, repeat: 2, ease: "sine.inOut" }, 21.0);
+          tl.fromTo("#chart-val", { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.4, ease: "back.out(2)" }, 21.0);
+        });
+
+        scene("#s3-receipt", 21.95, 24.15, function () {
+          tl.fromTo("#receipt", { y: -800 }, { y: 0, duration: 0.65, ease: "power2.out" }, 22.02);
+          tl.fromTo("#receipt > div", { opacity: 0, y: 22 }, { opacity: 1, y: 0, duration: 0.28, stagger: 0.09, ease: "power1.out" }, 22.65);
+          tl.to("#rc-big", { backgroundColor: "#fdecea", duration: 0.22, yoyo: true, repeat: 1 }, 23.3);
+        });
+
+        // S3 · VALUATION
+        scene("#s3-val", 24.15, 28.9, function () {
+          tl.fromTo("#exh-page", { y: 280, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: "power3.out" }, 24.22);
+          // magnifier drifts across the fine print
+          tl.fromTo("#mag", { x: -240, y: -320 }, { x: -60, y: -240, duration: 1.05, ease: "none" }, 24.5);
+          tl.to("#mag", { x: 150, y: -300, duration: 1.05, ease: "none" }, 25.55);
+          tl.to("#mag", { x: 290, y: -130, duration: 1.05, ease: "none" }, 26.6);
+          // giant callout slides in, red pen-circle stamps around it
+          tl.fromTo("#val-callout", { x: 580, opacity: 0 }, { x: 0, opacity: 1, duration: 0.45, ease: "power3.out" }, 26.15);
+          tl.fromTo("#val-circle", { scale: 2.2, opacity: 0, rotate: 8 }, { scale: 1, opacity: 0.92, rotate: -7, duration: 0.3, ease: "power3.out" }, 26.7);
+        });
+
+        // ===== S4 · USE OF FUNDS =====
+        var fc = { v: 0 };
+        scene("#s4-fund", 28.95, 32.4, function () {
+          tl.fromTo("#fund-card", { y: 260, rotate: -2, opacity: 0 }, { y: 0, rotate: 0, opacity: 1, duration: 0.55, ease: "power3.out" }, 29.02);
+          tl.fromTo("#fund-photo", { clipPath: "inset(0% 0% 100% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.55, ease: "power2.out" }, 29.4);
+          tl.to("#tally .draw", { strokeDashoffset: 0, duration: 0.14, stagger: 0.16, ease: "none" }, 29.55);
+          tl.to(fc, { v: 45, duration: 2.15, ease: "power1.inOut",
+            onUpdate: function () {
+              var n = document.getElementById("fund-count");
+              if (n) n.textContent = "Rp" + Math.round(fc.v) + " MILIAR";
+            } }, 29.65);
+          tl.fromTo("#fund-anno", { y: 22, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: "power2.out" }, 30.4);
+        });
+
+        // S4 · PIE — wedges draw in sequence; the red wedge tears off up-right
+        scene("#s4-pie", 32.4, 37.35, function () {
+          tl.fromTo("#pie-card", { y: 260, opacity: 0 }, { y: 0, opacity: 1, duration: 0.55, ease: "power3.out" }, 32.47);
+          [["#pie-y", 33.05], ["#pie-b", 33.95], ["#pie-r", 34.85]].forEach(function (w) {
+            tl.to(w[0], { strokeDashoffset: 0, duration: 0.45, ease: "none" }, w[1]);
+            tl.to(w[0], { fillOpacity: 0.85, duration: 0.3, ease: "power1.out" }, w[1] + 0.42);
+          });
+          tl.fromTo("#pie-legend .lg", { y: 26, opacity: 0 }, { y: 0, opacity: 1, duration: 0.35, stagger: 0.85, ease: "power2.out" }, 33.35);
+          tl.set("#pie-r", { transformOrigin: "50% 50%" }, 32.5);
+          tl.to("#pie-r", { x: 250, y: -190, rotation: 12, duration: 0.85, ease: "power2.in" }, 35.9);
+        });
+
+        // S4 · FLOW — torn wedge lands in the GMUM folder, wax seal slams
+        scene("#s4-flow", 37.35, 40.75, function () {
+          tl.fromTo("#flow-chip", { y: -40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: "power2.out" }, 37.48);
+          tl.fromTo("#flow-folder", { y: 380, opacity: 0 }, { y: 0, opacity: 1, duration: 0.55, ease: "power3.out" }, 37.42);
+          tl.fromTo("#flow-wedge", { x: -470, y: -720, rotate: -30, opacity: 0 }, { x: 0, y: 0, rotate: -7, opacity: 1, duration: 0.72, ease: "power2.in" }, 37.9);
+          tl.to("#flow-wedge", { y: -14, duration: 0.13, yoyo: true, repeat: 1, ease: "power1.out" }, 38.62);
+          tl.fromTo("#flow-cap", { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.4, ease: "power2.out" }, 38.4);
+          tl.to("#flow-arrow .draw:not(#arrow-head)", { strokeDashoffset: 0, duration: 0.55, ease: "none" }, 38.55);
+          tl.to("#arrow-head", { strokeDashoffset: 0, duration: 0.25, ease: "none" }, 39.12);
+          tl.fromTo("#flow-seal", { scale: 2.8, opacity: 0, rotate: 18 }, { scale: 1, opacity: 1, rotate: 0, duration: 0.32, ease: "expo.out" }, 39.52);
+        });
+
+        // ===== S5 · THE VERDICT =====
+        scene("#s5-cards", 40.76, 44.3, function () {
+          tl.fromTo("#card-innov", { y: -480, rotate: -4, opacity: 0 }, { y: 0, rotate: 0, opacity: 1, duration: 0.55, ease: "power3.out" }, 40.84);
+          tl.fromTo("#card-harga", { y: -520, rotate: 4, opacity: 0 }, { y: 0, rotate: 0, opacity: 1, duration: 0.55, ease: "power3.out" }, 40.94);
+          tl.to("#card-innov", { rotation: 2.6, duration: 0.55, yoyo: true, repeat: 3, ease: "sine.inOut" }, 41.6);
+          tl.to("#card-harga", { rotation: -2.6, duration: 0.55, yoyo: true, repeat: 3, ease: "sine.inOut" }, 41.87);
+        });
+
+        scene("#s5-price", 44.3, 49, function () {
+          tl.fromTo("#tag-drop", { y: -760, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: "power2.out" }, 44.36);
+          tl.to("#tag-swing", { rotation: 4, duration: 0.85, yoyo: true, repeat: 3, ease: "sine.inOut" }, 45.05);
+          tl.to("#exp-line", { strokeDashoffset: 0, duration: 1.15, ease: "power1.in" }, 45.5);
+          tl.to("#exp-head", { strokeDashoffset: 0, duration: 0.25, ease: "none" }, 46.65);
+          tl.fromTo("#pt-note", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 47.0);
+        });
+
+        scene("#s5-big", 49, 52.5, function () {
+          tl.fromTo("#big-stmt", { scale: 3.1, opacity: 0, rotate: 6 }, { scale: 1, opacity: 1, rotate: -1, duration: 0.38, ease: "expo.out" }, 49.06);
+          tl.fromTo("#big-note", { opacity: 0 }, { opacity: 1, duration: 0.45 }, 50.25);
+        });
+
+        // ===== S6 · LISTING & OUTRO =====
+        scene("#s6-listing", 52.53, 56.3, function () {
+          tl.fromTo("#cal-card", { y: 260, rotate: 1.5, opacity: 0 }, { y: 0, rotate: 0, opacity: 1, duration: 0.55, ease: "power3.out" }, 52.6);
+          tl.fromTo("#cal-card .spiral b", { scale: 0 }, { scale: 1, duration: 0.25, stagger: 0.05, ease: "back.out(2)" }, 53.1);
+          tl.fromTo("#cal-days", { opacity: 0 }, { opacity: 1, duration: 0.35 }, 53.35);
+          tl.fromTo("#cal-day", { scale: 0.4, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.45, ease: "back.out(1.6)" }, 53.55);
+          tl.fromTo("#cal-circle", { scale: 1.9, opacity: 0, rotate: 8 }, { scale: 1, opacity: 0.92, rotate: -6, duration: 0.3, ease: "power3.out" }, 54.05);
+          tl.fromTo("#listing-stamp", { scale: 3, opacity: 0, rotate: -26 }, { scale: 1, opacity: 1, rotate: -5, duration: 0.35, ease: "expo.out" }, 54.55);
+          tl.fromTo("#listing-logos", { y: 130, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "power3.out" }, 54.95);
+        });
+
+        scene("#s6-poll", 56.3, 60.35, function () {
+          tl.fromTo("#ballot", { y: 320, opacity: 0 }, { y: 0, opacity: 1, duration: 0.55, ease: "power3.out" }, 56.38);
+          tl.fromTo("#poll-a", { x: -90, opacity: 0 }, { x: 0, opacity: 1, duration: 0.4, ease: "power2.out" }, 56.62);
+          tl.fromTo("#poll-b", { x: -90, opacity: 0 }, { x: 0, opacity: 1, duration: 0.4, ease: "power2.out" }, 56.88);
+          tl.to("#chk-a", { scale: 1.16, borderColor: "#2563eb", duration: 0.4, yoyo: true, repeat: 5, ease: "sine.inOut" }, 57.15);
+          tl.to("#chk-b", { scale: 1.16, borderColor: "#c9402e", duration: 0.4, yoyo: true, repeat: 5, ease: "sine.inOut" }, 57.95);
+        });
+
+        scene("#s6-end", 60.35, 63, function () {
+          tl.fromTo("#end-card", { y: 240, rotate: -1.5, opacity: 0 }, { y: 0, rotate: 0, opacity: 1, duration: 0.5, ease: "power3.out" }, 60.42);
+          tl.fromTo("#end-headline", { y: 46, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45, ease: "power2.out" }, 60.75);
+          tl.to("#end-flourish .draw", { strokeDashoffset: 0, duration: 0.78, ease: "power1.inOut" }, 61.35);
+          tl.fromTo("#end-foot", { opacity: 0 }, { opacity: 1, duration: 0.35 }, 62.0);
+        });
+
+        // ===== BURNED-IN CAPTIONS — band pills across 0–63s =====
+        [["cap-1", 0.03, 2.32], ["cap-2", 2.39, 2.16], ["cap-3", 4.59, 2.41],
+         ["cap-4", 8.27, 1.93], ["cap-5", 10.25, 2.10], ["cap-6", 12.37, 3.90],
+         ["cap-7", 17.01, 1.89], ["cap-8", 18.97, 3.43], ["cap-9", 22.47, 1.52],
+         ["cap-10", 24.07, 3.83], ["cap-11", 28.96, 2.49], ["cap-12", 31.50, 1.96],
+         ["cap-13", 33.80, 2.70], ["cap-14", 36.52, 3.33], ["cap-15", 40.76, 2.24],
+         ["cap-16", 43.06, 4.34], ["cap-17", 47.45, 4.29], ["cap-18", 52.53, 2.45],
+         ["cap-19", 55.35, 2.12], ["cap-20", 57.95, 2.45], ["cap-21", 60.42, 2.53]
+        ].forEach(function (c) {
+          var el = "#" + c[0], t = c[1], d = c[2];
+          tl.set(el, { visibility: "visible" }, t);
+          tl.fromTo(el + " .caption-pill", { y: 34, opacity: 0 }, { y: 0, opacity: 1, duration: 0.24, ease: "power2.out" }, t + 0.02);
+          tl.to(el + " .caption-pill", { y: -20, opacity: 0, duration: 0.22, ease: "power2.in" }, t + d - 0.24);
+          tl.set(el, { visibility: "hidden" }, t + d);
+        });
+
+        window.__timelines["main"] = tl;
+      })();
+    </script>
+  </body>
+</html>

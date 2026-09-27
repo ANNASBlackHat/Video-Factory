@@ -1,0 +1,13 @@
+{
+  "id": "anthropic-ipo-evidence",
+  "lines": [
+    {"id": "scene_1", "text": "Juni lalu, perusahaan di balik Claude diam-diam mengirim draft S-1 ke regulator Amerika. Tanpa angka, tanpa tanggal."},
+    {"id": "scene_2", "text": "Yang beredar cuma satu: Oktober, valuasi 2 triliun dolar. Kalau jadi, IPO terbesar dalam sejarah."},
+    {"id": "scene_3", "text": "Tapi tanggalnya mundur. 4 September, Reuters melaporkan roadshow bergeser ke pertengahan Oktober."},
+    {"id": "scene_4", "text": "18 September, Wall Street Journal melaporkan targetnya kini November. Dua kali mundur dalam 6 minggu."},
+    {"id": "scene_5", "text": "Alasannya teknis: bankir ingin laporan kuartal 3 yang tuntas sebelum menentukan harga — sebelum debat kelambatan AI memanas."},
+    {"id": "scene_6", "text": "EDGAR masih kosong. Dokumen wajib terbuka 15 hari sebelum roadshow. Tanpa itu: tidak ada kode saham, tidak ada jumlah lembar, tidak ada rentang harga."},
+    {"id": "scene_7", "text": "Tapi permintaannya justru naik: hingga 100 miliar dolar. Sementara imbal hasil obligasi 30 tahun menyentuh 5,44 persen — tertinggi dalam 22 tahun."},
+    {"id": "scene_8", "text": "Jadi: angkanya 2 triliun. Tanggalnya belum ada. Sampai dokumen itu muncul di EDGAR, yang kita punya cuma janji."}
+  ]
+}

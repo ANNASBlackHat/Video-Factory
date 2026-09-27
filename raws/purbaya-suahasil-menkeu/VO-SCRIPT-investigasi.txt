@@ -1,0 +1,28 @@
+# VO Script — Investigasi Purbaya (Indonesian, ~65s)
+
+**Tone:** broadcast investigation, fast-paced, serious. Female medium-pace voice.
+**Total target:** ~65s. Each scene = 1 VO block.
+
+## Scene 1 — Hook (0-8s, ~8s VO)
+
+"Pagi masih rapat di DPD. Sore, dicopot dari kursi menteri keuangan. Purbaya Yudhi Sadewa resmi diganti Suahasil Nazara, lewat Keppres 97 P, tahun 2026."
+
+## Scene 2 — Mechanism (8-20s, ~12s VO)
+
+"Tujuh alasan utama. Pertama, koordinasi internal Kemenkeu jebol: mutasi ratusan pejabat eselon dua ditolak Dirjen Pajak dan Bea Cukai. Kedua, restitusi pajak ditahan di semua sektor. Ketiga, dividen Danantara 120 triliun diprotes. Keempat, friksi terbuka dengan Bank Indonesia soal likuiditas."
+
+## Scene 3 — History (20-30s, ~10s VO)
+
+"Setahun enam hari menjabat, Purbaya menggantikan Sri Mulyani sejak 8 September 2025. Sekarang ia digantikan Suahasil, yang sudah 7 tahun di kementerian keuangan."
+
+## Scene 4 — Policy Numbers (30-42s, ~12s VO)
+
+"Dampak kebijakannya nyata: 200 triliun saldo anggaran lebih digelontorkan ke bank himbara, pertumbuhan ekonomi naik ke 5 koma 6 persen. Tapi rupiah anjrah ke 18 ribu 15 per dolar, dan Moody's memotong outlook ke negatif."
+
+## Scene 5 — Suahasil (42-55s, ~13s VO)
+
+"Siapa Suahasil? Doktor ekonomi lulusan Illinois, guru besar UI, pernah pimpin badan kebijakan fiskal, dan wakil menteri keuangan sejak 2019. Arahan Prabowo: jaga kesehatan dan kredibilitas keuangan negara, defisit di bawah 3 persen."
+
+## Scene 6 — Close (55-65s, ~10s VO)
+
+"Purbaya baru mengunggah TikTok: udah siap belum? Video itu ditonton hampir 5 juta kali. Pasar menanti: apakah kursi bendahara negara benar-benar sudah tenang, atau cuma pergantian yang kedua di tahun ini?"

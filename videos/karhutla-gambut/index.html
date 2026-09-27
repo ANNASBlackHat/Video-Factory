@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1080, height=1920">
+    <title>INI BUKAN MUSIBAH ALAM — Karhutla Gambut Kalimantan</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #12100e; }
+      body { font-family: "Oswald", sans-serif; color: #fff; }
+      #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: #12100e; }
+      .clip { position: absolute; left: 0; top: 0; }
+      .full { width: 100%; height: 100%; overflow: hidden; position: relative; }
+      .si { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; will-change: transform, opacity; }
+      .black-display { font-family: "Archivo Black", sans-serif; }
+      .mono { font-family: "JetBrains Mono", monospace; font-variant-numeric: tabular-nums; }
+      .kicker { display: inline-block; font-family: "Oswald", sans-serif; font-weight: 700; font-size: 34px; letter-spacing: .18em; text-transform: uppercase; color: #ffb199; background: rgba(18,16,14,.72); border: 2px solid rgba(255,90,31,.55); border-radius: 999px; padding: 12px 30px; }
+      .big { font-family: "Archivo Black", sans-serif; text-transform: uppercase; line-height: 1.02; letter-spacing: .01em; text-shadow: 0 14px 60px rgba(0,0,0,.75); }
+      .stamp { display: inline-block; transform-origin: center; color: #ff2438; border: 7px double #ff2438; border-radius: 12px; padding: 18px 34px; font-family: "Oswald", sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; line-height: 1.05; background: rgba(225,29,46,.08); box-shadow: inset 0 0 34px rgba(225,29,46,.28), 0 18px 50px rgba(0,0,0,.6); }
+      .chip { display: inline-block; font-family: "JetBrains Mono", monospace; font-weight: 700; font-size: 44px; padding: 16px 30px; border: 3px solid #ff5a1f; color: #ffd9c9; background: rgba(18,16,14,.82); border-radius: 12px; }
+      .dark-grad { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(18,16,14,.15) 0%, rgba(18,16,14,.35) 55%, rgba(18,16,14,.88) 100%); }
+      .vign { position: absolute; inset: 0; background: radial-gradient(130% 100% at 50% 45%, transparent 55%, rgba(0,0,0,.5) 100%); pointer-events: none; }
+      .center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+      .ember { background: radial-gradient(circle, #ffd9a0 0%, #ff5a1f 45%, rgba(255,90,31,0) 72%); border-radius: 50%; }
+      #capWrap { position: absolute; left: 60px; right: 60px; bottom: 340px; text-align: center; z-index: 40; }
+      #capWrap .seg { display: none; justify-content: center; flex-wrap: wrap; gap: 8px 10px; }
+      #capWrap .seg.on { display: flex; }
+      #capWrap .wd { font-family: "Oswald", sans-serif; font-weight: 700; font-size: 56px; line-height: 1.12; padding: 4px 14px; border-radius: 10px; color: #f5ede6; background: rgba(10,9,8,.55); }
+      #capWrap .wd.seen { color: #fff; background: rgba(10,9,8,.78); }
+      #capWrap .wd.act { color: #12100e; background: #ff5a1f; }
+      #progTrack { position: absolute; left: 60px; right: 60px; top: 60px; height: 8px; background: rgba(255,255,255,.14); border-radius: 99px; z-index: 41; }
+      #progBar { position: absolute; left: 0; top: 0; height: 100%; width: 0%; background: #ff5a1f; border-radius: 99px; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="156.2" data-width="1080" data-height="1920" data-fps="30">
+      <!-- AUDIO -->
+      <audio id="vo" src="assets/audio/voiceover.wav" data-start="0" data-track-index="10"></audio>
+      <audio id="bed" src="assets/audio/bed_dark.wav" data-start="0" data-duration="129.5" data-volume="0.55" data-track-index="11"></audio>
+      <audio id="hope" src="assets/audio/bed_hope.wav" data-start="128.55" data-duration="27.65" data-volume="0.7" data-track-index="13"></audio>
+      <audio id="fx1" src="assets/audio/sfx/deep_hit.wav" data-start="0" data-duration="0.9" data-track-index="12"></audio>
+      <audio id="fx2" src="assets/audio/sfx/bass_riser.wav" data-start="3.2" data-duration="2.5" data-track-index="12"></audio>
+      <audio id="fx3" src="assets/audio/sfx/whoosh_hard.wav" data-start="6.5" data-duration="0.5" data-track-index="12"></audio>
+      <audio id="fx4" src="assets/audio/sfx/ui_blip.wav" data-start="7.6" data-duration="0.15" data-track-index="12"></audio>
+      <audio id="fx5" src="assets/audio/sfx/ui_blip.wav" data-start="8.1" data-duration="0.15" data-track-index="12"></audio>
+      <audio id="fx6" src="assets/audio/sfx/strobe_hit.wav" data-start="9.6" data-duration="0.7" data-track-index="12"></audio>
+      <audio id="fx7" src="assets/audio/sfx/tick_counter.wav" data-start="11.2" data-duration="1.1" data-track-index="12"></audio>
+      <audio id="fx8" src="assets/audio/sfx/whoosh_hard.wav" data-start="14.0" data-duration="0.5" data-track-index="12"></audio>
+      <audio id="fx9" src="assets/audio/sfx/stamp_thud.wav" data-start="16.6" data-duration="0.6" data-track-index="12"></audio>
+      <audio id="fx10" src="assets/audio/sfx/whoosh_hard.wav" data-start="18.95" data-duration="0.5" data-track-index="12"></audio>
+      <audio id="fx11" src="assets/audio/sfx/pen_scratch.wav" data-start="22.0" data-duration="0.8" data-track-index="12"></audio>
+      <audio id="fx12" src="assets/audio/sfx/whoosh_hard.wav" data-start="26.5" data-duration="0.5" data-track-index="12"></audio>
+      <audio id="fx13" src="assets/audio/sfx/ui_blip.wav" data-start="31.6" data-duration="0.15" data-track-index="12"></audio>
+      <audio id="fx14" src="assets/audio/sfx/ui_blip.wav" data-start="32.3" data-duration="0.15" data-track-index="12"></audio>
+      <audio id="fx15" src="assets/audio/sfx/ui_blip.wav" data-start="33.0" data-duration="0.15" data-track-index="12"></audio>
+      <audio id="fx16" src="assets/audio/sfx/whoosh_hard.wav" data-start="34.7" data-duration="0.5" data-track-index="12"></audio>
+      <audio id="fx17" src="assets/audio/sfx/riser_tension.wav" data-start="37.5" data-duration="2.8" data-track-index="12"></audio>
+      <audio id="fx18" src="assets/audio/sfx/deep_hit.wav" data-start="40.3" data-duration="0.9" data-track-index="12"></audio>
+      <audio id="fx19" src="assets/audio/sfx/stamp_thud.wav" data-start="43.8" data-duration="0.6" data-track-index="12"></audio>
+      <audio id="fx20" src="assets/audio/sfx/whoosh_hard.wav" data-start="45.3" data-duration="0.5" data-track-index="12"></audio>
+      <audio id="fx21" src="assets/audio/sfx/tick_loop.wav" data-start="48.2" data-duration="1.1" data-track-index="12"></audio>
+      <audio id="fx22" src="assets/audio/sfx/stamp_thud.wav" data-start="51.9" data-duration="0.6" data-track-index="12"></audio>
+      <audio id="fx23" src="assets/audio/sfx/tick_counter.wav" data-start="55.3" data-duration="1.1" data-track-index="12"></audio>
+      <audio id="fx24" src="assets/audio/sfx/confirm_click.wav" data-start="59.8" data-duration="0.2" data-track-index="12"></audio>
+      <audio id="fx25" src="assets/audio/sfx/stamp_thud.wav" data-start="61.7" data-duration="0.6" data-track-index="12"></audio>
+      <audio id="fx26" src="assets/audio/sfx/glitch_stutter.wav" data-start="65.4" data-duration="0.48" data-track-index="12"></audio>
+      <audio id="fx27" src="assets/audio/sfx/soft_riser.wav" data-start="74.4" data-duration="2.4" data-track-index="12"></audio>
+      <audio id="fx28" src="assets/audio/sfx/deep_hit.wav" data-start="77.29" data-duration="0.9" data-track-index="12"></audio>
+      <audio id="fx29" src="assets/audio/sfx/strobe_hit.wav" data-start="86.9" data-duration="0.55" data-track-index="12"></audio>
+      <audio id="fx30" src="assets/audio/sfx/typewriter_key.wav" data-start="87.55" data-duration="0.2" data-track-index="12"></audio>
+      <audio id="fx31" src="assets/audio/sfx/stamp_thud.wav" data-start="92.1" data-duration="0.6" data-track-index="12"></audio>
+      <audio id="fx32" src="assets/audio/sfx/stamp_thud.wav" data-start="94.3" data-duration="0.6" data-track-index="12"></audio>
+      <audio id="fx33" src="assets/audio/sfx/whoosh_hard.wav" data-start="98.2" data-duration="0.5" data-track-index="12"></audio>
+      <audio id="fx34" src="assets/audio/sfx/whoosh_hard.wav" data-start="101.65" data-duration="0.5" data-track-index="12"></audio>
+      <audio id="fx35" src="assets/audio/sfx/deep_hit.wav" data-start="105.4" data-duration="0.9" data-track-index="12"></audio>
+      <audio id="fx36" src="assets/audio/sfx/glitch_stutter.wav" data-start="109.8" data-duration="0.48" data-track-index="12"></audio>
+      <audio id="fx37" src="assets/audio/sfx/bass_riser.wav" data-start="112.3" data-duration="2.5" data-track-index="12"></audio>
+      <audio id="fx38" src="assets/audio/sfx/deep_hit.wav" data-start="114.8" data-duration="0.9" data-track-index="12"></audio>
+      <audio id="fx39" src="assets/audio/sfx/stamp_thud.wav" data-start="120.8" data-duration="0.6" data-track-index="12"></audio>
+      <audio id="fx40" src="assets/audio/sfx/alarm_buzzer.wav" data-start="123.2" data-duration="0.82" data-track-index="12"></audio>
+      <audio id="fx41" src="assets/audio/sfx/stamp_thud.wav" data-start="126.0" data-duration="0.6" data-track-index="12"></audio>
+      <audio id="fx42" src="assets/audio/sfx/confirm_click.wav" data-start="128.6" data-duration="0.2" data-track-index="12"></audio>
+      <audio id="fx43" src="assets/audio/sfx/seal_pop.wav" data-start="137.0" data-duration="0.4" data-track-index="12"></audio>
+      <audio id="fx44" src="assets/audio/sfx/seal_pop.wav" data-start="139.2" data-duration="0.4" data-track-index="12"></audio>
+      <audio id="fx45" src="assets/audio/sfx/seal_pop.wav" data-start="141.4" data-duration="0.4" data-track-index="12"></audio>
+      <audio id="fx46" src="assets/audio/sfx/seal_pop.wav" data-start="143.6" data-duration="0.4" data-track-index="12"></audio>
+      <audio id="fx47" src="assets/audio/sfx/whoosh_hard.wav" data-start="147.3" data-duration="0.5" data-track-index="12"></audio>
+      <audio id="fx48" src="assets/audio/sfx/deep_hit.wav" data-start="148.6" data-duration="0.9" data-track-index="12"></audio>
+      <div id="hud" class="clip" data-start="0" data-duration="156.2" data-track-index="1">
+        <div id="progTrack"><div id="progBar"></div></div>
+        <div class="vign"></div>
+      </div>
+      <!-- S1 hero 0-3.9 -->
+      <div id="w-s1" class="clip full" data-start="0" data-duration="3.9" data-track-index="2">
+        <img class="si" id="s1img" src="assets/img/pantaugambut-slider-01.jpg">
+        <div class="dark-grad"></div>
+        <div class="ember" id="s1emb" style="width:260px;height:260px;left:410px;top:860px;"></div>
+        <div class="center" style="justify-content:flex-end; padding-bottom:480px;">
+          <span class="kicker">KALIMANTAN · AGUSTUS 2026</span>
+          <div class="big" style="font-size:118px; margin-top:28px;">API TANPA<br>LIDAH API</div>
+        </div>
+      </div>
+
+      <!-- S2 cross-section 3.9-6.6 -->
+      <div id="w-s2" class="clip full" data-start="3.9" data-duration="2.7" data-track-index="2">
+        <div style="position:absolute;inset:0;background:linear-gradient(180deg,#1c1712 0%,#241b13 55%,#3a2417 100%);"></div>
+        <svg viewBox="0 0 1080 1920" style="position:absolute;inset:0;width:100%;height:100%;">
+          <rect x="140" y="700" width="800" height="900" rx="24" fill="#2a1f16" stroke="#4a3320" stroke-width="4"/>
+          <line id="s2ruler" x1="140" y1="700" x2="140" y2="700" stroke="#ff5a1f" stroke-width="8"/>
+          <g class="mono" fill="#c9b8a6" font-size="40">
+            <text x="960" y="715">0m</text><text x="960" y="1015">-1m</text>
+            <text x="960" y="1315">-2m</text><text x="960" y="1615">-3m</text>
+          </g>
+          <circle id="s2core" cx="540" cy="1600" r="0" fill="#ff5a1f"/>
+          <circle id="s2glow" cx="540" cy="1600" r="0" fill="#ffd9a0" opacity="0.8"/>
+        </svg>
+        <div class="center" style="justify-content:flex-end; padding-bottom:110px;">
+          <div class="big" style="font-size:92px; color:#ffd9c9;">MEMBARA<br>DI BAWAH TANAH</div>
+        </div>
+      </div>
+
+      <!-- S3 water vs ember 6.6-9.6 -->
+      <div id="w-s3" class="clip full" data-start="6.6" data-duration="3.0" data-track-index="2">
+        <div style="position:absolute;inset:0;background:linear-gradient(180deg,#141b22 0%,#241b13 60%,#3a2417 100%);"></div>
+        <div id="s3spray" style="position:absolute;inset:0;"></div>
+        <div style="position:absolute;left:0;right:0;top:640px;height:8px;background:#2dd4bf;opacity:.8;"></div>
+        <div class="mono" style="position:absolute;left:80px;top:560px;font-size:36px;color:#2dd4bf;">AIR :: PERMUKAAN</div>
+        <div class="ember" id="s3emb" style="width:300px;height:300px;left:390px;top:1420px;"></div>
+        <div class="center" style="justify-content:flex-end; padding-bottom:130px;">
+          <div class="big" style="font-size:92px; color:#ffd9c9;">BARA: TETAP HIDUP</div>
+        </div>
+      </div>
+
+      <!-- S4 AIR GA NGARUH 9.6-11.2 -->
+      <div id="w-s4" class="clip full" data-start="9.6" data-duration="1.6" data-track-index="2">
+        <div style="position:absolute;inset:0;background:#0c0a08;"></div>
+        <div class="center">
+          <div class="big" id="s4txt" style="font-size:150px; color:#ff2438;">AIR GA<br>NGARUH?</div>
+        </div>
+      </div>
+
+      <!-- S5 hotspot counter 11.2-14.1 -->
+      <div id="w-s5" class="clip full" data-start="11.2" data-duration="2.9" data-track-index="2">
+        <img class="si" id="s5img" src="assets/img/widget-ancaman.png">
+        <div class="dark-grad" style="background:linear-gradient(180deg,rgba(18,16,14,.55),rgba(18,16,14,.85));"></div>
+        <div class="center">
+          <div class="mono" style="font-size:38px;letter-spacing:.18em;color:#ffb199;">HOTSPOT KALIMANTAN · 21 AGT 2026</div>
+          <div class="mono big" id="odo1" style="font-size:200px;color:#ff5a1f;">0</div>
+          <div class="kicker">MODIS + VIIRS + BNPB</div>
+        </div>
+      </div>
+
+      <!-- S6 konsesi 14.1-18.9 -->
+      <div id="w-s6" class="clip full" data-start="14.1" data-duration="4.8" data-track-index="2">
+        <img class="si" src="assets/img/widget-ancaman.png">
+        <div id="s6sweep" style="position:absolute;inset:0;background:linear-gradient(90deg,rgba(225,29,46,.55),rgba(225,29,46,.15));transform:translateX(-101%);"></div>
+        <div class="center">
+          <div class="big" style="font-size:132px;">3 DARI 4<br><span style="color:#ff2438;">DI KONSESI</span></div>
+          <div id="s6stamp" class="stamp" style="margin-top:56px;"><span class="big" style="font-size:60px;display:block;">INI BUKAN<br>MUSIBAH ALAM</span></div>
+        </div>
+      </div>
+
+      <!-- S7 urusan mereka 19.0-26.6 -->
+      <div id="w-s7" class="clip full" data-start="19.0" data-duration="7.6" data-track-index="2">
+        <img class="si" id="s7img" src="assets/img/alinea-hotspot.jpg">
+        <div class="dark-grad"></div>
+        <div class="center">
+          <div class="kicker" style="margin-bottom:40px;">ASAP INI NGGAK TAHU BATAS</div>
+          <div style="position:relative;display:inline-block;">
+            <div class="big" style="font-size:118px;color:#f5ede6;">&ldquo;URUSAN<br>MEREKA?&rdquo;</div>
+            <div id="s7strike" style="position:absolute;left:-4%;top:52%;width:108%;height:14px;background:#ff2438;transform:rotate(-7deg) scaleX(0);transform-origin:left;"></div>
+          </div>
+          <div class="mono" id="s7salah" style="margin-top:44px;font-size:44px;color:#ffb199;opacity:0;">SALAH.</div>
+        </div>
+      </div>
+
+      <!-- S8 asap mengendap 26.6-31.5 -->
+      <div id="w-s8" class="clip full" data-start="26.6" data-duration="4.9" data-track-index="2">
+        <div style="position:absolute;inset:0;background:linear-gradient(180deg,#2a2d33 0%,#3a3a38 45%,#171512 100%);"></div>
+        <div id="s8smoke" style="position:absolute;inset:0;"></div>
+        <div style="position:absolute;left:0;right:0;bottom:0;height:520px;background:linear-gradient(180deg,transparent,#4a4038 55%,#5a4a3a);"></div>
+        <div class="center" style="justify-content:flex-end;padding-bottom:140px;">
+          <div class="big" style="font-size:94px;">ASAP MENGGENDAP RENDAH</div>
+          <div class="mono" style="font-size:40px;color:#ffb199;margin-top:20px;">KAMU NAPAS. LANGSUNG.</div>
+        </div>
+      </div>
+
+      <!-- S9 polutan 31.5-34.8 -->
+      <div id="w-s9" class="clip full" data-start="31.5" data-duration="3.3" data-track-index="2">
+        <div style="position:absolute;inset:0;background:#0c0a08;"></div>
+        <div class="center" style="gap:36px;">
+          <div class="chip p9" style="font-size:64px;border-color:#ff2438;color:#ff8f7a;">PM2.5</div>
+          <div class="chip p9" style="font-size:64px;">CO</div>
+          <div class="chip p9" style="font-size:64px;">HCN · SIANIDA</div>
+        </div>
+      </div>
+
+      <!-- S10 bar chart 34.8-40.5 -->
+      <div id="w-s10" class="clip full" data-start="34.8" data-duration="5.7" data-track-index="2">
+        <div style="position:absolute;inset:0;background:linear-gradient(180deg,#14100d,#1c1712);"></div>
+        <div class="center">
+          <div class="kicker" style="margin-bottom:60px;">LUAS TERBAKAR NASIONAL</div>
+          <div style="display:flex;align-items:flex-end;gap:90px;height:760px;">
+            <div style="text-align:center;">
+              <div class="mono" style="font-size:44px;color:#c9b8a6;margin-bottom:14px;">107 RIBU HA</div>
+              <div id="bar19" style="width:280px;height:0px;background:#6b5d4f;border-radius:14px 14px 0 0;"></div>
+              <div class="mono" style="font-size:48px;margin-top:18px;">2019</div>
+            </div>
+            <div style="text-align:center;">
+              <div class="mono" id="odo26" style="font-size:44px;color:#ff5a1f;margin-bottom:14px;">0 HA</div>
+              <div id="bar26" style="width:280px;height:0px;background:linear-gradient(180deg,#ff5a1f,#c2410c);border-radius:14px 14px 0 0;box-shadow:0 0 60px rgba(255,90,31,.4);"></div>
+              <div class="mono" style="font-size:48px;margin-top:18px;color:#ffb199;">2026</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- S11 +120% 40.5-43.8 -->
+      <div id="w-s11" class="clip full" data-start="40.5" data-duration="3.3" data-track-index="2">
+        <div style="position:absolute;inset:0;background:#0c0a08;"></div>
+        <div class="center">
+          <div class="big" id="s11big" style="font-size:230px;color:#ff2438;">+120%</div>
+          <div class="big" style="font-size:84px;color:#f5ede6;margin-top:30px;">VS 2019</div>
+        </div>
+      </div>
+
+      <!-- S12 kesalahan 1 43.8-48.2 -->
+      <div id="w-s12" class="clip full" data-start="43.8" data-duration="4.4" data-track-index="2">
+        <div style="position:absolute;inset:0;background:#14100d;"></div>
+        <div id="s12stamp" class="stamp" style="position:absolute;left:90px;top:220px;transform:rotate(-5deg);"><span style="font-size:52px;">KESALAHAN #1</span></div>
+        <div style="position:absolute;left:0;right:0;top:420px;bottom:0;display:flex;">
+          <div style="width:30%;background:linear-gradient(180deg,#1c2026,#0c0e11);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;">
+            <div style="font-size:150px;">&#x1F32C;&#xFE0F;</div>
+            <div class="mono" style="font-size:34px;color:#c9b8a6;">EL NI&Ntilde;O<br>= PEMICU</div>
+          </div>
+          <div style="width:70%;position:relative;overflow:hidden;">
+            <img class="si" id="s12img" src="assets/img/mongabay-riau-1098.jpg">
+            <div class="dark-grad"></div>
+            <div class="big" style="position:absolute;left:40px;bottom:60px;font-size:76px;color:#ffb199;">KANAL =<br>BAHAN BAKAR</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- S13 timeline 48.2-51.9 -->
+      <div id="w-s13" class="clip full" data-start="48.2" data-duration="3.7" data-track-index="2">
+        <div style="position:absolute;inset:0;background:linear-gradient(180deg,#1c1712,#14100d);"></div>
+        <div class="center">
+          <div class="kicker" style="margin-bottom:70px;">BAHAN BAKAR DISIAPKAN</div>
+          <div style="position:relative;width:860px;height:520px;">
+            <div style="position:absolute;left:0;right:0;top:250px;height:6px;background:#4a3320;"></div>
+            <div id="s13embers" style="position:absolute;inset:0;"></div>
+          </div>
+          <div class="mono big" id="s13year" style="font-size:120px;color:#ff5a1f;">1980</div>
+        </div>
+      </div>
+
+      <!-- S14 kesalahan 2 51.9-55.2 -->
+      <div id="w-s14" class="clip full" data-start="51.9" data-duration="3.3" data-track-index="2">
+        <div style="position:absolute;inset:0;background:#14100d;"></div>
+        <div id="s14stamp" class="stamp" style="position:absolute;right:90px;top:220px;transform:rotate(4deg);"><span style="font-size:52px;">KESALAHAN #2</span></div>
+        <div class="center" style="gap:50px;">
+          <div class="big" style="font-size:96px;color:#f5ede6;">&ldquo;ULAH PETANI?&rdquo;</div>
+          <div style="position:relative;width:840px;height:420px;overflow:hidden;border-radius:20px;">
+            <img class="si" id="s14img" src="assets/img/titik-vs-sawit.png">
+            <div class="big" style="position:absolute;left:30px;bottom:30px;font-size:64px;color:#ff8f7a;">KONSESI</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- S15 74% 55.2-61.7 -->
+      <div id="w-s15" class="clip full" data-start="55.2" data-duration="6.5" data-track-index="2">
+        <img class="si" id="s15img" src="assets/img/titik-vs-tambang.jpg">
+        <div class="dark-grad" style="background:linear-gradient(180deg,rgba(18,16,14,.5),rgba(18,16,14,.88));"></div>
+        <div class="center">
+          <div class="mono" style="font-size:38px;letter-spacing:.18em;color:#ffb199;">TITIK API DI DALAM KONSESI</div>
+          <div class="mono big" id="odo74" style="font-size:280px;color:#ff2438;">0%</div>
+          <div class="big" id="s15dayak" style="font-size:78px;color:#f5ede6;opacity:0;">BUKAN LADANG DAYAK.</div>
+        </div>
+      </div>
+
+      <!-- S16 kesalahan 3 61.7-69.3 -->
+      <div id="w-s16" class="clip full" data-start="61.7" data-duration="7.6" data-track-index="2">
+        <div style="position:absolute;inset:0;background:linear-gradient(180deg,#141b22 0%,#241b13 60%,#3a2417 100%);"></div>
+        <div id="s16spray" style="position:absolute;inset:0;"></div>
+        <div style="position:absolute;left:0;right:0;top:600px;height:8px;background:#2dd4bf;opacity:.8;"></div>
+        <div class="ember" style="width:340px;height:340px;left:370px;top:1380px;"></div>
+        <div id="s16stamp" class="stamp" style="position:absolute;left:90px;top:200px;transform:rotate(-4deg);"><span style="font-size:52px;">KESALAHAN #3</span></div>
+        <div class="center" style="justify-content:flex-end;padding-bottom:150px;">
+          <div class="big" style="font-size:84px;color:#ffd9c9;">SMOULDERING:<br>BARA DI BAWAH TANAH</div>
+        </div>
+      </div>
+
+      <!-- S17 interlude CTA 69.3-77.3 -->
+      <div id="w-s17" class="clip full" data-start="69.3" data-duration="8.0" data-track-index="2">
+        <img class="si" id="s17img" src="assets/img/mongabay-kanal-gambut.jpg">
+        <div class="dark-grad"></div>
+        <div class="center">
+          <div class="big" style="font-size:84px;color:#f5ede6;">KAMU LEBIH PAHAM<br>DARI SEBAGIAN BESAR<br>PEJABAT.</div>
+          <div id="s17pill" class="kicker" style="margin-top:60px;font-size:44px;color:#12100e;background:#ff5a1f;border-color:#ff5a1f;">KOMEN &ldquo;BASAH&rdquo; 👇</div>
+        </div>
+      </div>
+
+      <!-- S18 drop: spons 77.3-86.9 -->
+      <div id="w-s18" class="clip full" data-start="77.3" data-duration="9.6" data-track-index="2">
+        <div id="s18flash" style="position:absolute;inset:0;background:#2dd4bf;opacity:0;"></div>
+        <div style="position:absolute;inset:0;background:linear-gradient(180deg,#0e2a26 0%,#14342c 55%,#0c1f1a 100%);"></div>
+        <svg viewBox="0 0 1080 1920" style="position:absolute;inset:0;width:100%;height:100%;">
+          <rect id="s18sponge" x="290" y="760" width="500" height="500" rx="60" fill="#1f5c4d" stroke="#2dd4bf" stroke-width="6"/>
+          <g id="s18water" fill="#2dd4bf" opacity="0.85">
+            <circle cx="400" cy="520" r="14"/><circle cx="480" cy="470" r="11"/>
+            <circle cx="560" cy="530" r="15"/><circle cx="650" cy="480" r="12"/>
+            <circle cx="520" cy="430" r="9"/>
+          </g>
+          <g id="s18pores" fill="#0c1f1a">
+            <circle cx="420" cy="900" r="26"/><circle cx="560" cy="980" r="34"/>
+            <circle cx="660" cy="880" r="22"/><circle cx="480" cy="1100" r="28"/>
+            <circle cx="620" cy="1150" r="20"/>
+          </g>
+        </svg>
+        <div class="center" style="justify-content:flex-end;padding-bottom:170px;">
+          <div class="big" style="font-size:110px;color:#7dfce9;">GAMBUT = SPONS</div>
+          <div class="mono" style="font-size:42px;color:#a7f3e6;margin-top:24px;">NYIMPAN AIR RIBUAN TAHUN · KARBON TERBESAR</div>
+        </div>
+      </div>
+
+      <!-- S19 1995 PLG 86.9-92.1 -->
+      <div id="w-s19" class="clip full" data-start="86.9" data-duration="5.2" data-track-index="2">
+        <img class="si" id="s19img" src="assets/img/peta-ancaman-full.png">
+        <div class="dark-grad" style="background:linear-gradient(180deg,rgba(18,16,14,.6),rgba(18,16,14,.85));"></div>
+        <div id="s19tag" class="stamp" style="position:absolute;left:90px;top:300px;transform:rotate(-5deg);"><span style="font-size:60px;">1995 · PLG</span></div>
+        <svg viewBox="0 0 1080 1920" style="position:absolute;inset:0;width:100%;height:100%;">
+          <path id="s19kanal" d="M 120 900 C 350 1000, 500 1150, 560 1400 S 760 1750, 960 1800" fill="none" stroke="#ff5a1f" stroke-width="14" stroke-dasharray="2600" stroke-dashoffset="2600" stroke-linecap="round"/>
+        </svg>
+        <div class="center" style="justify-content:flex-end;padding-bottom:150px;">
+          <div class="big" style="font-size:88px;">KANAL RIBUAN KM MENGGALI GAMBUT</div>
+          <div class="mono" id="s19gauge" style="font-size:56px;color:#2dd4bf;margin-top:24px;">MUKA AIR: -40 cm</div>
+        </div>
+      </div>
+
+      <!-- S20 gagal 92.1-98.2 -->
+      <div id="w-s20" class="clip full" data-start="92.1" data-duration="6.1" data-track-index="2">
+        <div style="position:absolute;inset:0;background:linear-gradient(180deg,#2a2a28,#171512);"></div>
+        <div style="position:absolute;left:290px;top:720px;width:500px;height:500px;border-radius:60px;background:#4a4540;border:6px dashed #6b5d4f;transform:rotate(3deg);"></div>
+        <div class="center">
+          <div id="s20a" class="big" style="font-size:150px;color:#ff2438;">GAGAL.</div>
+          <div id="s20b" class="big" style="font-size:120px;color:#c9b8a6;opacity:0;">DITINGGAL.</div>
+          <div class="mono" style="font-size:40px;color:#ffb199;margin-top:40px;">SEPARUH TRANSMIGRAN PERGI</div>
+        </div>
+      </div>
+
+      <!-- S21 kanal masih ada 98.2-101.7 -->
+      <div id="w-s21" class="clip full" data-start="98.2" data-duration="3.5" data-track-index="2">
+        <img class="si" id="s21img" src="assets/img/mongabay-kanal-gambut.jpg">
+        <div class="dark-grad" style="background:linear-gradient(180deg,rgba(18,16,14,.25),rgba(18,16,14,.8));"></div>
+        <div class="center" style="justify-content:flex-end;padding-bottom:200px;">
+          <div class="big" style="font-size:100px;color:#ff8f7a;">TAPI KANALNYA?<br>MASIH ADA.</div>
+        </div>
+      </div>
+
+      <!-- S22 food estate 101.7-105.4 -->
+      <div id="w-s22" class="clip full" data-start="101.7" data-duration="3.7" data-track-index="2">
+        <div style="position:absolute;inset:0;background:#14100d;"></div>
+        <img class="si" id="s22img" src="assets/img/escavator.png">
+        <div class="dark-grad"></div>
+        <div class="center" style="justify-content:flex-end;padding-bottom:160px;">
+          <div class="kicker" style="font-size:40px;">ULANG TAHUN 1995</div>
+          <div class="big" style="font-size:104px;margin-top:24px;color:#ff2438;">2026: FOOD ESTATE</div>
+        </div>
+      </div>
+
+      <!-- S23 history loop 105.4-112.3 -->
+      <div id="w-s23" class="clip full" data-start="105.4" data-duration="6.9" data-track-index="2">
+        <div style="position:absolute;inset:0;background:#0c0a08;"></div>
+        <div style="position:absolute;left:0;right:0;top:380px;bottom:420px;display:flex;gap:6px;">
+          <div style="width:50%;position:relative;overflow:hidden;">
+            <img class="si" id="s23a" src="assets/img/mongabay-riau-1098.jpg">
+            <div class="big mono" style="position:absolute;left:30px;top:30px;font-size:72px;color:#ffb199;">1995</div>
+          </div>
+          <div style="width:50%;position:relative;overflow:hidden;">
+            <img class="si" id="s23b" src="assets/img/karhutla-riau-2015.jpg">
+            <div class="big mono" style="position:absolute;right:30px;top:30px;font-size:72px;color:#ff8f7a;">2026</div>
+          </div>
+        </div>
+        <div class="center" style="justify-content:flex-end;padding-bottom:170px;">
+          <div id="s23loop" class="big" style="font-size:130px;color:#ff2438;">HISTORY<br>ON LOOP</div>
+        </div>
+      </div>
+
+      <!-- S24 bukti 4.5x 112.3-120.7 -->
+      <div id="w-s24" class="clip full" data-start="112.3" data-duration="8.4" data-track-index="2">
+        <img class="si" id="s24img" src="assets/img/peta-ancaman-full.png">
+        <div class="dark-grad" style="background:rgba(12,10,8,.66);"></div>
+        <div class="center">
+          <div class="kicker" style="margin-bottom:40px;">RISET FISIKA GAMBUT · BUKAN OPINI</div>
+          <div class="big" id="s24big" style="font-size:340px;color:#ff5a1f;">&times;4,5</div>
+          <div class="big" style="font-size:84px;color:#f5ede6;margin-top:20px;">RISIKO KEBAKARAN<br>DENGAN KANAL DRAINASE</div>
+        </div>
+      </div>
+
+      <!-- S25 hukum 120.7-128.5 -->
+      <div id="w-s25" class="clip full" data-start="120.7" data-duration="7.8" data-track-index="2">
+        <div style="position:absolute;inset:0;background:#0c0a08;"></div>
+        <div class="center" style="gap:44px;">
+          <div class="mono big" style="font-size:150px;color:#f5ede6;">72 <span style="font-size:56px;">ORANG DITANGKAP</span></div>
+          <div class="mono" style="font-size:52px;color:#c9b8a6;">BARANG BUKTI: 35 KOREK API</div>
+          <div class="mono big" id="s25vs" style="font-size:150px;color:#ff2438;">4 <span style="font-size:56px;">KORPORASI</span></div>
+          <div id="s25stamp" class="stamp" style="transform:rotate(-4deg);"><span style="font-size:56px;">Rp6,1 T DENDA · BELUM CAIR</span></div>
+        </div>
+      </div>
+
+      <!-- S26 katingan 128.5-136.7 -->
+      <div id="w-s26" class="clip full" data-start="128.5" data-duration="8.2" data-track-index="2">
+        <img class="si" id="s26img" src="assets/img/foto-1.jpg">
+        <div class="dark-grad" style="background:linear-gradient(180deg,rgba(6,30,26,.15),rgba(6,30,26,.82));"></div>
+        <div class="center">
+          <div class="kicker" style="color:#7dfce9;border-color:rgba(45,212,191,.6);background:rgba(6,30,26,.6);">ADA YANG BERHASIL</div>
+          <div class="big" style="font-size:120px;color:#eafffb;margin-top:36px;">KATINGAN<br>MENTAYA</div>
+          <div class="mono" style="font-size:44px;color:#a7f3e6;margin-top:30px;">GAMBUT TETAP BASAH → MENGHASILKAN DARI KARBON</div>
+        </div>
+      </div>
+
+      <!-- S27 paludikultur 136.7-147.3 -->
+      <div id="w-s27" class="clip full" data-start="136.7" data-duration="10.6" data-track-index="2">
+        <div style="position:absolute;inset:0;background:#0e2a26;"></div>
+        <div class="p27" id="p27a" style="position:absolute;inset:0;">
+          <img class="si" src="assets/img/foto-1.jpg"><div class="dark-grad" style="background:linear-gradient(180deg,transparent 55%,rgba(6,30,26,.85));"></div>
+          <div class="big mono" style="position:absolute;left:60px;bottom:420px;font-size:88px;color:#7dfce9;">PURUN</div>
+        </div>
+        <div class="p27" id="p27b" style="position:absolute;inset:0;opacity:0;">
+          <img class="si" src="assets/img/foto-6.jpg"><div class="dark-grad" style="background:linear-gradient(180deg,transparent 55%,rgba(6,30,26,.85));"></div>
+          <div class="big mono" style="position:absolute;left:60px;bottom:420px;font-size:88px;color:#7dfce9;">SAGU</div>
+        </div>
+        <div class="p27" id="p27c" style="position:absolute;inset:0;opacity:0;">
+          <img class="si" src="assets/img/pengelolaan-basah.jpg"><div class="dark-grad" style="background:linear-gradient(180deg,transparent 55%,rgba(6,30,26,.85));"></div>
+          <div class="big mono" style="position:absolute;left:60px;bottom:420px;font-size:88px;color:#7dfce9;">JELUTUNG</div>
+        </div>
+        <div class="p27" id="p27d" style="position:absolute;inset:0;opacity:0;">
+          <img class="si" src="assets/img/hero-potensi.png"><div class="dark-grad" style="background:linear-gradient(180deg,transparent 55%,rgba(6,30,26,.85));"></div>
+          <div class="big mono" style="position:absolute;left:60px;bottom:420px;font-size:88px;color:#7dfce9;">GELAM · BELANGERAN</div>
+        </div>
+        <div class="center" style="justify-content:flex-end;padding-bottom:140px;">
+          <div class="big" style="font-size:80px;color:#eafffb;">TANAMAN YANG BUTUH AIR,<br>BUKAN YANG TAKUT AIR.</div>
+        </div>
+      </div>
+
+      <!-- S28 CTA 147.3-156.2 -->
+      <div id="w-s28" class="clip full" data-start="147.3" data-duration="8.9" data-track-index="2">
+        <img class="si" id="s28img" src="assets/img/mongabay-kanal-gambut.jpg">
+        <div class="dark-grad" style="background:rgba(6,30,26,.7);"></div>
+        <div class="center">
+          <div class="big" id="s28big" style="font-size:120px;color:#eafffb;">GAMBUT HARUS<br>TETAP BASAH.</div>
+          <div id="s28end" class="mono" style="font-size:32px;color:#a7f3e6;margin-top:80px;line-height:1.7;opacity:0;">
+            SUMBER: SIPONGI KLHK · WALHI · PANTAU GAMBUT · THE CONVERSATION<br>
+            FOTO: MONGABAY (RHETT BUTLER) · PANTAU GAMBUT · BRGM<br>
+            #Karhutla #Gambut #Kalimantan
+          </div>
+        </div>
+      </div>
+
+      <!-- CAPTIONS (word-level karaoke) -->
+      <div id="capWrap" class="clip" data-start="0" data-duration="156.2" data-track-index="30"></div>
+
+    </div>
+    <script>
+      const WORDS = [{w:"api",s:0.411,e:0.671},{w:"ini",s:0.751,e:0.892},{w:"tidak",s:0.912,e:1.072},{w:"punya",s:1.112,e:1.212},{w:"lidah",s:1.252,e:1.392},{w:"api",s:1.432,e:1.692},{w:"tapi",s:2.252,e:2.533},{w:"dia",s:2.593,e:2.673},{w:"bisa",s:2.733,e:2.873},{w:"membakar",s:2.913,e:3.313},{w:"tanah",s:3.453,e:3.833},{w:"sampai",s:4.374,e:4.634},{w:"3",s:4.834,e:4.894},{w:"meter",s:4.934,e:5.134},{w:"ke",s:5.174,e:5.234},{w:"bawah",s:5.274,e:5.514},{w:"ribuan",s:6.575,e:6.855},{w:"liter",s:6.875,e:7.135},{w:"air",s:7.155,e:7.376},{w:"disemprot",s:7.416,e:7.876},{w:"apinya",s:8.536,e:8.816},{w:"tetap",s:8.836,e:9.037},{w:"menyala",s:9.077,e:9.457},{w:"kok",s:9.637,e:9.697},{w:"bisa",s:9.757,e:11.158},{w:"Agustus",s:11.178,e:11.698},{w:"2026",s:11.718,e:11.918},{w:"delapan",s:12.159,e:12.639},{w:"ribu",s:13.559,e:13.98},{w:"enam ratus",s:14.02,e:14.5},{w:"titik",s:14.64,e:14.86},{w:"api",s:14.92,e:15.14},{w:"di",s:15.18,e:15.24},{w:"kalimantan",s:15.28,e:15.801},{w:"dan",s:16.181,e:16.321},{w:"3",s:16.581,e:16.681},{w:"dari",s:16.721,e:16.901},{w:"4",s:17.162,e:17.322},{w:"ada",s:17.882,e:18.042},{w:"di",s:18.102,e:18.162},{w:"dalam",s:18.202,e:18.422},{w:"konsesi",s:18.482,e:18.863},{w:"Mungkin",s:19.95,e:20.15},{w:"kamu",s:20.19,e:20.35},{w:"mikir,",s:20.39,e:20.751},{w:"ah",s:21.211,e:21.311},{w:"kebakaran",s:21.451,e:21.832},{w:"hutan",s:21.872,e:22.172},{w:"urusan",s:22.292,e:22.532},{w:"mereka,",s:22.572,e:22.993},{w:"salah,",s:23.533,e:23.833},{w:"asap",s:24.334,e:24.554},{w:"ini",s:24.594,e:24.714},{w:"nggak",s:24.734,e:24.874},{w:"tahu",s:24.954,e:25.094},{w:"batas.",s:25.154,e:25.695},{w:"Asap",s:26.596,e:26.776},{w:"gambut",s:26.836,e:27.136},{w:"mengendap",s:27.196,e:27.557},{w:"di permukaan",s:27.597,e:27.957},{w:"tanah.",s:28.017,e:28.437},{w:"Kamu",s:29.058,e:29.258},{w:"napas",s:29.278,e:29.518},{w:"langsung.",s:29.558,e:31.12},{w:"PM2.5",s:31.5,e:31.98},{w:"karbon",s:32.12,e:32.401},{w:"monoksida",s:32.441,e:32.941},{w:"bahkan",s:33.061,e:33.301},{w:"sianida.",s:33.361,e:34.763},{w:"Januari",s:34.783,e:35.263},{w:"sampai",s:35.343,e:35.583},{w:"Juli",s:35.663,e:36.004},{w:"2026.",s:36.024,e:36.164},{w:"200",s:36.184,e:36.244},{w:"ribu",s:36.264,e:36.444},{w:"hectar",s:36.464,e:36.624},{w:"terbakar.",s:36.664,e:36.884},{w:"Lebih",s:40.459,e:40.739},{w:"dua",s:40.879,e:40.999},{w:"kali",s:41.059,e:41.239},{w:"lipat",s:41.279,e:41.56},{w:"dari",s:41.66,e:41.86},{w:"2019.",s:41.92,e:42.44},{w:"Kesalahan",s:43.761,e:44.061},{w:"pertama,",s:44.121,e:44.481},{w:"mikir",s:44.921,e:45.121},{w:"ini",s:45.181,e:45.301},{w:"gara-gara",s:45.361,e:45.701},{w:"El",s:45.741,e:45.861},{w:"Nino.",s:45.882,e:46.182},{w:"El",s:46.702,e:46.822},{w:"Nino",s:46.842,e:47.062},{w:"cuma",s:47.122,e:47.282},{w:"pemicu.",s:47.362,e:47.782},{w:"Bahan",s:48.223,e:48.383},{w:"bakarnya",s:48.443,e:49.083},{w:"udah",s:49.963,e:50.103},{w:"disiapin",s:50.123,e:50.464},{w:"puluhan",s:50.524,e:50.764},{w:"tahun.",s:50.804,e:51.084},{w:"Kesalahan",s:51.884,e:52.284},{w:"kedua,",s:52.324,e:52.705},{w:"mikir",s:53.105,e:53.385},{w:"ini",s:53.445,e:53.605},{w:"ulah",s:53.685,e:53.885},{w:"petani.",s:53.945,e:54.345},{w:"Faktanya,",s:55.226,e:55.766},{w:"74%",s:56.206,e:56.686},{w:"titik",s:57.067,e:57.307},{w:"api",s:57.327,e:57.627},{w:"ada",s:57.727,e:57.867},{w:"di",s:57.887,e:57.947},{w:"dalam",s:58.007,e:58.207},{w:"konsesi",s:58.247,e:58.607},{w:"korporasi.",s:58.687,e:59.348},{w:"Bukan",s:59.808,e:60.028},{w:"ladang",s:60.068,e:60.308},{w:"dayak.",s:60.368,e:60.628},{w:"Dan",s:61.709,e:61.849},{w:"kesalahan",s:61.909,e:62.349},{w:"ketiga,",s:62.389,e:62.749},{w:"mikir",s:63.289,e:63.47},{w:"air",s:63.55,e:63.75},{w:"bisa",s:63.83,e:64.01},{w:"menyelesaikan",s:64.03,e:64.47},{w:"ini.",s:64.53,e:64.77},{w:"Gambut",s:65.43,e:65.711},{w:"kering",s:65.771,e:65.971},{w:"itu",s:66.011,e:66.191},{w:"bukan",s:66.371,e:66.651},{w:"kebakaran.",s:66.691,e:67.131},{w:"Dia",s:67.591,e:67.771},{w:"menggunung.",s:67.811,e:68.172},{w:"Kalau",s:69.309,e:69.509},{w:"masih",s:69.569,e:69.849},{w:"nonton",s:69.909,e:70.249},{w:"sampai",s:70.29,e:70.51},{w:"sini,",s:70.55,e:70.83},{w:"kamu",s:71.39,e:71.61},{w:"lebih",s:71.65,e:71.81},{w:"paham",s:71.89,e:72.331},{w:"dari",s:72.391,e:72.551},{w:"sebagian",s:72.611,e:72.951},{w:"besar",s:72.991,e:73.191},{w:"pejabat.",s:73.251,e:73.651},{w:"Komen",s:74.412,e:74.652},{w:"basah",s:74.712,e:75.072},{w:"kalau",s:75.372,e:75.532},{w:"kamu",s:75.572,e:75.772},{w:"setuju.",s:75.792,e:77.213},{w:"Gini",s:77.293,e:77.433},{w:"cara",s:77.493,e:77.653},{w:"bacanya,",s:77.713,e:78.173},{w:"gambut",s:78.534,e:78.854},{w:"itu,",s:78.874,e:79.174},{w:"Spons,",s:79.614,e:80.174},{w:"Spons",s:80.495,e:80.875},{w:"yang",s:80.895,e:80.995},{w:"nyimpan",s:81.015,e:81.315},{w:"air",s:81.375,e:81.535},{w:"ribuan",s:81.555,e:81.815},{w:"tahun.",s:81.855,e:82.135},{w:"Spons",s:82.736,e:83.116},{w:"yang",s:83.136,e:83.216},{w:"nyimpan",s:83.236,e:83.476},{w:"karbon",s:83.516,e:83.856},{w:"lebih",s:84.076,e:84.276},{w:"banyak",s:84.316,e:84.597},{w:"dari",s:84.657,e:84.897},{w:"hutan",s:84.977,e:85.217},{w:"manapun.",s:85.257,e:86.838},{w:"Tahun",s:86.898,e:87.218},{w:"1995,",s:87.278,e:88.058},{w:"Proyek",s:88.498,e:88.959},{w:"Sejuta",s:89.119,e:89.519},{w:"Hector",s:89.599,e:89.999},{w:"menggali",s:90.179,e:90.559},{w:"kanal",s:90.64,e:90.88},{w:"ribuan",s:90.92,e:91.2},{w:"kilometer.",s:91.26,e:91.7},{w:"Air",s:92.08,e:92.36},{w:"dialirkan",s:92.44,e:93.001},{w:"ke",s:93.081,e:93.161},{w:"luar,",s:93.181,e:93.421},{w:"Sponsnya",s:93.981,e:94.521},{w:"jadi",s:94.601,e:94.802},{w:"kering",s:94.902,e:95.162},{w:"keset.",s:95.222,e:95.482},{w:"Gagal,",s:96.087,e:96.467},{w:"ditinggal",s:97.147,e:97.587},{w:"Tapi",s:98.228,e:98.468},{w:"kanalnya",s:98.508,e:98.928},{w:"masih",s:99.548,e:99.828},{w:"ada",s:99.888,e:100.048},{w:"sampai",s:100.108,e:100.348},{w:"sekarang.",s:100.408,e:101.668},{w:"Sekarang,",s:101.688,e:102.068},{w:"proyek",s:102.749,e:103.029},{w:"pangan",s:103.109,e:103.409},{w:"baru",s:103.489,e:103.649},{w:"datang",s:103.689,e:103.929},{w:"ke",s:103.969,e:104.029},{w:"tanah",s:104.089,e:104.329},{w:"yang",s:104.349,e:104.469},{w:"sama.",s:104.529,e:104.809},{w:"Eskavator",s:105.429,e:105.909},{w:"tenggelam.",s:105.969,e:106.33},{w:"Padi gagal,",s:107.15,e:107.67},{w:"kanal",s:108.33,e:108.65},{w:"baru",s:108.71,e:108.85},{w:"digali.",s:108.91,e:109.27},{w:"Sejarah",s:109.81,e:110.15},{w:"nggak",s:110.17,e:110.271},{w:"cuma",s:110.311,e:110.451},{w:"berulang,",s:110.491,e:110.831},{w:"dia",s:110.951,e:111.091},{w:"nge-loop.",s:111.111,e:112.251},{w:"Mau",s:112.271,e:112.431},{w:"bukti,",s:112.491,e:112.871},{w:"kanal",s:113.211,e:113.491},{w:"drainase",s:113.551,e:113.851},{w:"bikin",s:114.211,e:114.432},{w:"risiko",s:114.492,e:114.832},{w:"kebakaran",s:114.912,e:115.432},{w:"naik",s:115.472,e:115.732},{w:"4,5",s:115.972,e:116.372},{w:"kali",s:116.432,e:116.592},{w:"lipat.",s:116.632,e:116.952},{w:"Itu",s:117.452,e:117.632},{w:"riset",s:117.652,e:117.912},{w:"fisika",s:118.052,e:118.353},{w:"gambut.",s:118.473,e:118.833},{w:"Bukan",s:119.133,e:119.313},{w:"opini.",s:119.373,e:119.693},{w:"Hukum",s:120.744,e:121.104},{w:"72",s:121.725,e:122.185},{w:"orang",s:122.225,e:122.386},{w:"ditangkap,",s:122.406,e:122.806},{w:"barang",s:123.366,e:123.607},{w:"buktinya",s:123.667,e:124.167},{w:"35",s:124.568,e:124.968},{w:"korek",s:125.028,e:125.208},{w:"api,",s:125.268,e:125.528},{w:"tapi",s:126.069,e:126.269},{w:"korporasi",s:126.369,e:126.87},{w:"yang",s:126.89,e:127.01},{w:"diselidiki",s:127.07,e:127.79},{w:"empat.",s:128.211,e:128.431},{w:"Tapi",s:128.531,e:129.672},{w:"ada",s:129.772,e:129.892},{w:"yang",s:129.912,e:130.013},{w:"berhasil,",s:130.053,e:130.513},{w:"Katingan",s:131.254,e:131.574},{w:"Mentaya,",s:131.614,e:132.054},{w:"gambut",s:132.555,e:132.955},{w:"tetap",s:133.035,e:133.215},{w:"basah",s:133.276,e:133.616},{w:"dan",s:133.796,e:133.916},{w:"malah",s:133.956,e:134.136},{w:"menghasilkan,",s:134.156,e:134.717},{w:"dari",s:135.157,e:135.317},{w:"karbon.",s:135.377,e:136.559},{w:"Solusinya",s:136.659,e:137.099},{w:"bukan",s:137.159,e:137.339},{w:"roket,",s:137.379,e:137.66},{w:"biarin",s:138.52,e:138.741},{w:"gambut",s:138.801,e:139.001},{w:"basah,",s:139.061,e:139.381},{w:"tanam",s:139.902,e:140.162},{w:"sagu,",s:140.222,e:140.602},{w:"jelutung,",s:141.023,e:141.383},{w:"purun,",s:141.723,e:142.003},{w:"tanaman",s:142.324,e:142.644},{w:"yang",s:142.664,e:142.764},{w:"butuh",s:142.804,e:142.984},{w:"air,",s:143.044,e:143.325},{w:"bukan",s:143.565,e:143.745},{w:"yang",s:143.765,e:143.865},{w:"takut",s:143.905,e:144.145},{w:"air,",s:144.226,e:144.466},{w:"untungnya",s:144.866,e:145.226},{w:"nyata,",s:145.246,e:145.587},{w:"karbonnya",s:145.767,e:146.147},{w:"nyata.",s:146.187,e:146.448},{w:"bagikan",s:147.339,e:147.7},{w:"video",s:147.78,e:148.04},{w:"ini",s:148.08,e:148.321},{w:"karena",s:148.641,e:148.982},{w:"kalau",s:149.082,e:149.322},{w:"semua",s:149.402,e:149.603},{w:"orang",s:149.663,e:149.843},{w:"mikir",s:149.883,e:150.164},{w:"ini",s:150.224,e:150.364},{w:"cuma",s:150.444,e:150.604},{w:"musibah",s:150.684,e:151.065},{w:"alam",s:151.085,e:151.386},{w:"kamu",s:151.967,e:152.187},{w:"udah",s:152.227,e:152.367},{w:"tau",s:152.427,e:152.668},{w:"ini",s:153.249,e:153.369},{w:"kebijakan",s:153.449,e:154.01},{w:"dan",s:154.471,e:154.591},{w:"kebijakan",s:154.651,e:155.072},{w:"bisa",s:155.112,e:155.252},{w:"diubah",s:155.292,e:155.652}];
+      function prnd(i) { const x = Math.sin(i * 12.9898) * 43758.5453; return x - Math.floor(x); }
+      (function buildCaptions() {
+        const wrap = document.getElementById("capWrap");
+        const segs = []; let cur = [];
+        WORDS.forEach((w, i) => {
+          if (i > 0 && w.s - WORDS[i-1].e >= 0.7 && cur.length) { segs.push(cur); cur = []; }
+          cur.push(w);
+        });
+        if (cur.length) segs.push(cur);
+        window.CAPSEGS = segs.map(seg => {
+          const div = document.createElement("div");
+          div.className = "seg";
+          const spans = seg.map(w => {
+            const sp = document.createElement("span");
+            sp.className = "wd"; sp.textContent = w.w;
+            div.appendChild(sp); return sp;
+          });
+          wrap.appendChild(div);
+          return { div, spans, t0: seg[0].s, t1: seg[seg.length-1].e };
+        });
+        [["s3spray", 12], ["s16spray", 14]].forEach(pair => {
+          const id = pair[0], n = pair[1];
+          const host = document.getElementById(id);
+          for (let i = 0; i < n; i++) {
+            const d = document.createElement("div");
+            const sz = 10 + prnd(i + id.length) * 14;
+            d.style.cssText = "position:absolute;width:" + sz + "px;height:" + sz + "px;border-radius:50%;background:#7dd3fc;left:" + (120 + prnd(i * 3 + 1) * 840) + "px;top:-60px;opacity:.9;";
+            host.appendChild(d);
+          }
+        });
+        (function () {
+          const host = document.getElementById("s8smoke");
+          for (let i = 0; i < 18; i++) {
+            const d = document.createElement("div");
+            const sz = 60 + prnd(i + 7) * 120;
+            d.style.cssText = "position:absolute;width:" + sz + "px;height:" + sz + "px;border-radius:50%;background:rgba(120,110,100," + (0.10 + prnd(i * 5) * 0.14) + ");left:" + (prnd(i * 7) * 950) + "px;top:" + (600 + prnd(i * 11) * 1100) + "px;";
+            host.appendChild(d);
+          }
+        })();
+        (function () {
+          const host = document.getElementById("s13embers");
+          for (let i = 0; i < 14; i++) {
+            const d = document.createElement("div");
+            const sz = 26 + prnd(i + 2) * 30;
+            d.className = "ember e13";
+            d.style.cssText += "width:" + sz + "px;height:" + sz + "px;left:" + (40 + prnd(i * 13) * 780) + "px;top:" + (60 + prnd(i * 17) * 360) + "px;position:absolute;opacity:0;";
+            host.appendChild(d);
+          }
+        })();
+      })();
+    </script>
+    <script>
+      (function () {
+        const tl = gsap.timeline({ paused: true });
+        const segs = window.CAPSEGS;
+        tl.fromTo("#progBar", { width: "0%" }, { width: "100%", duration: 156.2, ease: "none" }, 0);
+        let wi = 0;
+        segs.forEach(s => {
+          tl.set(s.div, { display: "flex" }, Math.max(0.05, s.t0 - 0.12));
+          tl.set(s.div, { display: "none" }, s.t1 + 0.18);
+          s.spans.forEach(sp => {
+            const w = WORDS[wi++];
+            tl.set(sp, { backgroundColor: "#ff5a1f", color: "#12100e" }, w.s);
+            tl.set(sp, { backgroundColor: "rgba(10,9,8,.78)", color: "#ffffff" }, w.e + 0.02);
+          });
+        });
+        tl.fromTo("#s1img", { scale: 1.0 }, { scale: 1.14, duration: 3.9, ease: "none" }, 0);
+        tl.fromTo("#s1emb", { scale: 0.7, opacity: 0.5 }, { scale: 1.15, opacity: 1, duration: 0.9, yoyo: true, repeat: 3, ease: "sine.inOut" }, 0.3);
+        tl.from("#w-s1 .center > *", { opacity: 0, y: 60, duration: 0.5, stagger: 0.15, ease: "power3.out" }, 0.4);
+        tl.fromTo("#s2ruler", { attr: { x2: 140 } }, { attr: { x2: 940 }, duration: 1.0, ease: "power2.inOut" }, 4.3);
+        tl.to("#s2core", { attr: { r: 58 }, duration: 0.4, ease: "back.out(2)" }, 5.15);
+        tl.to("#s2glow", { attr: { r: 130 }, duration: 0.9, ease: "power2.out" }, 5.2);
+        tl.from("#w-s2 .center .big", { opacity: 0, y: 50, duration: 0.4, ease: "power3.out" }, 4.1);
+        tl.fromTo("#s3spray div", { y: -80, opacity: 0 }, { y: 700, opacity: 1, duration: 1.1, stagger: 0.06, ease: "power1.in" }, 6.8);
+        tl.fromTo("#s3emb", { scale: 0.8 }, { scale: 1.1, duration: 0.7, yoyo: true, repeat: 3, ease: "sine.inOut" }, 6.8);
+        tl.from("#w-s3 .center .big", { opacity: 0, y: 40, duration: 0.4 }, 7.0);
+        tl.fromTo("#s4txt", { scale: 2.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.24, ease: "power4.in" }, 9.65);
+        tl.to("#s4txt", { textShadow: "0 0 120px rgba(255,36,56,.8)", duration: 0.12, yoyo: true, repeat: 3 }, 9.95);
+        tl.fromTo("#s5img", { scale: 1.05 }, { scale: 1.18, duration: 2.9, ease: "none" }, 11.2);
+        const o1 = { v: 0 };
+        tl.to(o1, { v: 8638, duration: 1.5, ease: "power2.out", snap: "v", onUpdate: function () { document.getElementById("odo1").textContent = Math.round(o1.v).toLocaleString("id-ID"); } }, 11.3);
+        tl.from("#w-s5 .center .mono, #w-s5 .kicker", { opacity: 0, y: 40, duration: 0.4, stagger: 0.15 }, 11.35);
+        tl.fromTo("#s6sweep", { xPercent: -101 }, { xPercent: 0, duration: 0.7, ease: "power3.out" }, 14.2);
+        tl.fromTo("#s6stamp", { scale: 2.4, opacity: 0, rotation: -30 }, { scale: 1, opacity: 1, rotation: -6, duration: 0.24, ease: "power4.in" }, 16.55);
+        tl.from("#w-s6 .center .big", { opacity: 0, y: 60, duration: 0.4 }, 14.3);
+        tl.fromTo("#s7img", { scale: 1.0 }, { scale: 1.12, duration: 7.6, ease: "none" }, 19.0);
+        tl.from("#w-s7 .kicker, #w-s7 .big", { opacity: 0, y: 50, duration: 0.5, stagger: 0.2 }, 20.4);
+        tl.fromTo("#s7strike", { scaleX: 0 }, { scaleX: 1, duration: 0.45, ease: "power3.in" }, 22.0);
+        tl.to("#s7salah", { opacity: 1, duration: 0.3 }, 24.4);
+        tl.fromTo("#s8smoke div", { y: -200 }, { y: 300, duration: 4.5, ease: "none", stagger: 0.05 }, 26.6);
+        tl.from("#w-s8 .center > *", { opacity: 0, y: 50, duration: 0.5, stagger: 0.2 }, 27.2);
+        tl.fromTo(".p9", { scale: 0.3, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.35, stagger: 0.6, ease: "back.out(2)" }, 31.55);
+        tl.to("#bar19", { height: 400, duration: 0.6, ease: "power2.out" }, 35.0);
+        tl.to("#bar26", { height: 740, duration: 1.6, ease: "power2.out" }, 36.2);
+        const o2 = { v: 0 };
+        tl.to(o2, { v: 202010, duration: 1.6, ease: "power2.out", snap: "v", onUpdate: function () { document.getElementById("odo26").textContent = Math.round(o2.v).toLocaleString("id-ID") + " HA"; } }, 36.2);
+        tl.fromTo("#s11big", { scale: 0.4, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.3, ease: "back.out(1.9)" }, 40.55);
+        tl.fromTo("#s12stamp", { scale: 2.2, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.22, ease: "power4.in" }, 43.85);
+        tl.fromTo("#s12img", { scale: 1.18 }, { scale: 1.0, duration: 4.2, ease: "none" }, 43.8);
+        tl.fromTo(".e13", { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.3, stagger: 0.14, ease: "back.out(2)" }, 48.3);
+        const o3 = { v: 1980 };
+        tl.to(o3, { v: 2026, duration: 2.6, ease: "none", snap: "v", onUpdate: function () { document.getElementById("s13year").textContent = Math.round(o3.v); } }, 48.3);
+        tl.fromTo("#s14stamp", { scale: 2.2, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.22, ease: "power4.in" }, 51.95);
+        tl.from("#s14img", { scale: 1.25, duration: 3.1, ease: "power1.out" }, 51.9);
+        tl.from("#w-s14 .center .big", { opacity: 0, y: 60, duration: 0.4 }, 52.4);
+        tl.fromTo("#s15img", { scale: 1.0 }, { scale: 1.14, duration: 6.5, ease: "none" }, 55.2);
+        const o4 = { v: 0 };
+        tl.to(o4, { v: 74, duration: 1.4, ease: "power2.out", snap: "v", onUpdate: function () { document.getElementById("odo74").textContent = Math.round(o4.v) + "%"; } }, 55.4);
+        tl.to("#s15dayak", { opacity: 1, duration: 0.3 }, 59.8);
+        tl.fromTo("#s16stamp", { scale: 2.2, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.22, ease: "power4.in" }, 61.75);
+        tl.fromTo("#s16spray div", { y: -80, opacity: 0 }, { y: 660, opacity: 1, duration: 1.2, stagger: 0.07, ease: "power1.in" }, 64.0);
+        tl.from("#w-s16 .center .big", { opacity: 0, y: 40, duration: 0.4 }, 65.4);
+        tl.fromTo("#s17img", { scale: 1.0 }, { scale: 1.12, duration: 8.0, ease: "none" }, 69.3);
+        tl.from("#w-s17 .big", { opacity: 0, y: 50, duration: 0.5 }, 69.8);
+        tl.fromTo("#s17pill", { scale: 0.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.35, ease: "back.out(2)" }, 74.4);
+        tl.to("#s17pill", { scale: 1.08, duration: 0.3, yoyo: true, repeat: 3, ease: "sine.inOut" }, 74.9);
+        tl.fromTo("#s18flash", { opacity: 0 }, { opacity: 0.85, duration: 0.12, yoyo: true, repeat: 1 }, 77.3);
+        tl.from("#s18sponge", { scale: 0.6, transformOrigin: "50% 50%", duration: 0.5, ease: "back.out(1.6)" }, 77.5);
+        tl.fromTo("#s18water circle", { attr: { cy: 400 }, opacity: 0 }, { attr: { cy: 800 }, opacity: 1, duration: 0.8, stagger: 0.1, ease: "power1.in" }, 78.2);
+        tl.from("#s18pores circle", { scale: 0, transformOrigin: "50% 50%", duration: 0.3, stagger: 0.1, ease: "back.out(2)" }, 79.4);
+        tl.from("#w-s18 .center > *", { opacity: 0, y: 50, duration: 0.5, stagger: 0.2 }, 80.6);
+        tl.fromTo("#s19img", { scale: 1.0 }, { scale: 1.1, duration: 5.2, ease: "none" }, 86.9);
+        tl.fromTo("#s19tag", { scale: 2.2, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.22, ease: "power4.in" }, 86.95);
+        tl.to("#s19kanal", { strokeDashoffset: 0, duration: 2.2, ease: "power1.inOut" }, 87.4);
+        const o5 = { v: 40 };
+        tl.to(o5, { v: 150, duration: 1.2, ease: "power1.in", snap: "v", onUpdate: function () { document.getElementById("s19gauge").textContent = "MUKA AIR: -" + Math.round(o5.v) + " cm"; } }, 89.6);
+        tl.from("#w-s19 .center > *", { opacity: 0, y: 50, duration: 0.4 }, 87.2);
+        tl.fromTo("#s20a", { scale: 2.4, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.2, ease: "power4.in" }, 92.15);
+        tl.to("#s20b", { opacity: 1, duration: 0.25, ease: "power2.out" }, 94.3);
+        tl.fromTo("#s21img", { scale: 1.05 }, { scale: 1.2, duration: 3.5, ease: "none" }, 98.2);
+        tl.from("#w-s21 .big", { opacity: 0, y: 60, duration: 0.4 }, 98.6);
+        tl.fromTo("#s22img", { scale: 1.3 }, { scale: 1.05, duration: 3.7, ease: "power1.out" }, 101.7);
+        tl.from("#w-s22 .center > *", { opacity: 0, y: 50, duration: 0.35, stagger: 0.15 }, 102.1);
+        tl.fromTo("#s23a", { scale: 1.1 }, { scale: 1.0, duration: 6.9, ease: "none" }, 105.4);
+        tl.fromTo("#s23b", { scale: 1.0 }, { scale: 1.1, duration: 6.9, ease: "none" }, 105.4);
+        tl.from("#s23loop", { opacity: 0, y: 60, duration: 0.4 }, 105.6);
+        tl.to("#s23loop", { opacity: 0.15, duration: 0.08, yoyo: true, repeat: 5 }, 109.8);
+        tl.fromTo("#s24img", { scale: 1.0 }, { scale: 1.1, duration: 8.4, ease: "none" }, 112.3);
+        tl.fromTo("#s24big", { scale: 0.4, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.4, ease: "back.out(1.7)" }, 114.7);
+        tl.from("#w-s24 .kicker, #w-s24 .center .big:not(#s24big)", { opacity: 0, y: 40, duration: 0.4 }, 117.4);
+        tl.from("#w-s25 .center > *", { opacity: 0, y: 80, duration: 0.35, stagger: 0.55, ease: "power3.out" }, 120.8);
+        tl.to("#s25vs", { textShadow: "0 0 90px rgba(255,36,56,.8)", duration: 0.15, yoyo: true, repeat: 3 }, 123.4);
+        tl.fromTo("#s25stamp", { scale: 1.8, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.2, ease: "power4.in" }, 126.0);
+        tl.fromTo("#s26img", { scale: 1.18 }, { scale: 1.0, duration: 8.2, ease: "power1.out" }, 128.5);
+        tl.from("#w-s26 .center > *", { opacity: 0, y: 50, duration: 0.45, stagger: 0.25 }, 129.0);
+        tl.from("#w-s27 .center .big", { opacity: 0, y: 50, duration: 0.4 }, 144.9);
+        tl.fromTo("#p27a .si", { scale: 1.0 }, { scale: 1.08, duration: 2.5, ease: "none" }, 136.7);
+        [["#p27a", "#p27b", 139.2], ["#p27b", "#p27c", 141.4], ["#p27c", "#p27d", 143.6]].forEach(pair => {
+          const a = pair[0], b = pair[1], t = pair[2];
+          tl.set(b, { opacity: 1 }, t);
+          tl.set(a, { opacity: 0 }, t + 0.02);
+          tl.fromTo(b + " .si", { scale: 1.0 }, { scale: 1.08, duration: 2.2, ease: "none" }, t);
+        });
+        tl.fromTo("#s28img", { scale: 1.0 }, { scale: 1.12, duration: 8.9, ease: "none" }, 147.3);
+        tl.fromTo("#s28big", { scale: 2.2, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.25, ease: "power4.in" }, 148.55);
+        tl.to("#s28end", { opacity: 1, duration: 0.6, ease: "power2.out" }, 150.8);
+        window.__timelines["main"] = tl;
+      })();
+    </script>
+  </body>
+</html>

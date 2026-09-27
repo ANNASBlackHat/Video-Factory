@@ -1,0 +1,49 @@
+# ── Secrets & personal ────────────────────────────────────────────────
+.env
+resume.txt
+.qoder/
+
+# ── OS / tool junk ────────────────────────────────────────────────────
+.DS_Store
+**/__pycache__/
+*.pyc
+
+# ── Stale duplicate of .agents/ (26 skills, Aug 24, missing agnes-ai-skill) ──
+# Canonical live copy is .agents/skills (27 skills, Sep 14).
+agent/
+
+# ── Dependencies & caches (reinstall / regenerate) ────────────────────
+node_modules/
+**/node_modules/
+**/.media/
+**/.hyperframes*/
+
+# ── Outputs — regenerable by re-running the pipeline ──────────────────
+videos/*/renders/
+videos/*/snapshots*/
+videos/*/audit/
+raws/*/snapshots/
+raws/*/frames/
+raws/*/contact/
+raws/*/output.mp4
+raws/*/*.wav
+
+# ── Heavy media — re-download / re-encode on demand ───────────────────
+# All video anywhere: source footage, re-encoded YouTube clips, BGM,
+# renders. Re-fetch via yt-dlp / PLAYBOOK §2 and re-render per PLAYBOOK §6.
+*.mp4
+*.mov
+*.webm
+raws/*/raw/
+videos/*/assets/vid/
+# Big extracted source audio (gabriel-rey 72 MB etc.) — re-extract it.
+# NOTE: audio under videos/*/assets/ (VO + SFX library) and raws/*/vo-*/
+# (TTS takes) is KEPT — the SFX rule is "copy, never regenerate".
+raws/*/*.wav
+*.mp3
+
+# ── Optional: uncomment to also drop evidence images (~36 MB) ─────────
+# Kept IN by default — re-collecting them is painful because
+# WSJ / Reuters / Polymarket are blocked (syndication hunting).
+# raws/*/assets-collected/
+# raws/*/assets-evidence/

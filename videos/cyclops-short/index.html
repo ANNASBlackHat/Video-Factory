@@ -1,0 +1,611 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="assets/vendor/gsap.min.js"></script>
+    <style>
+      :root{--board:#101218;--panel:#1B1E27;--line:#2A2E3A;--bone:#E9E6DE;--dim:#8B8FA0;--ember:#FF5A1F;--alarm:#E11D2E;--amber:#FFC233;--cold:#3EC6C0;}
+      *{margin:0;padding:0;box-sizing:border-box;}
+      html,body{width:1080px;height:1920px;overflow:hidden;background:#000;}
+      body{font-family:"Oswald",sans-serif;color:var(--bone);}
+      #root{position:relative;width:1080px;height:1920px;overflow:hidden;background:var(--board);}
+      .clip{position:absolute;left:0;top:0;width:1080px;height:1920px;overflow:hidden;}
+      .full{position:relative;width:1080px;height:1920px;overflow:hidden;}
+      .si{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;will-change:transform;}
+      .vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;will-change:transform,opacity;}
+      .boardbg{position:absolute;inset:0;background:radial-gradient(120% 80% at 50% 20%,#161923 0%,var(--board) 55%,#0A0C10 100%);}
+      .gridlines{position:absolute;inset:0;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:120px 120px;opacity:.16;}
+      .mono{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums;}
+      .bdisplay{font-family:"Archivo Black",sans-serif;font-weight:400;text-transform:uppercase;}
+      .eyebrow{font-weight:700;letter-spacing:.22em;font-size:34px;color:var(--dim);text-transform:uppercase;}
+      .shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.22) 0%,rgba(0,0,0,.66) 100%);}
+      .tag{position:absolute;background:var(--panel);border:2px solid var(--line);border-left:10px solid var(--amber);border-radius:14px;padding:22px 34px;font-weight:700;font-size:52px;letter-spacing:.06em;text-transform:uppercase;box-shadow:0 14px 34px rgba(0,0,0,.5);}
+      .tag.alarm{border-left-color:var(--alarm);}
+      .pin{position:absolute;top:-14px;left:50%;transform:translateX(-50%);width:26px;height:26px;border-radius:50%;background:var(--amber);box-shadow:0 4px 10px rgba(0,0,0,.6);}
+      .stamp{position:absolute;font-family:"Archivo Black",sans-serif;font-weight:400;text-transform:uppercase;border:6px solid currentColor;border-radius:10px;padding:8px 26px;transform:rotate(-4deg);opacity:.94;}
+      /* H1-H2 */
+      #hAphotoWrap{position:absolute;inset:0;will-change:transform;}
+      #hAeyebrow{position:absolute;top:170px;left:0;right:0;margin:auto;width:fit-content;text-align:center;background:rgba(16,18,24,.8);border:1px solid var(--line);padding:10px 26px;border-radius:10px;white-space:nowrap;}
+      #hA306{position:absolute;top:560px;left:0;right:0;text-align:center;font-size:340px;line-height:1;color:var(--ember);text-shadow:0 12px 0 rgba(0,0,0,.35),0 0 80px rgba(255,90,31,.35);}
+      #hA306lbl{position:absolute;top:940px;left:0;right:0;text-align:center;font-size:56px;font-weight:700;letter-spacing:.14em;}
+      #hAplansWrap{position:absolute;left:0;right:0;top:1080px;height:840px;overflow:hidden;}
+      #hAplansWrap .si{object-position:center 30%;}
+      #hAlast{position:absolute;bottom:400px;left:60px;font-size:30px;color:var(--bone);background:rgba(16,18,24,.82);border:1px solid var(--line);padding:14px 20px;white-space:nowrap;}
+      /* H3-H4 tags */
+      #tagDistress{top:360px;left:120px;}
+      #tagWreck{top:520px;left:260px;}
+      .xstrike{position:absolute;left:0;top:50%;width:100%;height:12px;background:var(--alarm);transform-origin:left center;}
+      /* H5-H6 */
+      #uboatPan{position:absolute;inset:0;will-change:transform;}
+      #tagUboat{top:240px;right:110px;}
+      #wrong{position:absolute;top:760px;left:0;right:0;text-align:center;font-size:300px;line-height:1;color:var(--alarm);text-shadow:0 12px 0 rgba(0,0,0,.4),0 0 90px rgba(225,29,46,.4);}
+      /* T1-T2 */
+      #ktbCard{position:absolute;top:420px;left:90px;width:900px;background:#E9E6DE;color:#181818;border-radius:12px;padding:44px 48px;box-shadow:0 24px 60px rgba(0,0,0,.55);}
+      #ktbCard h2{font-family:"JetBrains Mono",monospace;font-weight:700;font-size:44px;letter-spacing:.04em;}
+      #ktbCard .row{font-family:"JetBrains Mono",monospace;font-size:28px;margin-top:22px;padding:14px 0;border-top:2px dashed #9a978c;color:#3c3a34;}
+      #stampReview{top:1180px;left:110px;font-size:64px;color:var(--alarm);}
+      #stampChecked{top:1340px;left:330px;font-size:52px;color:#1f7a3d;}
+      /* T3 */
+      #zero{position:absolute;top:560px;left:0;right:0;text-align:center;font-size:360px;line-height:1;color:var(--bone);text-shadow:0 12px 0 rgba(0,0,0,.4);}
+      #zeroLine{position:absolute;top:960px;left:0;right:0;text-align:center;font-size:40px;color:var(--dim);white-space:nowrap;overflow:hidden;}
+      /* T4 map */
+      #mapCard{position:absolute;top:360px;left:90px;width:900px;height:900px;}
+      /* T5 flip */
+      #flipWrap{position:absolute;top:1280px;left:140px;width:800px;height:300px;perspective:1200px;}
+      #flipInner{position:relative;width:100%;height:100%;transform-style:preserve-3d;}
+      .face{position:absolute;inset:0;backface-visibility:hidden;display:flex;align-items:center;justify-content:center;background:var(--panel);border:3px solid var(--amber);border-radius:16px;font-weight:700;font-size:64px;letter-spacing:.05em;text-transform:uppercase;text-align:center;padding:0 30px;}
+      .face.back{transform:rotateY(180deg);border-color:var(--alarm);color:var(--alarm);font-size:54px;}
+      /* R1-R3 */
+      #tagAsk{top:300px;left:110px;font-size:56px;}
+      #emberGrade{position:absolute;inset:0;background:rgba(255,90,31,.18);mix-blend-mode:overlay;}
+      .physCard{position:absolute;top:240px;left:60px;width:960px;background:var(--panel);border:2px solid var(--line);border-radius:18px;padding:30px;}
+      .physLbl{font-size:32px;font-weight:700;letter-spacing:.12em;color:var(--dim);text-transform:uppercase;text-align:center;}
+      #barBracket{position:absolute;top:1170px;left:120px;width:700px;height:70px;}
+      #fiveX{position:absolute;top:1230px;right:100px;font-size:190px;color:var(--alarm);border:none;padding:0;transform:rotate(-8deg);}
+      /* R6 water */
+      #stampUnder{top:1250px;left:190px;font-size:58px;color:var(--cold);}
+      /* R8+ storm */
+      #force8{position:absolute;bottom:560px;left:60px;font-size:38px;color:var(--bone);background:rgba(16,18,24,.8);border:1px solid var(--line);padding:14px 20px;}
+      /* V1-V2 */
+      #caseStatus{position:absolute;top:300px;left:0;right:0;text-align:center;font-size:64px;color:var(--bone);white-space:nowrap;overflow:hidden;}
+      #probable{position:absolute;top:720px;left:0;right:0;text-align:center;font-size:150px;line-height:1.05;color:var(--alarm);border-width:10px;padding:20px 40px;text-shadow:0 0 60px rgba(225,29,46,.5);transform:rotate(-4deg);}
+      #stampUnder{position:absolute;top:1250px;left:190px;font-size:58px;color:var(--cold);}
+      /* V3 */
+      #xnot{position:absolute;top:800px;left:0;right:0;text-align:center;}
+      #notwar{position:absolute;top:980px;left:0;right:0;text-align:center;font-size:150px;color:var(--alarm);line-height:1;}
+      /* V4 */
+      #finalLine{position:absolute;top:780px;left:60px;right:60px;text-align:center;font-size:110px;line-height:1.25;}
+      #finalLine .wd{display:inline-block;margin:0 14px;opacity:0;}
+      #finalLine .ember{color:var(--ember);}#finalLine .alarm{color:var(--alarm);}
+      /* C1-C2 */
+      #caseTab{position:absolute;top:420px;left:0;background:var(--amber);color:#101218;font-weight:700;font-size:44px;letter-spacing:.14em;padding:18px 40px 18px 60px;border-radius:0 14px 14px 0;}
+      #endTitle{position:absolute;top:640px;left:60px;right:60px;text-align:center;font-size:130px;line-height:1.05;text-shadow:0 10px 0 rgba(0,0,0,.35);}
+      #endEp{position:absolute;top:850px;left:60px;right:60px;text-align:center;font-size:54px;font-weight:700;letter-spacing:.2em;color:var(--ember);text-transform:uppercase;}
+      #chips{position:absolute;top:1180px;left:60px;right:60px;display:flex;flex-wrap:wrap;gap:14px;justify-content:center;}
+      .chip{font-size:26px;color:var(--dim);border:1px solid var(--line);background:rgba(16,18,24,.8);border-radius:8px;padding:10px 16px;}
+      #pill{position:absolute;top:1420px;left:50%;background:var(--ember);color:#101218;font-weight:700;font-size:48px;letter-spacing:.08em;padding:22px 46px;border-radius:999px;white-space:nowrap;}
+      /* FLASH + CAPTIONS */
+      #flash{position:absolute;inset:0;opacity:0;z-index:30;pointer-events:none;}
+      #capWrap{position:absolute;left:0;right:0;bottom:320px;z-index:40;text-align:center;pointer-events:none;}
+      #capWrap .seg{display:none;justify-content:center;flex-wrap:wrap;gap:6px 8px;background:rgba(16,18,24,.82);border:1px solid var(--line);border-radius:18px;padding:12px 18px;width:fit-content;max-width:calc(100% - 32px);box-sizing:border-box;margin:0 auto;}
+      #capWrap .seg.on{display:flex;}
+      #capWrap .wd{font-weight:700;font-size:58px;line-height:1.1;padding:4px 14px;border-radius:10px;color:var(--bone);background:rgba(16,18,24,.2);}
+      #capWrap .wd.seen{color:#fff;background:rgba(16,18,24,.72);}
+      #capWrap .wd.act{color:#101218;background:var(--ember);}
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="53.71"
+      data-width="1080"
+      data-height="1920"
+      data-fps="30"
+    >
+      
+      
+
+      <!-- ======================= AUDIO TRACKS ======================= -->
+      <audio id="vo"  src="assets/audio/voiceover.wav" data-start="0" data-duration="53.71" data-track-index="10"></audio>
+      <audio id="bed" src="assets/audio/bed_dark.wav"  data-start="0" data-duration="53.71" data-volume="0.55" data-track-index="11"></audio>
+      <!-- SFX (track 12) -->
+      <audio id="sfx_deep_hit_0" src="assets/audio/sfx/deep_hit.wav"      data-start="0"     data-duration="1"    data-volume="0.8"  data-track-index="12"></audio>
+      <audio id="sfx_stamp_thud_1_04" src="assets/audio/sfx/stamp_thud.wav"    data-start="1.04"  data-duration="0.6"  data-volume="0.85" data-track-index="13"></audio>
+      <audio id="sfx_paper_flip_2_14" src="assets/audio/sfx/paper_flip.wav"    data-start="2.14"  data-duration="0.8"  data-volume="0.5"  data-track-index="14"></audio>
+      <audio id="sfx_whoosh_hard_4_76" src="assets/audio/sfx/whoosh_hard.wav"   data-start="4.76"  data-duration="0.5"  data-volume="0.7"  data-track-index="12"></audio>
+      <audio id="sfx_stamp_thud_6_42" src="assets/audio/sfx/stamp_thud.wav"    data-start="6.42"  data-duration="0.6"  data-volume="0.85" data-track-index="13"></audio>
+      <audio id="sfx_sonar_ping_7_92" src="assets/audio/sfx/sonar_ping.wav"    data-start="7.92"  data-duration="1"    data-volume="0.55" data-track-index="14"></audio>
+      <audio id="sfx_deep_hit_11_6" src="assets/audio/sfx/deep_hit.wav"      data-start="11.6"  data-duration="1"    data-volume="0.85" data-track-index="12"></audio>
+      <audio id="sfx_paper_flip_12_4" src="assets/audio/sfx/paper_flip.wav"    data-start="12.4"  data-duration="0.8"  data-volume="0.5"  data-track-index="13"></audio>
+      <audio id="sfx_stamp_thud_14_36" src="assets/audio/sfx/stamp_thud.wav"    data-start="14.36" data-duration="0.6"  data-volume="0.85" data-track-index="14"></audio>
+      <audio id="sfx_tick_counter_16_36" src="assets/audio/sfx/tick_counter.wav"  data-start="16.36" data-duration="0.62" data-volume="0.6"  data-track-index="12"></audio>
+      <audio id="sfx_deep_hit_16_42" src="assets/audio/sfx/deep_hit.wav"      data-start="16.42" data-duration="1"    data-volume="0.8"  data-track-index="13"></audio>
+      <audio id="sfx_sonar_ping_18_3" src="assets/audio/sfx/sonar_ping.wav"    data-start="18.3"  data-duration="1"    data-volume="0.5"  data-track-index="14"></audio>
+      <audio id="sfx_sonar_ping_19_4" src="assets/audio/sfx/sonar_ping.wav"    data-start="19.4"  data-duration="1"    data-volume="0.5"  data-track-index="12"></audio>
+      <audio id="sfx_whoosh_hard_20_46" src="assets/audio/sfx/whoosh_hard.wav"   data-start="20.46" data-duration="0.5"  data-volume="0.7"  data-track-index="13"></audio>
+      <audio id="sfx_paper_flip_20_5" src="assets/audio/sfx/paper_flip.wav"    data-start="20.5"  data-duration="0.8"  data-volume="0.5"  data-track-index="14"></audio>
+      <audio id="sfx_riser_tension_22_8" src="assets/audio/sfx/riser_tension.wav" data-start="22.8"  data-duration="2.8"  data-volume="0.6"  data-track-index="12"></audio>
+      <audio id="sfx_deep_hit_26_14" src="assets/audio/sfx/deep_hit.wav"      data-start="26.14" data-duration="1"    data-volume="0.8"  data-track-index="13"></audio>
+      <audio id="sfx_tick_counter_26_9" src="assets/audio/sfx/tick_counter.wav"  data-start="26.9"  data-duration="0.62" data-volume="0.6"  data-track-index="14"></audio>
+      <audio id="sfx_deep_hit_27_9" src="assets/audio/sfx/deep_hit.wav"      data-start="27.9"  data-duration="1"    data-volume="0.8"  data-track-index="12"></audio>
+      <audio id="sfx_ui_click_29_8" src="assets/audio/sfx/ui_click.wav"      data-start="29.8"  data-duration="0.15" data-volume="0.5"  data-track-index="13"></audio>
+      <audio id="sfx_whoosh_hard_31" src="assets/audio/sfx/whoosh_hard.wav"   data-start="31"    data-duration="0.5"  data-volume="0.7"  data-track-index="14"></audio>
+      <audio id="sfx_stamp_thud_33_4" src="assets/audio/sfx/stamp_thud.wav"    data-start="33.4"  data-duration="0.6"  data-volume="0.7"  data-track-index="12"></audio>
+      <audio id="sfx_water_swell_34_34" src="assets/audio/sfx/water_swell.wav"   data-start="34.34" data-duration="1.4"  data-volume="0.6"  data-track-index="13"></audio>
+      <audio id="sfx_riser_tension_38" src="assets/audio/sfx/riser_tension.wav" data-start="38"    data-duration="2.8"  data-volume="0.6"  data-track-index="14"></audio>
+      <audio id="sfx_thunder_40_08" src="assets/audio/sfx/thunder.wav"       data-start="40.08" data-duration="1.2"  data-volume="0.9"  data-track-index="12"></audio>
+      <audio id="sfx_ui_click_41_38" src="assets/audio/sfx/ui_click.wav"      data-start="41.38" data-duration="0.15" data-volume="0.5"  data-track-index="13"></audio>
+      <audio id="sfx_stamp_thud_42_64" src="assets/audio/sfx/stamp_thud.wav"    data-start="42.64" data-duration="0.6"  data-volume="0.9"  data-track-index="14"></audio>
+      <audio id="sfx_whoosh_hard_43_94" src="assets/audio/sfx/whoosh_hard.wav"   data-start="43.94" data-duration="0.5"  data-volume="0.7"  data-track-index="12"></audio>
+      <audio id="sfx_deep_hit_45_16" src="assets/audio/sfx/deep_hit.wav"      data-start="45.16" data-duration="1"    data-volume="0.75" data-track-index="13"></audio>
+      <audio id="sfx_deep_hit_47_4" src="assets/audio/sfx/deep_hit.wav"      data-start="47.4"  data-duration="1"    data-volume="0.8"  data-track-index="14"></audio>
+      <audio id="sfx_deep_hit_48_4" src="assets/audio/sfx/deep_hit.wav"      data-start="48.4"  data-duration="1"    data-volume="0.9"  data-track-index="12"></audio>
+      <audio id="sfx_paper_flip_49_4" src="assets/audio/sfx/paper_flip.wav"    data-start="49.4"  data-duration="0.8"  data-volume="0.5"  data-track-index="13"></audio>
+      <audio id="sfx_ui_click_52_64" src="assets/audio/sfx/ui_click.wav"      data-start="52.64" data-duration="0.15" data-volume="0.5"  data-track-index="14"></audio>
+      <!-- H1 0.00-2.14: 306 SLAM -->
+      <div class="clip" id="hA" data-start="0" data-duration="2.14" data-track-index="0">
+        <div class="full">
+          <div id="hAphotoWrap"><img class="si" src="assets/img/uss_cyclops_19N13451.jpg" alt="" /></div>
+          <div class="shade"></div>
+          <div id="hAeyebrow" class="eyebrow">USS CYCLOPS &mdash; MARCH 1918</div>
+          <div id="hA306" class="bdisplay">306</div>
+          <div id="hA306lbl">SOULS ABOARD</div>
+        </div>
+      </div>
+      <!-- H2 2.14-4.76: BLUEPRINT PARALLAX -->
+      <div class="clip" id="hB" data-start="2.14" data-duration="2.62" data-track-index="0">
+        <div class="full">
+          <div class="boardbg"></div><div class="gridlines"></div>
+          <div id="hAplansWrap" data-layout-allow-overflow><img class="si" src="assets/img/uss_cyclops_plans_NARA.small.jpg" alt="" /></div>
+          <div class="shade"></div>
+          <div id="hAlast" class="mono">LAST SIGHTING: BARBADOS &mdash; MAR 4 1918</div>
+        </div>
+      </div>
+      <!-- H3 4.76-6.42: NO DISTRESS CALL -->
+      <div class="clip" id="hC" data-start="4.76" data-duration="1.66" data-track-index="0">
+        <div class="full">
+          <div class="boardbg"></div><div class="gridlines"></div>
+          <div class="tag" id="tagDistress">NO DISTRESS CALL<div class="pin"></div><div class="xstrike" id="xsC"></div></div>
+        </div>
+      </div>
+      <!-- H4 6.42-7.92: NO WRECKAGE -->
+      <div class="clip" id="hD" data-start="6.42" data-duration="1.5" data-track-index="0">
+        <div class="full">
+          <div class="boardbg"></div><div class="gridlines"></div>
+          <div class="tag" id="tagDistress">NO DISTRESS CALL<div class="pin"></div><div class="xstrike" id="xsD"></div></div>
+          <div class="tag" id="tagWreck">NO WRECKAGE<div class="pin"></div></div>
+        </div>
+      </div>
+      <!-- H5 7.92-10.18: U-BOAT -->
+      <div class="clip" id="hE" data-start="7.92" data-duration="2.26" data-track-index="0">
+        <div class="full">
+          <div id="uboatPan" data-layout-allow-overflow><img class="si" src="assets/img/stower_sinking_linda_blanche.jpg" alt="" /></div>
+          <div class="shade"></div>
+          <div class="tag" id="tagUboat">U-BOAT?<div class="pin"></div></div>
+        </div>
+      </div>
+      <!-- H6 10.18-11.60: HOLD -->
+      <div class="clip" id="hF" data-start="10.18" data-duration="1.42" data-track-index="0">
+        <div class="full">
+          <div class="boardbg"></div><div class="gridlines"></div>
+        </div>
+      </div>
+      <!-- T1 11.60-14.36: WRONG + KTB CARD -->
+      <div class="clip" id="tA" data-start="11.6" data-duration="2.76" data-track-index="0">
+        <div class="full">
+          <div class="boardbg"></div><div class="gridlines"></div>
+          <div id="wrong" class="bdisplay">WRONG</div>
+          <div id="ktbCard" class="mono">
+            <h2>KTB &mdash; BDU WAR DIARIES</h2>
+            <div class="row">ALL U-BOAT &amp; RAIDERS</div>
+            <div class="row">EVERY SINKING CLAIMED</div>
+            <div class="row">POSTWAR REVIEW</div>
+          </div>
+        </div>
+      </div>
+      <!-- T2 14.36-16.36: POSTWAR STAMPS -->
+      <div class="clip" id="tB" data-start="14.36" data-duration="2" data-track-index="0">
+        <div class="full">
+          <div class="boardbg"></div><div class="gridlines"></div>
+          <div id="ktbCard" class="mono">
+            <h2>KTB &mdash; BDU WAR DIARIES</h2>
+            <div class="row">ALL U-BOAT &amp; RAIDERS</div>
+            <div class="row">EVERY SINKING CLAIMED</div>
+            <div class="row">POSTWAR REVIEW</div>
+          </div>
+          <div class="stamp" id="stampReview">POST-WAR REVIEW</div>
+          <div class="stamp" id="stampChecked">CHECKED</div>
+        </div>
+      </div>
+      <!-- T3 16.36-18.24: ZERO -->
+      <div class="clip" id="tC" data-start="16.36" data-duration="1.88" data-track-index="0">
+        <div class="full">
+          <div class="boardbg"></div><div class="gridlines"></div>
+          <div id="zero" class="bdisplay">ZERO</div>
+          <div id="zeroLine" class="mono">WEST OF 40TH MERIDIAN &mdash; MARCH 1918</div>
+        </div>
+      </div>
+      <!-- T4 18.24-20.46: ROUTE MAP -->
+      <div class="clip" id="tD" data-start="18.24" data-duration="2.22" data-track-index="0">
+        <div class="full">
+          <div class="boardbg"></div><div class="gridlines"></div>
+          <div id="mapCard">
+            <svg viewBox="0 0 900 900" style="position:absolute;inset:0;width:100%;height:100%">
+              <rect x="0" y="0" width="900" height="900" fill="#141722" stroke="#2A2E3A" stroke-width="3" rx="14"/>
+              <g fill="#22262F" opacity="0.5"><rect x="40" y="60" width="260" height="180"/><rect x="340" y="40" width="220" height="140"/><rect x="620" y="80" width="230" height="160"/></g>
+              <line x1="640" y1="60" x2="640" y2="840" stroke="#8B8FA0" stroke-width="4" stroke-dasharray="14 10"/>
+              <text x="640" y="40" fill="#8B8FA0" font-size="30" text-anchor="middle" font-family="JetBrains Mono,monospace">40TH MERIDIAN</text>
+              <circle cx="270" cy="700" r="14" fill="#FFC233"/>
+              <text x="270" y="750" fill="#E9E6DE" font-size="32" text-anchor="middle" font-family="Oswald,sans-serif" font-weight="700">BARBADOS</text>
+              <circle cx="620" cy="250" r="14" fill="#E9E6DE"/>
+              <text x="620" y="210" fill="#E9E6DE" font-size="32" text-anchor="middle" font-family="Oswald,sans-serif" font-weight="700">BALTIMORE</text>
+              <path id="routePath" d="M 270 700 C 380 640, 470 480, 540 380 S 600 280, 620 250" fill="none" stroke="#FF5A1F" stroke-width="8" stroke-linecap="round"/>
+              <circle id="capeDot" cx="520" cy="430" r="16" fill="#FF5A1F"/>
+              <text id="capeLbl" x="560" y="470" fill="#FF5A1F" font-size="28" font-family="JetBrains Mono,monospace">VIRGINIA CAPES</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <!-- T5 20.46-21.84: THEORY FLIP -->
+      <div class="clip" id="tE" data-start="20.46" data-duration="1.38" data-track-index="0">
+        <div class="full">
+          <div class="boardbg"></div><div class="gridlines"></div>
+          <div id="flipWrap"><div id="flipInner">
+            <div class="face">WAR THEORY</div>
+            <div class="face back">DISPROVEN &mdash; NO CLAIM / NO SIGNATURE</div>
+          </div></div>
+        </div>
+      </div>
+      <!-- R1 21.84-25.14: CREW + ASK -->
+      <div class="clip" id="rA" data-start="21.84" data-duration="3.3" data-track-index="0">
+        <div class="full">
+          <div id="rAphotoWrap"><img class="si" src="assets/img/uss_cyclops_crew_righting_arms.small.jpg" alt="" /></div>
+          <div class="shade"></div>
+          <div class="tag" id="tagAsk">SO WHAT ACTUALLY HAPPENED?<div class="pin"></div></div>
+        </div>
+      </div>
+      <!-- R2 25.14-26.56: ORE -->
+      <div class="clip" id="rB" data-start="25.14" data-duration="1.42" data-track-index="0">
+        <div class="full">
+          <div id="rBwrap"><img class="si" src="assets/img/manganese_ore_rock.jpg" alt="" /></div>
+          <div id="emberGrade"></div>
+        </div>
+      </div>
+      <!-- R3 26.56-29.80: DENSITY BAR -->
+      <div class="clip" id="rC" data-start="26.56" data-duration="3.24" data-track-index="0">
+        <div class="full">
+          <div class="boardbg"></div><div class="gridlines"></div>
+          <div class="physCard">
+            <div class="physLbl">SAME HULL &mdash; DIFFERENT CARGO</div>
+            <svg viewBox="0 0 900 640" style="position:absolute;left:0;top:70px;width:100%;height:520px">
+              <line x1="120" y1="470" x2="780" y2="470" stroke="#2A2E3A" stroke-width="6"/>
+              <rect x="170" y="70" width="200" height="400" fill="none" stroke="#2A2E3A" stroke-width="4"/>
+              <rect x="540" y="70" width="200" height="400" fill="none" stroke="#2A2E3A" stroke-width="4"/>
+              <rect id="barCoal" x="178" y="410" width="184" height="60" fill="#E9E6DE"/>
+              <rect id="barOre"  x="548" y="170" width="184" height="300" fill="#FF5A1F"/>
+              <text x="270" y="530" fill="#8B8FA0" font-size="30" text-anchor="middle" font-family="JetBrains Mono,monospace">COAL / BUILT FOR</text>
+              <text x="640" y="530" fill="#FF5A1F" font-size="30" text-anchor="middle" font-family="JetBrains Mono,monospace">MANGANESE ORE / CARRYING</text>
+            </svg>
+          </div>
+          <svg id="barBracket" viewBox="0 0 700 70">
+            <path id="bracketPath" d="M 30 10 L 30 45 M 30 45 L 660 45 M 660 45 L 660 10" fill="none" stroke="#E11D2E" stroke-width="6"/>
+          </svg>
+          <div class="stamp" id="fiveX">5x</div>
+        </div>
+      </div>
+      <!-- R4 29.80-31.62: ENGINE CRACK -->
+      <div class="clip" id="rD" data-start="29.8" data-duration="1.82" data-track-index="0">
+        <div class="full">
+          <div class="boardbg"></div><div class="gridlines"></div>
+          <div class="physCard">
+            <div class="physLbl">TWIN SCREW &mdash; ENGINE ROOM</div>
+            <svg viewBox="0 0 900 560" style="position:absolute;left:0;top:80px;width:100%;height:480px">
+              <g stroke="#2A2E3A" stroke-width="4" fill="none">
+                <rect x="120" y="60" width="280" height="300" rx="18"/>
+                <rect x="500" y="60" width="280" height="300" rx="18"/>
+              </g>
+              <g stroke="#E9E6DE" stroke-width="7" fill="none">
+                <circle cx="260" cy="210" r="70"/>
+                <circle cx="640" cy="210" r="70"/>
+              </g>
+              <circle id="engPistonA" cx="260" cy="210" r="20" fill="#E9E6DE"/>
+              <circle id="engPistonB" cx="640" cy="210" r="20" fill="#E9E6DE"/>
+              <path id="engCrack" d="M 640 140 L 620 180 L 655 205 L 630 250 L 650 300" fill="none" stroke="#E11D2E" stroke-width="8"/>
+              <text x="460" y="430" fill="#E11D2E" font-size="32" text-anchor="middle" font-family="JetBrains Mono,monospace">1 OF 2 ENGINES / DISABLED</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <!-- R5 31.62-34.34: OVERLOAD -->
+      <div class="clip" id="rE" data-start="31.62" data-duration="2.72" data-track-index="0">
+        <div class="full">
+          <div class="boardbg"></div><div class="gridlines"></div>
+          <div class="physCard">
+            <div class="physLbl">CARGO DEPTH</div>
+            <svg viewBox="0 0 900 560" style="position:absolute;left:0;top:80px;width:100%;height:480px">
+              <rect x="180" y="60" width="540" height="320" fill="none" stroke="#2A2E3A" stroke-width="4"/>
+              <g id="brickG" fill="#FF5A1F" opacity="0.9"></g>
+              <line id="deckLine" x1="140" y1="60" x2="760" y2="60" stroke="#E9E6DE" stroke-width="6"/>
+              <line x1="140" y1="440" x2="760" y2="440" stroke="#2A2E3A" stroke-width="4"/>
+              <text x="450" y="490" fill="#8B8FA0" font-size="30" text-anchor="middle" font-family="JetBrains Mono,monospace">HOLD LOADED ABOVE THE LINE</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <!-- R6 34.34-37.48: WATERLINE -->
+      <div class="clip" id="rF" data-start="34.34" data-duration="3.14" data-track-index="0">
+        <div class="full">
+          <div class="boardbg"></div><div class="gridlines"></div>
+          <div class="physCard">
+            <div class="physLbl">FREEBOARD</div>
+            <svg viewBox="0 0 900 560" style="position:absolute;left:0;top:80px;width:100%;height:480px">
+              <g id="shipG">
+                <rect x="240" y="200" width="420" height="120" fill="#E9E6DE"/>
+                <rect x="300" y="150" width="120" height="50" fill="#E9E6DE"/>
+                <circle id="plimsollDisc" cx="690" cy="260" r="26" fill="none" stroke="#FFC233" stroke-width="6"/>
+                <line x1="664" y1="260" x2="716" y2="260" stroke="#FFC233" stroke-width="6"/>
+              </g>
+              <rect id="waterG" x="140" y="360" width="620" height="140" fill="#3EC6C0" opacity="0.55"/>
+              <circle id="ripple" cx="690" cy="360" r="10" fill="none" stroke="#3EC6C0" stroke-width="5" opacity="0"/>
+            </svg>
+          </div>
+          <div class="stamp" id="stampUnder">FULLY UNDERWATER</div>
+        </div>
+      </div>
+      <!-- R7 37.48-39.52: DRIFT + WAVE LOOM -->
+      <div class="clip" id="rG" data-start="37.48" data-duration="2.04" data-track-index="0">
+        <div class="full">
+          <div class="boardbg"></div><div class="gridlines"></div>
+          <svg id="driftSil" viewBox="0 0 1080 500" style="position:absolute;top:620px;left:0;width:1080px;height:500px">
+            <path d="M 90 220 L 250 220 L 300 180 L 360 180 L 380 220 L 640 220 L 700 300 L 250 300 Z" fill="#E9E6DE" opacity="0.85"/>
+            <path d="M 300 180 L 310 120 L 360 120 L 365 180 Z" fill="#E9E6DE" opacity="0.85"/>
+          </svg>
+          <div id="waveLoom"><img class="si" src="assets/img/courbet_storm_wave.jpg" alt="" /></div>
+          <div class="shade"></div>
+        </div>
+      </div>
+      <!-- R8 39.52-40.08: STORM SLICE -->
+      <video id="stormVid1" class="clip vid" src="assets/vid/storm_vertical_1080x1920.mp4" muted playsinline preload="auto" data-start="39.52" data-duration="0.56" data-media-start="10" data-track-index="1"></video>
+      <div class="clip" id="rH" data-start="39.52" data-duration="0.56" data-track-index="0">
+        <div class="full">
+          <div class="shade" style="background:linear-gradient(180deg,rgba(0,0,0,.15) 0%,rgba(0,0,0,.55) 100%)"></div>
+          <div id="force8" class="mono">FORCE 8-10 / MAR 9-10 1918</div>
+        </div>
+      </div>
+      <!-- V1 40.08-41.70: CASE STATUS -->
+      <video id="stormVid2" class="clip vid" src="assets/vid/storm_vertical_1080x1920.mp4" muted playsinline preload="auto" data-start="40.08" data-duration="1.62" data-media-start="0.5" data-track-index="1"></video>
+      <div class="clip" id="vA" data-start="40.08" data-duration="1.62" data-track-index="0">
+        <div class="full">
+          <div id="stormDim2" class="shade" style="background:rgba(8,10,14,.6)"></div>
+          <div id="caseStatus" class="mono">CASE STATUS:</div>
+        </div>
+      </div>
+      <!-- V2 41.70-43.94: PROBABLE STAMP -->
+      <video id="stormVid3" class="clip vid" src="assets/vid/storm_vertical_1080x1920.mp4" muted playsinline preload="auto" data-start="41.7" data-duration="2.24" data-media-start="6" data-track-index="1"></video>
+      <div class="clip" id="vB" data-start="41.7" data-duration="2.24" data-track-index="0">
+        <div class="full">
+          <div id="stormDim3" class="shade" style="background:rgba(8,10,14,.6)"></div>
+          <div id="caseStatus" class="mono">CASE STATUS:</div>
+          <div class="stamp" id="probable">PROBABLE ~75%</div>
+        </div>
+      </div>
+      <!-- V3 43.94-46.42: NOT WAR -->
+      <video id="navyVid" class="clip vid" src="assets/vid/navy_1920x1080.mp4" muted playsinline preload="auto" data-start="43.94" data-duration="2.48" data-media-start="5" data-track-index="1"></video>
+      <div class="clip" id="vC" data-start="43.94" data-duration="2.48" data-track-index="0">
+        <div class="full">
+          <div id="navyDim" class="shade" style="background:rgba(8,10,14,.55)"></div>
+          <svg id="xnot" viewBox="0 0 300 300" style="width:300px;height:300px;left:390px">
+            <path id="xnotPath" d="M 40 40 L 260 260 M 260 40 L 40 260" fill="none" stroke="#E11D2E" stroke-width="26" stroke-linecap="round"/>
+          </svg>
+          <div id="notwar" class="bdisplay">NOT WAR</div>
+        </div>
+      </div>
+      <!-- V4 46.42-48.40: FINAL LINE -->
+      <div class="clip" id="vD" data-start="46.42" data-duration="1.98" data-track-index="0">
+        <div class="full">
+          <div class="boardbg"></div>
+          <div id="finalLine" class="bdisplay">
+            <span class="wd">KILLED</span><span class="wd">BY</span><span class="wd ember" id="flHer">HER</span><span class="wd ember" id="flOwn">OWN</span><span class="wd alarm" id="flPhys">PHYSICS</span>
+          </div>
+        </div>
+      </div>
+      <!-- C1 48.40-50.96: END CARD -->
+      <div class="clip" id="cA" data-start="48.4" data-duration="2.56" data-track-index="0">
+        <div class="full">
+          <div id="endWrap">
+            <div class="boardbg"></div><div class="gridlines"></div>
+            <div id="caseTab">CASE FILE</div>
+            <div id="endTitle" class="bdisplay">DEAD<br/>RECKONING</div>
+            <div id="endEp">EP 1 / USS CYCLOPS</div>
+          </div>
+        </div>
+      </div>
+      <!-- C2 50.96-53.71: SOURCES + CTA -->
+      <div class="clip" id="cB" data-start="50.96" data-duration="2.75" data-track-index="0">
+        <div class="full">
+          <div id="endWrap">
+            <div class="boardbg"></div><div class="gridlines"></div>
+            <div id="caseTab">CASE FILE</div>
+            <div id="endTitle" class="bdisplay">DEAD<br/>RECKONING</div>
+            <div id="endEp">EP 1 / USS CYCLOPS</div>
+            <div id="chips" class="mono">
+              <span class="chip">NHHC</span>
+              <span class="chip">USN POSTWAR REVIEW</span>
+              <span class="chip">US WEATHER BUREAU MAR 1918</span>
+            </div>
+            <div id="pill">FULL CASE FILE &mdash; LINKED BELOW</div>
+          </div>
+        </div>
+      </div>
+      <!-- FLASH + CAPTIONS (always on top) -->
+      <div id="flash" class="clip" data-start="0" data-duration="53.71" data-track-index="20"></div>
+      <div id="capWrap" class="clip" data-start="0" data-duration="53.71" data-track-index="21"></div>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+      const W = [[1.04,1.76,"306"],[1.76,2.14,"people"],[2.14,2.48,"vanished"],[2.48,2.78,"on"],[2.78,2.96,"this"],[2.96,3.16,"ship"],[3.16,3.34,"in"],[3.34,4.06,"1918,"],[4.76,5.06,"no"],[5.06,5.46,"distress"],[5.46,5.92,"call,"],[6.42,6.78,"no"],[6.78,7.44,"wreckage,"],[7.92,8.36,"everyone"],[8.36,8.9,"assumed"],[8.9,9.12,"a"],[9.12,9.4,"German"],[9.4,9.68,"U"],[9.68,9.92,"-boat"],[9.92,10.18,"got"],[10.18,10.46,"her,"],[11.08,11.36,"they"],[11.36,11.6,"were"],[11.6,11.96,"wrong."],[12.86,13.52,"German"],[13.52,13.88,"naval"],[13.88,14.36,"records"],[14.36,14.82,"checked"],[14.82,15.24,"after"],[15.24,15.36,"the"],[15.36,15.64,"war,"],[16.1,16.36,"show"],[16.36,16.76,"zero"],[16.76,17.24,"submarines"],[17.24,17.84,"anywhere"],[17.84,18.04,"near"],[18.04,18.24,"her"],[18.24,18.64,"position,"],[19.38,19.58,"no"],[19.58,19.76,"one"],[19.76,19.9,"ever"],[19.9,20.26,"claimed"],[20.26,20.46,"the"],[20.46,20.72,"kill,"],[21.06,21.26,"because"],[21.26,21.5,"no"],[21.5,21.68,"one"],[21.68,21.84,"was"],[21.84,22.12,"there,"],[22.82,23.26,"so"],[23.26,23.46,"what"],[23.46,23.84,"actually"],[23.84,24.34,"happened?"],[25.14,25.46,"She"],[25.46,25.78,"was"],[25.78,26.14,"carrying"],[26.14,26.56,"ore"],[26.56,26.96,"five"],[26.96,27.34,"times"],[27.34,27.92,"denser"],[27.92,28,"than"],[28,28.16,"the"],[28.16,28.38,"coal"],[28.38,28.6,"she"],[28.6,28.76,"was"],[28.76,28.96,"built"],[28.96,29.28,"for,"],[29.8,30.2,"one"],[30.2,30.3,"of"],[30.3,30.44,"her"],[30.44,30.62,"two"],[30.62,31,"engines"],[31,31.24,"was"],[31.24,31.62,"broken,"],[32.36,32.7,"and"],[32.7,32.92,"she"],[32.92,33.08,"was"],[33.08,33.34,"so"],[33.34,34.08,"overloaded,"],[34.34,34.46,"her"],[34.46,35,"waterline"],[35,35.34,"mark"],[35.34,35.54,"was"],[35.54,35.84,"fully"],[35.84,36.42,"underwater"],[36.42,36.66,"when"],[36.66,36.82,"she"],[36.82,37.04,"left"],[37.04,37.48,"port,"],[38.08,38.38,"Then"],[38.38,38.74,"she"],[38.74,39.12,"sailed"],[39.12,39.52,"straight"],[39.52,39.9,"into"],[39.9,40.08,"a"],[40.08,40.4,"gale,"],[41.38,41.7,"case"],[41.7,42.2,"status,"],[42.64,42.94,"probable."],[43.94,44.16,"She"],[44.16,44.52,"wasn't"],[44.52,44.8,"sunk"],[44.8,45.04,"by"],[45.04,45.16,"the"],[45.16,45.4,"war"],[45.4,45.64,"she"],[45.64,45.82,"was"],[45.82,46.06,"sailing"],[46.06,46.42,"through,"],[47.02,47.24,"she"],[47.24,47.4,"was"],[47.4,47.74,"killed"],[47.74,48,"by"],[48,48.2,"her"],[48.2,48.4,"own"],[48.4,48.74,"physics,"],[49.4,49.76,"full"],[49.76,50.1,"case"],[50.1,50.46,"file,"],[50.96,51.08,"the"],[51.08,51.32,"whole"],[51.32,52.06,"investigation,"],[52.64,52.84,"linked"],[52.84,53.18,"below."]];
+      // ---- helpers ----
+      function shake(t, sel, amp, n) { for (let i = 0; i < n; i++) { tl.to(sel, { x: (i % 2 ? -1 : 1) * amp * (1 - i / n), y: (i % 2 ? 1 : -1) * amp * 0.5 * (1 - i / n), duration: 0.045, ease: "none" }, t + i * 0.05); } tl.set(sel, { x: 0, y: 0 }, t + n * 0.05 + 0.01); }
+      function typer(sel, str, start, step) { const el = document.querySelector(sel); if (!el) return; tl.call(() => { el.textContent = ""; }, null, start); for (let i = 1; i <= str.length; i++) { const s = str.slice(0, i); tl.call(() => { el.textContent = s; }, null, start + i * step); } }
+      function whipIn(sel, t, dir) { tl.set(sel, { x: (dir || 1) * 120 }, t); tl.to(sel, { x: 0, duration: 0.22, ease: "power3.out" }, t); }
+      // ---- karaoke captions ----
+      const SEGS = []; let cur = [];
+      for (const w of W) { if (!cur.length) { cur.push(w); continue; } const prev = cur[cur.length - 1]; if (w[0] - prev[1] < 0.6 && cur.length < 6) { cur.push(w); } else { SEGS.push(cur); cur = [w]; } }
+      if (cur.length) SEGS.push(cur);
+      const capWrap = document.getElementById("capWrap");
+      const capSegEls = [], capWordEls = [];
+      for (const seg of SEGS) { const el = document.createElement("div"); el.className = "seg"; const spans = []; for (const w of seg) { const s = document.createElement("span"); s.className = "wd"; s.textContent = w[2]; el.appendChild(s); spans.push(s); } capWrap.appendChild(el); capSegEls.push(el); capWordEls.push(spans); }
+      for (let i = 0; i < SEGS.length; i++) { const seg = SEGS[i], el = capSegEls[i]; tl.set(el, { display: "flex" }, seg[0][0]); tl.set(el, { display: "none" }, Math.min(seg[seg.length - 1][1] + 0.04, 53.7)); for (let j = 0; j < seg.length; j++) { const w = seg[j], s = capWordEls[i][j]; tl.set(s, { color: "#101218", backgroundColor: "#FF5A1F" }, w[0]); tl.set(s, { color: "#FFFFFF", backgroundColor: "rgba(16,18,24,0.72)" }, w[1]); } }
+      // SFX data-volume -> attribute fix (data-* must be real attributes)
+      document.querySelectorAll("audio[data-volume]").forEach(a => { a.setAttribute("data-volume", a.getAttribute("data-volume")); });
+      // ---- H1 0.00-2.14: 306 SLAM ----
+      tl.set("#hAphotoWrap", { scale: 1.05 }, 0);
+      tl.to("#hAphotoWrap", { scale: 1.12, duration: 2.14, ease: "none" }, 0);
+      tl.set("#hAeyebrow", { opacity: 0, y: 24 }, 0); tl.to("#hAeyebrow", { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 0.1);
+      tl.set("#hA306", { opacity: 0, scale: 1.5 }, 0); tl.to("#hA306", { opacity: 1, scale: 1.0, duration: 0.28, ease: "power4.out" }, 1.04);
+      shake(1.1, "#hA .full", 14, 5);
+      tl.set("#hA306lbl", { opacity: 0, y: 18 }, 0); tl.to("#hA306lbl", { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 1.24);
+      // ---- H2 2.14-4.76: BLUEPRINT PARALLAX ----
+      tl.set("#hAplansWrap", { y: 260 }, 2.14); tl.to("#hAplansWrap", { y: 0, duration: 2.4, ease: "power2.out" }, 2.14);
+      typer("#hAlast", "LAST SIGHTING: BARBADOS - MAR 4 1918", 2.4, 0.03);
+      // ---- H3 4.76-6.42: NO DISTRESS CALL ----
+      whipIn("#hC .tag", 4.8, 1);
+      tl.set("#xsC", { scaleX: 0 }, 4.76); tl.to("#xsC", { scaleX: 1, duration: 0.22, ease: "power3.in" }, 5.5);
+      // ---- H4 6.42-7.92: NO WRECKAGE ----
+      tl.set("#hD .tag", { opacity: 0, scale: 0.9 }, 6.42);
+      tl.to("#hD #tagDistress", { opacity: 1, scale: 1, duration: 0.18, ease: "back.out(2)" }, 6.42);
+      tl.to("#hD #tagWreck", { opacity: 1, scale: 1, duration: 0.18, ease: "back.out(2)" }, 6.68);
+      tl.set("#xsD", { scaleX: 0 }, 6.42); tl.to("#xsD", { scaleX: 1, duration: 0.22, ease: "power3.in" }, 7.2);
+      // ---- H5 7.92-10.18: U-BOAT ----
+      tl.set("#uboatPan", { x: -80, scale: 1.08 }, 7.92);
+      tl.to("#uboatPan", { x: 80, duration: 2.26, ease: "none" }, 7.92);
+      whipIn("#hE .tag", 8.02, -1);
+      tl.to("#hE .tag", { scale: 1.06, duration: 0.09, yoyo: true, repeat: 5, ease: "none" }, 8.7);
+      // ---- H6 10.18-11.60: HOLD (WRONG lands in T1) ----
+      // ---- T1 11.60-14.36: WRONG + KTB CARD ----
+      tl.set("#wrong", { opacity: 0, scale: 1.6 }, 11.6);
+      tl.to("#wrong", { opacity: 1, scale: 1.0, duration: 0.3, ease: "power4.out" }, 11.6);
+      shake(11.6, "#tA .full", 18, 6);
+      tl.set("#tA #ktbCard", { opacity: 0, y: 60, rotation: -8 }, 12.4);
+      tl.to("#tA #ktbCard", { opacity: 1, y: 0, rotation: 0, duration: 0.45, ease: "power3.out" }, 12.4);
+      // ---- T2 14.36-16.36: POSTWAR STAMPS ----
+      tl.set("#tB #ktbCard", { opacity: 1, y: 0, rotation: 0 }, 14.36);
+      tl.set("#tB #stampReview", { opacity: 0, scale: 2.4 }, 14.36);
+      tl.to("#tB #stampReview", { opacity: 0.94, scale: 1, duration: 0.16, ease: "power4.in" }, 14.36);
+      tl.set("#tB #stampChecked", { opacity: 0, scale: 2.4 }, 15.64);
+      tl.to("#tB #stampChecked", { opacity: 0.94, scale: 1, duration: 0.16, ease: "power4.in" }, 15.64);
+      // ---- T3 16.36-18.24: ZERO ----
+      tl.set("#zero", { opacity: 0, scale: 1.8 }, 16.36);
+      tl.to("#zero", { opacity: 1, scale: 1, duration: 0.3, ease: "power4.out" }, 16.36);
+      shake(16.4, "#tC .full", 14, 5);
+      typer("#zeroLine", "WEST OF 40TH MERIDIAN - MARCH 1918", 16.8, 0.024);
+      // ---- T4 18.24-20.46: ROUTE MAP ----
+      whipIn("#mapCard", 18.26, -1);
+      const route = document.getElementById("routePath");
+      const routeLen = route ? route.getTotalLength() : 800;
+      tl.set(route, { strokeDasharray: routeLen, strokeDashoffset: routeLen }, 18.24);
+      tl.to(route, { strokeDashoffset: 0, duration: 1.2, ease: "power1.inOut" }, 18.4);
+      tl.set("#capeDot", { scale: 0, transformOrigin: "center" }, 18.24);
+      tl.to("#capeDot", { scale: 1, duration: 0.2, ease: "back.out(2.5)" }, 19.3);
+      tl.set("#capeLbl", { opacity: 0 }, 18.24); tl.to("#capeLbl", { opacity: 1, duration: 0.3 }, 19.4);
+      tl.to("#capeDot", { scale: 1.5, duration: 0.12, yoyo: true, repeat: 3, ease: "none" }, 19.6);
+      // ---- T5 20.46-21.84: THEORY FLIP ----
+      tl.set("#flipInner", { rotationY: 0 }, 20.46);
+      tl.to("#flipInner", { rotationY: 180, duration: 0.45, ease: "power2.inOut" }, 20.5);
+      // ---- R1 21.84-25.14: CREW + ASK ----
+      tl.set("#rAphotoWrap", { scale: 1.02 }, 21.84);
+      tl.to("#rAphotoWrap", { scale: 1.1, duration: 3.3, ease: "none" }, 21.84);
+      tl.set("#rA .tag", { opacity: 0, y: 40 }, 21.84);
+      tl.to("#rA .tag", { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 23.3);
+      // ---- R2 25.14-26.56: ORE PUNCH ----
+      tl.set("#rBwrap", { scale: 1.25 }, 25.14);
+      tl.to("#rBwrap", { scale: 1.0, duration: 0.2, ease: "power4.out" }, 26.14);
+      // ---- R3 26.56-29.80: DENSITY BAR ----
+      tl.set("#rC #barCoal", { scaleY: 0, transformOrigin: "50% 100%" }, 26.56);
+      tl.to("#rC #barCoal", { scaleY: 1, duration: 0.5, ease: "power2.out" }, 26.7);
+      tl.set("#rC #barOre", { scaleY: 0, transformOrigin: "50% 100%" }, 26.56);
+      tl.to("#rC #barOre", { scaleY: 1, duration: 0.7, ease: "power3.out" }, 27.0);
+      tl.set("#rC #bracketPath", { opacity: 0 }, 26.56);
+      tl.set("#rC #bracketPath", { opacity: 1 }, 27.34);
+      tl.set("#rC #fiveX", { opacity: 0, scale: 2.2 }, 26.56);
+      tl.to("#rC #fiveX", { opacity: 1, scale: 1, duration: 0.22, ease: "power4.in" }, 27.34);
+      // ---- R4 29.80-31.62: ENGINE CRACK ----
+      tl.set("#rD #engPistonA", { y: 0 }, 29.8); tl.set("#rD #engPistonB", { y: 0 }, 29.8);
+      tl.to("#rD #engPistonA", { y: -26, duration: 0.28, yoyo: true, repeat: 3, ease: "power1.inOut" }, 29.84);
+      tl.to("#rD #engPistonB", { y: -26, duration: 0.28, yoyo: true, repeat: 2, ease: "power1.inOut" }, 29.84);
+      tl.set("#rD #engCrack", { opacity: 0 }, 29.8); tl.set("#rD #engCrack", { opacity: 1 }, 31.0);
+      tl.to("#rD .physCard svg", { rotation: 3, transformOrigin: "center", duration: 0.12, ease: "none" }, 31.0);
+      tl.to("#rD #engPistonB", { opacity: 0.15, duration: 0.1 }, 31.12);
+      tl.to("#rD #engCrack", { opacity: 0.3, duration: 0.1, yoyo: true, repeat: 3, ease: "none" }, 31.12);
+      // ---- R5 31.62-34.34: OVERLOAD ----
+      const brickG = document.getElementById("brickG");
+      const BRICKS = 18;
+      if (brickG) { for (let i = 0; i < BRICKS; i++) { const r = document.createElementNS("http://www.w3.org/2000/svg", "rect"); r.setAttribute("x", 200 + (i % 6) * 85); r.setAttribute("width", 78); r.setAttribute("height", 30); r.setAttribute("y", 350); brickG.appendChild(r); } }
+      const brickRows = 3, brickCols = 6;
+      for (let row = 0; row < brickRows; row++) { for (let col = 0; col < brickCols; col++) { const idx = row * brickCols + col; const t = 31.72 + row * 0.32 + col * 0.012; const y = 350 - row * 34; tl.set(`#brickG rect:nth-child(${idx + 1})`, { y: 350, opacity: 0 }, 31.62); tl.to(`#brickG rect:nth-child(${idx + 1})`, { y: y, opacity: 0.9, duration: 0.18, ease: "power2.out" }, t); } }
+      tl.set("#rE #deckLine", { y: 0 }, 31.62); tl.to("#rE #deckLine", { y: 8, duration: 0.5, ease: "power1.out" }, 33.6);
+      // ---- R6 34.34-37.48: WATERLINE ----
+      tl.set("#rF #waterG", { y: 120, opacity: 0 }, 34.34);
+      tl.to("#rF #waterG", { y: 0, opacity: 0.55, duration: 1.2, ease: "power1.inOut" }, 34.8);
+      tl.set("#rF #shipG", { y: 0 }, 34.34); tl.to("#rF #shipG", { y: 54, duration: 0.6, ease: "power2.in" }, 35.84);
+      tl.set("#rF #ripple", { attr: { r: 10 }, opacity: 0 }, 35.84);
+      tl.to("#rF #ripple", { attr: { r: 70 }, opacity: 0.9, duration: 0.4, ease: "power1.out" }, 36.3);
+      tl.to("#rF #ripple", { opacity: 0, duration: 0.3 }, 36.7);
+      tl.set("#rF #stampUnder", { opacity: 0, scale: 2.0 }, 34.34);
+      tl.to("#rF #stampUnder", { opacity: 0.94, scale: 1, duration: 0.18, ease: "power4.in" }, 36.42);
+      // ---- R7 37.48-39.52: DRIFT + WAVE LOOM ----
+      tl.set("#rG #driftSil", { x: 0, opacity: 1 }, 37.48);
+      tl.to("#rG #driftSil", { x: 340, opacity: 0, duration: 1.7, ease: "power1.in" }, 37.6);
+      tl.set("#rG #waveLoom", { yPercent: 100 }, 37.48);
+      tl.to("#rG #waveLoom", { yPercent: 0, duration: 1.6, ease: "power2.out" }, 37.9);
+      // ---- R8 39.52-40.08: STORM SLICE ----
+      tl.set("#rH #stormVid1", { scale: 1.1 }, 39.52);
+      tl.to("#rH #stormVid1", { scale: 1.0, duration: 0.3, ease: "power3.out" }, 39.6);
+      tl.set("#flash", { opacity: 0.9 }, 40.06);
+      tl.to("#flash", { opacity: 0, duration: 0.14, ease: "power2.out" }, 40.1);
+      // ---- V1 40.08-41.70: CASE STATUS ----
+      typer("#vA #caseStatus", "CASE STATUS:", 41.38, 0.045);
+      // ---- V2 41.70-43.94: PROBABLE ----
+      tl.set("#vB #probable", { opacity: 0, scale: 2.2 }, 41.7);
+      tl.to("#vB #probable", { opacity: 1, scale: 1, duration: 0.2, ease: "power4.in" }, 42.64);
+      shake(42.68, "#vB .full", 12, 5);
+      // ---- V3 43.94-46.42: NOT WAR ----
+      tl.set("#vC #xnotPath", { opacity: 0 }, 43.94);
+      tl.set("#vC #notwar", { opacity: 0, scale: 1.3 }, 43.94);
+      tl.to("#vC #notwar", { opacity: 1, scale: 1, duration: 0.22, ease: "power4.out" }, 45.16);
+      tl.set("#vC #xnotPath", { opacity: 1 }, 45.16);
+      tl.set("#vC #xnot", { rotation: -8 }, 43.94);
+      // ---- V4 46.42-48.40: FINAL LINE ----
+      tl.set("#vD .wd", { opacity: 0, scale: 0.9 }, 46.42);
+      tl.to("#vD .wd:nth-child(1)", { opacity: 1, scale: 1, duration: 0.16, ease: "back.out(2)" }, 47.02);
+      tl.to("#vD .wd:nth-child(2)", { opacity: 1, scale: 1, duration: 0.16, ease: "back.out(2)" }, 47.22);
+      tl.to("#vD #flHer", { opacity: 1, scale: 1, duration: 0.16, ease: "back.out(2)" }, 47.42);
+      tl.to("#vD #flOwn", { opacity: 1, scale: 1, duration: 0.16, ease: "back.out(2)" }, 47.62);
+      tl.to("#vD #flPhys", { opacity: 1, scale: 1.06, duration: 0.2, ease: "back.out(2.5)" }, 48.4);
+      shake(48.4, "#vD .full", 12, 4);
+      // ---- C1 48.40-50.96: END CARD ----
+      tl.set("#cA #endWrap", { scale: 1.0, opacity: 0 }, 48.4);
+      tl.to("#cA #endWrap", { opacity: 1, duration: 0.35, ease: "power2.out" }, 48.4);
+      tl.set("#cA #caseTab", { x: -520 }, 48.4);
+      tl.to("#cA #caseTab", { x: 0, duration: 0.45, ease: "power3.out" }, 49.4);
+      tl.set("#cA #endTitle", { opacity: 0, y: 50 }, 48.4);
+      tl.to("#cA #endTitle", { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, 48.55);
+      tl.set("#cA #endEp", { opacity: 0 }, 48.4);
+      tl.to("#cA #endEp", { opacity: 1, duration: 0.4 }, 49.1);
+      // ---- C2 50.96-53.71: SOURCES + CTA ----
+      tl.set("#cB #endWrap", { scale: 1.0, opacity: 1 }, 50.96);
+      tl.to("#cB #endWrap", { scale: 1.02, duration: 2.75, ease: "none" }, 50.96);
+      tl.set("#cB #caseTab", { x: 0 }, 50.96);
+      tl.set("#cB .chip", { opacity: 0, y: 30 }, 50.96);
+      tl.to("#cB .chip", { opacity: 1, y: 0, duration: 0.3, stagger: 0.1, ease: "power2.out" }, 51.1);
+      tl.set("#cB #pill", { scale: 0.6, opacity: 0 }, 50.96);
+      tl.to("#cB #pill", { scale: 1, opacity: 1, duration: 0.25, ease: "back.out(2.5)" }, 52.64);
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

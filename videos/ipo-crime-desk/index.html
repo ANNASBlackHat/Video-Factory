@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1080, height=1920">
+    <title>MARKET CRIME DESK — Bedah IPO SWAP</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #0a0b0d; }
+      body { font-family: "Inter", sans-serif; color: #fff; }
+      #root {
+        position: relative; width: 1080px; height: 1920px; overflow: hidden;
+        background: #0a0b0d;
+      }
+      .clip { position: absolute; left: 0; top: 0; }
+      .full { width: 100%; height: 100%; display: grid; place-items: center; }
+      .mono   { font-family: "JetBrains Mono", monospace; }
+      .oswald { font-family: "Oswald", sans-serif; }
+      .black-display { font-family: "Archivo Black", sans-serif; }
+      .tnum { font-variant-numeric: tabular-nums; }
+      .si { position: absolute; left: 0; top: 0; width: 100%; height: 100%; will-change: opacity, transform; }
+
+      /* ---------- shared chrome ---------- */
+      .chrome-frame {
+        background: #101216; border: 2px solid #2a2e36; border-radius: 26px;
+        box-shadow: 0 30px 80px rgba(0,0,0,.7), 0 0 0 1px rgba(255,255,255,.04);
+        overflow: hidden;
+      }
+      .chrome-bar {
+        height: 54px; display: flex; align-items: center; gap: 10px; padding: 0 22px;
+        background: #191d24; border-bottom: 1px solid #262b33;
+      }
+      .dot { width: 16px; height: 16px; border-radius: 50%; }
+      .url-pill {
+        margin-left: 14px; flex: 1; background: #0c0e11; border-radius: 999px;
+        padding: 8px 18px; font-family: "JetBrains Mono", monospace;
+        font-size: 20px; color: #7dd3fc; white-space: nowrap; overflow: hidden;
+      }
+      .pill-badge {
+        display: inline-flex; align-items: center; gap: 8px;
+        border: 2px solid #333945; border-radius: 999px; color: #cbd5e1;
+        font-family: "Oswald", sans-serif; font-weight: 700; font-size: 24px;
+        letter-spacing: .1em; padding: 8px 22px; background: #14171c;
+      }
+      .pill-badge.red { border-color: #e11d2e; color: #ff5a67; }
+
+      /* rubber stamp */
+      .stamp {
+        position: absolute; display: inline-block; transform-origin: center;
+        color: #ff2438; border: 7px double #ff2438; border-radius: 12px;
+        padding: 16px 30px; text-align: center;
+        font-family: "Oswald", sans-serif; font-weight: 700; text-transform: uppercase;
+        letter-spacing: .06em; line-height: 1.08;
+        background: rgba(225,29,46,.07);
+        box-shadow: inset 0 0 34px rgba(225,29,46,.28), 0 18px 50px rgba(0,0,0,.55);
+      }
+      .stamp .stamp-flag {
+        display: block; font-size: 38px; letter-spacing: .22em; color: #fff;
+        background: #e11d2e; margin: -16px -30px 8px; padding: 8px 30px 4px;
+        border-radius: 5px 5px 0 0;
+      }
+      .stamp .stamp-word { font-size: 54px; letter-spacing: .04em; }
+
+      /* evidence-board grid backdrop */
+      .board-bg {
+        background:
+          linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px),
+          radial-gradient(120% 80% at 50% 20%, #12151a 0%, #0a0b0d 70%);
+        background-size: 72px 72px, 72px 72px, cover;
+      }
+
+      /* crop-motion inner wrapper inside an overflow-hidden frame */
+      .crop-host { overflow: hidden; position: relative; }
+      .crop-img-wrap { position: absolute; left: -6%; top: -6%; width: 112%; height: 112%; }
+      .cover { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+      /* ---------- captions ---------- */
+      .caption-bar {
+        left: 40px; top: 1564px; width: 1000px; min-height: 118px;
+        display: flex; align-items: center; justify-content: center;
+        z-index: 60; pointer-events: none;
+      }
+      .caption-text {
+        max-width: 980px; text-align: center;
+        font-family: "Oswald", sans-serif; font-weight: 700; font-size: 58px;
+        line-height: 1.12; text-transform: uppercase; letter-spacing: .01em;
+        color: #fff; text-shadow: 0 3px 14px rgba(0,0,0,.85);
+      }
+      .cap-hl { background: #e11d2e; padding: 2px 14px; border-radius: 6px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+      .cap-box { background: rgba(8,9,11,.78); padding: 12px 26px; border-radius: 12px; border: 1px solid rgba(255,255,255,.08); }
+
+      /* ---------- ticker ---------- */
+      #ticker { top: 1780px; height: 92px; z-index: 61; width: 100%; overflow: hidden; background: #e11d2e; border-top: 3px solid #ff5a67; border-bottom: 3px solid #7f0a14; }
+      .ticker-track {
+        position: absolute; left: 0; top: 0; height: 86px; white-space: nowrap;
+        display: flex; align-items: center; will-change: transform;
+        font-family: "JetBrains Mono", monospace; font-weight: 700; font-size: 40px; color: #fff;
+      }
+      .ticker-track span { padding: 0 34px; }
+
+      /* ---------- HUD ---------- */
+      .hud { z-index: 62; pointer-events: none; }
+      .hud-chip {
+        display: inline-flex; align-items: center; gap: 12px;
+        font-family: "Oswald", sans-serif; font-weight: 700; font-size: 27px;
+        letter-spacing: .18em; color: #94a3b8; text-transform: uppercase;
+        background: rgba(10,11,13,.66); border: 1px solid #262b33; border-radius: 999px;
+        padding: 10px 26px;
+      }
+      .hud-chip b { color: #fff; }
+      .hud-dot { width: 16px; height: 16px; border-radius: 50%; background: #e11d2e; box-shadow: 0 0 14px #e11d2e; }
+
+      /* ---------- scene-specific ---------- */
+      .k-line { font-family: "Archivo Black", sans-serif; line-height: .96; text-transform: uppercase; }
+      .slash-motif { height: 14px; width: 260px; background: repeating-linear-gradient(-45deg,#e11d2e 0 16px,transparent 16px 30px); }
+
+      .glitch-big { position: relative; font-family: "Archivo Black", sans-serif; text-transform: uppercase; line-height: .98; will-change: transform; }
+      .glitch-layer { position: absolute; inset: 0; opacity: .85; }
+
+      .wf-col { width: 74px; border-radius: 6px 6px 0 0; transform-origin: bottom; background: linear-gradient(#34d399,#065f46); }
+      .wf-col.dead { background: linear-gradient(#ff3548,#7f0a14); }
+
+      .bar-row { display: flex; align-items: center; gap: 20px; }
+      .bar-label { width: 330px; font-family: "Oswald", sans-serif; font-weight: 700; font-size: 31px; letter-spacing: .05em; text-align: right; color: #e2e8f0; text-transform: uppercase; }
+      .bar-track { flex: 1; height: 84px; background: #161a20; border: 1px solid #232833; border-radius: 10px; overflow: hidden; }
+      .bar-fill { height: 100%; transform-origin: left center; }
+      .bar-pct { width: 150px; font-family: "JetBrains Mono", monospace; font-weight: 700; font-size: 40px; }
+
+      .split-half { position: absolute; top: 380px; width: 500px; height: 900px; border-radius: 26px; overflow: hidden; display: grid; place-items: center; }
+
+      svg.stroke-draw { stroke-dasharray: 1600; stroke-dashoffset: 1600; }
+
+      .btn-capsule {
+        width: 420px; height: 230px; border-radius: 32px; display: grid; place-items: center;
+        font-family: "Archivo Black", sans-serif; font-size: 70px; text-transform: uppercase;
+        border: 4px solid transparent; will-change: transform;
+      }
+      .btn-buy  { background: linear-gradient(180deg,#16a34a,#14532d); border-color: #4ade80; color: #f0fdf4; box-shadow: 0 0 60px rgba(34,197,94,.35); }
+      .btn-skip { background: linear-gradient(180deg,#3f0d14,#200408); border-color: #e11d2e; color: #fecdd3; box-shadow: 0 0 60px rgba(225,29,46,.3); }
+
+      .vignette {
+        z-index: 55; pointer-events: none;
+        background: radial-gradient(115% 82% at 50% 42%, transparent 55%, rgba(0,0,0,.55) 100%);
+      }
+      .scanlines {
+        z-index: 56; pointer-events: none; opacity: .10;
+        background: repeating-linear-gradient(0deg, rgba(255,255,255,.5) 0 1px, transparent 1px 5px);
+      }
+    </style>
+  </head>
+  <body>
+    <div data-hf-id="hf-92f1" id="root" data-composition-id="main" data-start="0" data-duration="63" data-width="1080" data-height="1920" data-fps="30">
+      <!-- ================= AUDIO : VO + SFX (each sfx on own track index) ================= -->
+      <audio data-hf-id="hf-vkuq" id="voiceover-10" class="clip" src="assets/audio/voiceover.wav" data-start="0" data-track-index="10"></audio>
+      <audio data-hf-id="hf-tzfn" id="deep-hit-11" class="clip" src="assets/audio/sfx/deep_hit.wav" data-start="0" data-duration="0.9" data-track-index="11"></audio>
+      <audio data-hf-id="hf-5lvc" id="whoosh-hard-12" class="clip" src="assets/audio/sfx/whoosh_hard.wav" data-start="1.95" data-duration="0.5" data-track-index="12"></audio>
+      <audio data-hf-id="hf-jz98" id="whoosh-hard-13" class="clip" src="assets/audio/sfx/whoosh_hard.wav" data-start="4.45" data-duration="0.5" data-track-index="13"></audio>
+      <audio data-hf-id="hf-0ov3" id="ui-click-14" class="clip" src="assets/audio/sfx/ui_click.wav" data-start="5.4" data-duration="0.15" data-track-index="14"></audio>
+      <audio data-hf-id="hf-kvfv" id="deep-hit-15" class="clip" src="assets/audio/sfx/deep_hit.wav" data-start="8" data-duration="0.9" data-track-index="15"></audio>
+      <audio data-hf-id="hf-wst7" id="whoosh-hard-16" class="clip" src="assets/audio/sfx/whoosh_hard.wav" data-start="10.45" data-duration="0.5" data-track-index="16"></audio>
+      <audio data-hf-id="hf-wyt8" id="stamp-thud-17" class="clip" src="assets/audio/sfx/stamp_thud.wav" data-start="14.5" data-duration="0.6" data-track-index="17"></audio>
+      <audio data-hf-id="hf-0xy6" id="glitch-stutter-18" class="clip" src="assets/audio/sfx/glitch_stutter.wav" data-start="17" data-duration="0.48" data-track-index="18"></audio>
+      <audio data-hf-id="hf-qmrr" id="deep-hit-19" class="clip" src="assets/audio/sfx/deep_hit.wav" data-start="17" data-duration="0.9" data-track-index="19"></audio>
+      <audio data-hf-id="hf-ww56" id="whoosh-hard-20" class="clip" src="assets/audio/sfx/whoosh_hard.wav" data-start="18.95" data-duration="0.5" data-track-index="20"></audio>
+      <audio data-hf-id="hf-dodk" id="tick-counter-21" class="clip" src="assets/audio/sfx/tick_counter.wav" data-start="21.85" data-duration="0.62" data-track-index="21"></audio>
+      <audio data-hf-id="hf-z2ga" id="whoosh-hard-22" class="clip" src="assets/audio/sfx/whoosh_hard.wav" data-start="23.75" data-duration="0.5" data-track-index="22"></audio>
+      <audio data-hf-id="hf-x2jn" id="riser-tension-23" class="clip" src="assets/audio/sfx/riser_tension.wav" data-start="23.6" data-duration="2.8" data-track-index="23"></audio>
+      <audio data-hf-id="hf-a4bf" id="alarm-buzzer-24" class="clip" src="assets/audio/sfx/alarm_buzzer.wav" data-start="26.45" data-duration="0.82" data-track-index="24"></audio>
+      <audio data-hf-id="hf-tc5m" id="stamp-thud-25" class="clip" src="assets/audio/sfx/stamp_thud.wav" data-start="26.6" data-duration="0.6" data-track-index="25"></audio>
+      <audio data-hf-id="hf-qtp3" id="whoosh-hard-26" class="clip" src="assets/audio/sfx/whoosh_hard.wav" data-start="28.91" data-duration="0.5" data-track-index="26"></audio>
+      <audio data-hf-id="hf-18c4" id="tick-counter-27" class="clip" src="assets/audio/sfx/tick_counter.wav" data-start="30.25" data-duration="0.62" data-track-index="27"></audio>
+      <audio data-hf-id="hf-2pe7" id="whoosh-hard-28" class="clip" src="assets/audio/sfx/whoosh_hard.wav" data-start="32.45" data-duration="0.5" data-track-index="28"></audio>
+      <audio data-hf-id="hf-5fbn" id="whoosh-hard-29" class="clip" src="assets/audio/sfx/whoosh_hard.wav" data-start="36.45" data-duration="0.5" data-track-index="29"></audio>
+      <audio data-hf-id="hf-0xw7" id="alarm-buzzer-30" class="clip" src="assets/audio/sfx/alarm_buzzer.wav" data-start="38.35" data-duration="0.82" data-track-index="30"></audio>
+      <audio data-hf-id="hf-zefd" id="stamp-thud-31" class="clip" src="assets/audio/sfx/stamp_thud.wav" data-start="38.4" data-duration="0.6" data-track-index="31"></audio>
+      <audio data-hf-id="hf-ip6z" id="whoosh-hard-32" class="clip" src="assets/audio/sfx/whoosh_hard.wav" data-start="40.71" data-duration="0.5" data-track-index="32"></audio>
+      <audio data-hf-id="hf-dpw2" id="whoosh-hard-33" class="clip" src="assets/audio/sfx/whoosh_hard.wav" data-start="43.95" data-duration="0.5" data-track-index="33"></audio>
+      <audio data-hf-id="hf-c70u" id="ui-click-34" class="clip" src="assets/audio/sfx/ui_click.wav" data-start="44.4" data-duration="0.15" data-track-index="34"></audio>
+      <audio data-hf-id="hf-h0ra" id="deep-hit-35" class="clip" src="assets/audio/sfx/deep_hit.wav" data-start="48.5" data-duration="0.9" data-track-index="35"></audio>
+      <audio data-hf-id="hf-d35y" id="alarm-buzzer-36" class="clip" src="assets/audio/sfx/alarm_buzzer.wav" data-start="49.7" data-duration="0.82" data-track-index="36"></audio>
+      <audio data-hf-id="hf-znrd" id="stamp-thud-37" class="clip" src="assets/audio/sfx/stamp_thud.wav" data-start="49.8" data-duration="0.6" data-track-index="37"></audio>
+      <audio data-hf-id="hf-gpq2" id="whoosh-hard-38" class="clip" src="assets/audio/sfx/whoosh_hard.wav" data-start="52.48" data-duration="0.5" data-track-index="38"></audio>
+      <audio data-hf-id="hf-1re3" id="ui-click-39" class="clip" src="assets/audio/sfx/ui_click.wav" data-start="53.1" data-duration="0.15" data-track-index="39"></audio>
+      <audio data-hf-id="hf-tnlh" id="ui-click-40" class="clip" src="assets/audio/sfx/ui_click.wav" data-start="56" data-duration="0.15" data-track-index="40"></audio>
+      <audio data-hf-id="hf-bofe" id="deep-hit-41" class="clip" src="assets/audio/sfx/deep_hit.wav" data-start="56" data-duration="0.9" data-track-index="41"></audio>
+      <audio data-hf-id="hf-8z0i" id="whoosh-hard-42" class="clip" src="assets/audio/sfx/whoosh_hard.wav" data-start="59.9" data-duration="0.5" data-track-index="42"></audio>
+      <audio data-hf-id="hf-g3z3" id="deep-hit-43" class="clip" src="assets/audio/sfx/deep_hit.wav" data-start="60" data-duration="0.9" data-track-index="43"></audio>
+
+      <!-- ================= persistent HUD / vignette / ticker ================= -->
+      <div data-hf-id="hf-ppa6" id="hud-brand" class="clip hud" style="left:40px;top:44px;" data-start="0" data-duration="63" data-track-index="1">
+        <span data-hf-id="hf-6hub" class="hud-chip"><span data-hf-id="hf-sy0a" class="hud-dot"></span> BEDAH <b data-hf-id="hf-dr61">IPO</b></span>
+      </div>
+      <div data-hf-id="hf-tj02" id="hud-case" class="clip hud" style="right:40px;top:44px;" data-start="0" data-duration="63" data-track-index="1">
+        <span data-hf-id="hf-3qh7" class="hud-chip mono">KASUS : <b data-hf-id="hf-gtke">SWAP</b></span>
+      </div>
+      <div data-hf-id="hf-zihk" id="vignette" class="clip full vignette" data-start="0" data-duration="63" data-track-index="2"></div>
+      <div data-hf-id="hf-s17i" id="scanlines" class="clip full scanlines" data-start="0" data-duration="63" data-track-index="2"></div>
+
+      <div data-hf-id="hf-mh3c" id="ticker" class="clip" data-start="0" data-duration="63" data-track-index="3">
+        <div data-hf-id="hf-0vph" class="ticker-track" data-layout-allow-overflow="true">
+          <span data-hf-id="hf-2kd5">-59% LABA</span><span data-hf-id="hf-1bmq">·</span><span data-hf-id="hf-ztb5">105× VALUASI</span><span data-hf-id="hf-8hs6">·</span><span data-hf-id="hf-yvgc">Rp45 M DANA PUBLIK</span><span data-hf-id="hf-8w37">·</span><span data-hf-id="hf-q446">Rp570 JUTA RUGI</span><span data-hf-id="hf-9ae8">·</span><span data-hf-id="hf-q8sb">LISTING 10 SEPTEMBER</span><span data-hf-id="hf-6i91">·</span>
+          <span data-hf-id="hf-gewd">-59% LABA</span><span data-hf-id="hf-6wk2">·</span><span data-hf-id="hf-6tdh">105× VALUASI</span><span data-hf-id="hf-7av3">·</span><span data-hf-id="hf-nb5g">Rp45 M DANA PUBLIK</span><span data-hf-id="hf-7p64">·</span><span data-hf-id="hf-mjwa">Rp570 JUTA RUGI</span><span data-hf-id="hf-4x0x">·</span><span data-hf-id="hf-6zln">LISTING 10 SEPTEMBER</span><span data-hf-id="hf-5bby">·</span>
+          <span data-hf-id="hf-hltg">-59% LABA</span><span data-hf-id="hf-qoea">·</span><span data-hf-id="hf-80ak">105× VALUASI</span><span data-hf-id="hf-qa39">·</span><span data-hf-id="hf-i299">Rp45 M DANA PUBLIK</span><span data-hf-id="hf-rh0c">·</span><span data-hf-id="hf-my7b">Rp570 JUTA RUGI</span><span data-hf-id="hf-r2pb">·</span><span data-hf-id="hf-6lam">LISTING 10 SEPTEMBER</span><span data-hf-id="hf-s9me">·</span>
+          <span data-hf-id="hf-h7if">-59% LABA</span><span data-hf-id="hf-rvbd">·</span><span data-hf-id="hf-7lzj">105× VALUASI</span><span data-hf-id="hf-t28g">·</span><span data-hf-id="hf-igka">Rp45 M DANA PUBLIK</span><span data-hf-id="hf-snxf">·</span><span data-hf-id="hf-ncic">Rp570 JUTA RUGI</span><span data-hf-id="hf-nhy2">·</span><span data-hf-id="hf-66zl">LISTING 10 SEPTEMBER</span><span data-hf-id="hf-n3n1">·</span>
+        </div>
+      </div>
+
+      <!-- ================= S1 HOOK 0–8s ================= -->
+      <section data-hf-id="hf-84rh" id="s1a" class="clip full board-bg" style="z-index:10;" data-start="0" data-duration="2" data-track-index="4">
+        <div data-hf-id="hf-klde" class="si full" id="w-s1a">
+        <div data-hf-id="hf-86t6" class="kinetic" style="display:flex;flex-direction:column;align-items:center;gap:26px;">
+          <div data-hf-id="hf-3hk3" class="k-line" style="font-size:196px;color:#fff;">PERTAMA</div>
+          <div data-hf-id="hf-7t8l" class="slash-motif"></div>
+          <div data-hf-id="hf-0wbd" class="k-line" style="font-size:196px;color:#e11d2e;text-shadow:0 0 60px rgba(225,29,46,.45);">KALINYA</div>
+          <div data-hf-id="hf-avtg" class="k-line" style="font-size:84px;color:#fff;border:5px solid #fff;padding:6px 26px;">DALAM SEJARAH</div>
+        </div>
+      </div>
+      </section>
+
+      <section data-hf-id="hf-mkcu" id="s1b" class="clip full board-bg" style="z-index:11;" data-start="2" data-duration="2.5" data-track-index="4">
+        <div data-hf-id="hf-gn9d" class="si full" id="w-s1b">
+        <div data-hf-id="hf-vj2c" style="display:flex;flex-direction:column;align-items:center;gap:44px;">
+          <div data-hf-id="hf-e06t" id="ugmChip" style="width:340px;height:340px;border-radius:50%;background:#f5f6f7;display:grid;place-items:center;box-shadow:0 24px 80px rgba(0,0,0,.7), 0 0 90px rgba(225,29,46,.22);">
+            <img data-hf-id="hf-uz9p" src="assets/img/ugm_logo.png" alt="Logo UGM" style="width:264px;height:264px;object-fit:contain;">
+          </div>
+          <div data-hf-id="hf-7dm4" style="text-align:center;">
+            <div data-hf-id="hf-cs4s" class="mono" style="font-size:26px;letter-spacing:.3em;color:#94a3b8;margin-bottom:18px;">UNIVERSITAS GADJAH MADA</div>
+            <h1 data-hf-id="hf-61kf" class="oswald" style="font-weight:700;font-size:92px;line-height:1.05;text-transform:uppercase;">
+              ANAK USAHA UGM<br data-hf-id="hf-x5px"><span data-hf-id="hf-xogt" class="tag-red" style="font-size:82px;padding:4px 26px;display:inline-block;">MASUK BURSA</span>
+            </h1>
+          </div>
+        </div>
+      </div>
+      </section>
+
+      <section data-hf-id="hf-iyej" id="s1c" class="clip full" style="z-index:12;background:radial-gradient(120% 85% at 50% 30%, #14171d 0%, #0a0b0d 72%);" data-start="4.5" data-duration="3.5" data-track-index="4">
+        <div data-hf-id="hf-fvlk" class="si full" id="w-s1c">
+        <div data-hf-id="hf-rpar" id="swapCard" class="chrome-frame" style="position:absolute;left:60px;top:330px;width:960px;height:1060px;">
+          <div data-hf-id="hf-sf72" class="chrome-bar">
+            <span data-hf-id="hf-80zh" class="dot" style="background:#ff5f57;"></span><span data-hf-id="hf-vgfl" class="dot" style="background:#febc2e;"></span><span data-hf-id="hf-d8a3" class="dot" style="background:#28c840;"></span>
+            <span data-hf-id="hf-7rcu" class="url-pill">e-IPO.idx.co.id · SWAP</span>
+          </div>
+          <div data-hf-id="hf-cvdt" class="crop-host" style="height:430px;border-bottom:2px solid #262b33;">
+            <img data-hf-id="hf-1k59" src="assets/img/swap_logo_eipo.jpg" alt="Banner e-IPO SWAP" class="cover">
+          </div>
+          <div data-hf-id="hf-90rx" style="padding:40px 48px;display:flex;flex-direction:column;gap:34px;">
+            <div data-hf-id="hf-afij" style="display:flex;gap:16px;">
+              <span data-hf-id="hf-721h" class="pill-badge pill-green">SHARIAH</span>
+              <span data-hf-id="hf-nout" class="pill-badge">HEALTHCARE</span>
+              <span data-hf-id="hf-cx34" class="pill-badge red">SUBSIDIARY OF UGM</span>
+            </div>
+            <div data-hf-id="hf-3ug6" style="border-top:2px dashed #2a2e36;padding-top:30px;">
+              <div data-hf-id="hf-r077" class="mono" style="font-size:25px;color:#94a3b8;letter-spacing:.1em;">LISTING DATE — PT SWAYASA PRAKARSA TBK</div>
+              <div data-hf-id="hf-z9ll" id="swapDate" class="black-display tnum" style="font-size:92px;color:#fff;margin-top:14px;line-height:1.04;">10 SEPTEMBER<br data-hf-id="hf-rsrt">2026</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      </section>
+
+      <!-- ================= S2 PRODUCT WOW 8–17s ================= -->
+      <section data-hf-id="hf-199o" id="s2a" class="clip full board-bg" style="z-index:13;" data-start="8" data-duration="2.5" data-track-index="4">
+        <div data-hf-id="hf-5r1r" class="si full" id="w-s2a">
+        <div data-hf-id="hf-ni2s" style="text-align:center;">
+          <div data-hf-id="hf-kbe0" id="s2w1" class="k-line" style="font-size:150px;color:#94a3b8;">BUKAN</div>
+          <div data-hf-id="hf-89tf" id="s2w2wrap" style="position:relative;display:inline-block;">
+            <div data-hf-id="hf-en7m" id="s2w2" class="k-line" style="font-size:112px;color:#fff;">KALENG-KALENG.</div>
+            <div data-hf-id="hf-3nrp" id="strikeLine" style="position:absolute;left:-3%;top:50%;width:106%;height:20px;background:#e11d2e;transform-origin:left center;box-shadow:0 0 30px rgba(225,29,46,.6);"></div>
+          </div>
+          <div data-hf-id="hf-tppx" class="mono" style="margin-top:36px;font-size:28px;color:#ff5a67;letter-spacing:.2em;">LEVEL PRODUKNYA BEDA</div>
+        </div>
+      </div>
+      </section>
+
+      <section data-hf-id="hf-ls95" id="s2b" class="clip full crop-host" style="z-index:13;background:#050607;" data-start="10.5" data-duration="3.3" data-track-index="4">
+        <div data-hf-id="hf-uvk4" class="si full" id="w-s2b">
+        <div data-hf-id="hf-hy5c" class="crop-img-wrap" data-layout-allow-overflow="true">
+          <img data-hf-id="hf-ysyp" id="s2bImg" src="assets/img/surgery_medical_implant.jpg" alt="Implan medis" class="cover">
+        </div>
+        <div data-hf-id="hf-jqtl" style="position:absolute;inset:0;background:linear-gradient(180deg, rgba(127,10,20,.45) 0%, rgba(10,4,6,.72) 58%, rgba(5,2,3,.95) 100%);"></div>
+        <div data-hf-id="hf-ig2n" style="position:absolute;left:70px;right:70px;bottom:400px;">
+          <span data-hf-id="hf-7tjj" class="tag-red mono" style="font-size:27px;padding:8px 20px;letter-spacing:.2em;">BEDAH SARAF · NEURO</span>
+          <h1 data-hf-id="hf-y6ua" id="implantTitle" class="k-line" style="font-size:150px;color:#fff;margin-top:26px;text-shadow:0 10px 50px rgba(0,0,0,.9);">IMPLAN<br data-hf-id="hf-szow">OTAK</h1>
+          <div data-hf-id="hf-9b0k" style="height:12px;width:320px;background:#e11d2e;margin-top:30px;"></div>
+        </div>
+      </div>
+      </section>
+
+      <section data-hf-id="hf-09nq" id="s2c" class="clip full board-bg" style="z-index:13;" data-start="13.8" data-duration="3.2" data-track-index="4">
+        <div data-hf-id="hf-vn7x" class="si full" id="w-s2c">
+        <div data-hf-id="hf-lpr1" class="chrome-frame crop-host" data-layout-allow-overflow="true" style="position:absolute;right:-150px;top:260px;width:740px;height:1160px;border-radius:26px;">
+          <div data-hf-id="hf-lr14" class="crop-img-wrap" data-layout-allow-overflow="true">
+            <img data-hf-id="hf-m8w1" id="s2cImg" src="assets/img/gamacha_product_box.jpg" alt="Kemasan produk Gamacha" class="cover">
+          </div>
+        </div>
+        <div data-hf-id="hf-ovsn" style="position:absolute;left:64px;top:420px;width:560px;display:flex;flex-direction:column;gap:36px;z-index:5;">
+          <div data-hf-id="hf-22hl" class="mono" style="font-size:25px;color:#94a3b8;letter-spacing:.22em;">RISET &amp; PRODUKSI SENDIRI:</div>
+          <div data-hf-id="hf-bym8" id="halalStamp" class="stamp" style="position:relative;transform:rotate(-7deg);align-self:flex-start;">
+            <span data-hf-id="hf-vmbb" class="stamp-flag">MATERIAL TULANG</span>
+            <span data-hf-id="hf-73x5" class="stamp-word">HALAL PERTAMA<br data-hf-id="hf-sldv">DI DUNIA</span>
+          </div>
+          <p data-hf-id="hf-e9xw" class="oswald" style="font-weight:400;font-size:38px;line-height:1.35;color:#cbd5e1;">
+            Pengganti produk impor — buatan anak usaha UGM.
+          </p>
+        </div>
+      </div>
+      </section>
+
+      <!-- ================= S3 THE PROBLEM 17–28.96s ================= -->
+      <section data-hf-id="hf-iqvc" id="s3a" class="clip full" style="z-index:14;background:#0a0b0d;" data-start="17" data-duration="2" data-track-index="4">
+        <div data-hf-id="hf-gwcw" class="si full" id="w-s3a">
+        <div data-hf-id="hf-jmue" id="flashA" class="full" style="position:absolute;left:0;top:0;width:100%;height:100%;background:#e11d2e;"></div>
+        <div data-hf-id="hf-swq1" id="gText" class="glitch-big" style="font-size:130px;color:#fff;text-align:center;padding:0 60px;">
+          TAPI INI<br data-hf-id="hf-qluq">MASALAHNYA.
+          <div data-hf-id="hf-ljqn" class="glitch-layer" aria-hidden="true" style="color:#e11d2e;transform:translate(-10px,-6px);">TAPI INI<br data-hf-id="hf-q7jp">MASALAHNYA.</div>
+          <div data-hf-id="hf-va21" class="glitch-layer" aria-hidden="true" style="color:#38bdf8;transform:translate(10px,6px);opacity:.5;">TAPI INI<br data-hf-id="hf-regs">MASALAHNYA.</div>
+        </div>
+      </div>
+      </section>
+
+      <section data-hf-id="hf-fsip" id="s3b" class="clip full board-bg" style="z-index:14;" data-start="19" data-duration="2.7" data-track-index="4">
+        <div data-hf-id="hf-pk8r" class="si full" id="w-s3b">
+        <div data-hf-id="hf-rzic" style="position:absolute;left:70px;top:250px;">
+          <span data-hf-id="hf-72it" class="tag-red mono" style="font-size:27px;padding:8px 20px;letter-spacing:.2em;">LABA BERSIH · ANJLOK</span>
+        </div>
+        <div data-hf-id="hf-gyrn" style="position:absolute;left:70px;top:800px;display:flex;align-items:flex-end;gap:34px;height:520px;" id="wfChart">
+          <div data-hf-id="hf-bnzr" class="wf-col" style="height:500px;"></div>
+          <div data-hf-id="hf-m3p2" class="wf-col" style="height:420px;"></div>
+          <div data-hf-id="hf-7f6e" class="wf-col" style="height:330px;"></div>
+          <div data-hf-id="hf-n8bh" class="wf-col dead" style="height:210px;"></div>
+        </div>
+        <div data-hf-id="hf-vcky" style="position:absolute;right:70px;top:880px;text-align:right;">
+          <div data-hf-id="hf-svhs" id="crashNum" class="black-display tnum" style="font-size:240px;color:#ff2438;line-height:1;text-shadow:0 0 80px rgba(225,29,46,.5);">-59%</div>
+          <div data-hf-id="hf-1q9n" class="mono" style="font-size:30px;color:#94a3b8;margin-top:10px;">TERJUN PAYAH</div>
+        </div>
+      </div>
+      </section>
+
+      <section data-hf-id="hf-j2n2" id="s3c" class="clip full crop-host" style="z-index:14;background:#050607;" data-start="21.7" data-duration="2.2" data-track-index="4">
+        <div data-hf-id="hf-lm4q" class="si full" id="w-s3c">
+        <div data-hf-id="hf-kk41" class="crop-img-wrap" data-layout-allow-overflow="true">
+          <img data-hf-id="hf-tbv7" id="s3cImg" src="assets/img/stock_market_trading.jpg" alt="Layar pasar saham" class="cover" style="filter:grayscale(.7) brightness(.42) contrast(1.1);">
+        </div>
+        <div data-hf-id="hf-xqe4" style="position:absolute;inset:0;background:linear-gradient(180deg, rgba(10,11,13,.55), rgba(10,11,13,.9));"></div>
+        <div data-hf-id="hf-tdjs" style="position:relative;text-align:center;">
+          <div data-hf-id="hf-8wcb" id="rugiSmall" class="k-line" style="font-size:120px;color:#fff;">RUGI</div>
+          <div data-hf-id="hf-a44j" id="rugiBig" class="black-display tnum" style="font-size:140px;color:#ff2438;line-height:1;text-shadow:0 0 90px rgba(225,29,46,.55);">Rp570 JUTA</div>
+          <div data-hf-id="hf-k4ub" class="mono" style="margin-top:34px;font-size:36px;color:#e2e8f0;letter-spacing:.14em;">2 BULAN PERTAMA 2026</div>
+        </div>
+      </div>
+      </section>
+
+      <section data-hf-id="hf-vcfp" id="s3d" class="clip full board-bg" style="z-index:14;" data-start="23.9" data-duration="5.06" data-track-index="4">
+        <div data-hf-id="hf-2uf1" class="si full" id="w-s3d">
+        <div data-hf-id="hf-mb5p" style="text-align:center;">
+          <span data-hf-id="hf-8ln1" class="tag-red mono" style="font-size:28px;padding:8px 22px;letter-spacing:.22em;">VALUASI PENAWARAN</span>
+          <div data-hf-id="hf-8khz" style="display:flex;align-items:baseline;justify-content:center;margin-top:30px;">
+            <div data-hf-id="hf-tq2w" id="odoNum" class="black-display tnum" style="font-size:330px;color:#fff;line-height:1;">1</div>
+            <div data-hf-id="hf-9di1" class="black-display" style="font-size:150px;color:#ff2438;line-height:1;">×</div>
+          </div>
+          <div data-hf-id="hf-mcam" class="mono" style="font-size:44px;color:#94a3b8;margin-top:16px;letter-spacing:.18em;">KALI LABA</div>
+        </div>
+        <div data-hf-id="hf-7b7i" id="stamp1" class="stamp" style="right:70px;bottom:330px;transform:rotate(11deg);">
+          <span data-hf-id="hf-pr8c" class="stamp-flag">RED FLAG #01</span>
+          <span data-hf-id="hf-bp8x" class="stamp-word">VALUASI<br data-hf-id="hf-r05r">SELANGIT</span>
+        </div>
+      </div>
+      </section>
+
+      <!-- ================= S4 FUND FLOW 28.96–40.76s ================= -->
+      <section data-hf-id="hf-0lb4" id="s4a" class="clip full crop-host" style="z-index:14;background:#050607;" data-start="28.96" data-duration="3.54" data-track-index="4">
+        <div data-hf-id="hf-ezct" class="si full" id="w-s4a">
+        <div data-hf-id="hf-kyf2" class="crop-img-wrap" data-layout-allow-overflow="true">
+          <img data-hf-id="hf-4mw6" id="s4aImg" src="assets/img/rupiah_cash_real.jpg" alt="Tumpukan uang rupiah" class="cover" style="filter:brightness(.45) saturate(.85);">
+        </div>
+        <div data-hf-id="hf-sa69" style="position:absolute;inset:0;background:linear-gradient(180deg, rgba(10,11,13,.5), rgba(10,11,13,.92));"></div>
+        <div data-hf-id="hf-vho0" style="position:relative;text-align:center;">
+          <div data-hf-id="hf-vq6z" id="s4word" class="k-line" style="font-size:150px;color:#fff;">GAK CUMA ITU.</div>
+          <div data-hf-id="hf-pac3" id="fundChip" style="margin:46px auto 0;display:inline-block;background:#101216;border:2px solid #2a2e36;border-radius:20px;padding:28px 44px;box-shadow:0 24px 70px rgba(0,0,0,.65);">
+            <div data-hf-id="hf-se7d" class="mono" style="font-size:27px;color:#94a3b8;letter-spacing:.18em;">DANA DARI PUBLIK</div>
+            <div data-hf-id="hf-uklb" id="fundNum" class="black-display tnum" style="font-size:110px;color:#ff2438;line-height:1;margin-top:10px;">Rp0</div>
+          </div>
+        </div>
+      </div>
+      </section>
+
+      <section data-hf-id="hf-yxn5" id="s4b" class="clip full board-bg" style="z-index:14;" data-start="32.5" data-duration="4" data-track-index="4">
+        <div data-hf-id="hf-ixgu" class="si full" id="w-s4b">
+        <div data-hf-id="hf-363v" style="width:980px;">
+          <span data-hf-id="hf-0n2s" class="tag-red mono" style="font-size:27px;padding:8px 20px;letter-spacing:.2em;">ALOKASI DANA IPO · Rp45 MILIAR</span>
+          <div data-hf-id="hf-3daz" id="allocChart" style="display:flex;flex-direction:column;gap:46px;margin-top:56px;">
+            <div data-hf-id="hf-vxho" class="bar-row">
+              <div data-hf-id="hf-kci0" class="bar-label">Modal Kerja</div>
+              <div data-hf-id="hf-2kxp" class="bar-track"><div data-hf-id="hf-tb0t" class="bar-fill alloc" data-w="79%" style="width:79%;background:linear-gradient(90deg,#16a34a,#4ade80);"></div></div>
+              <div data-hf-id="hf-ndlo" class="bar-pct tnum" style="color:#4ade80;">39,5%</div>
+            </div>
+            <div data-hf-id="hf-x17o" class="bar-row">
+              <div data-hf-id="hf-q8xj" class="bar-label">Capex / Aset</div>
+              <div data-hf-id="hf-dok1" class="bar-track"><div data-hf-id="hf-nrau" class="bar-fill alloc" data-w="61%" style="width:61%;background:linear-gradient(90deg,#475569,#94a3b8);"></div></div>
+              <div data-hf-id="hf-fxsh" class="bar-pct tnum" style="color:#cbd5e1;">30,5%</div>
+            </div>
+            <div data-hf-id="hf-vual" class="bar-row">
+              <div data-hf-id="hf-vfjb" class="bar-label">Bayar Utang Induk</div>
+              <div data-hf-id="hf-evh4" class="bar-track"><div data-hf-id="hf-hrza" class="bar-fill alloc" data-w="60%" id="debtBar" style="width:60%;background:linear-gradient(90deg,#7f0a14,#e11d2e);box-shadow:0 0 40px rgba(225,29,46,.35);"></div></div>
+              <div data-hf-id="hf-2w0f" class="bar-pct tnum" style="color:#ff5a67;">30%</div>
+            </div>
+          </div>
+          <div data-hf-id="hf-o9vi" class="mono" style="margin-top:52px;font-size:29px;color:#ff5a67;">= Rp12 miliar langsung ke grup induknya sendiri</div>
+        </div>
+      </div>
+      </section>
+
+      <section data-hf-id="hf-5zuo" id="s4c" class="clip full board-bg" style="z-index:14;" data-start="36.5" data-duration="4.26" data-track-index="4">
+        <div data-hf-id="hf-mvkv" class="si full" id="w-s4c">
+        <div data-hf-id="hf-bfxr" style="display:flex;flex-direction:column;align-items:center;">
+          <div data-hf-id="hf-3ve8" id="flowChip" class="black-display tnum" style="background:#200408;border:3px solid #e11d2e;border-radius:16px;padding:18px 40px;font-size:42px;color:#ff5a67;box-shadow:0 0 60px rgba(225,29,46,.25);">Rp12 MILIAR · 30% DANA PUBLIK</div>
+          <svg data-hf-id="hf-jkzx" width="120" height="190" viewBox="0 0 120 190" style="margin:8px 0;">
+            <path data-hf-id="hf-wk2v" id="flowArrow" d="M60 6 L60 150 L28 108 M60 150 L92 108" fill="none" stroke="#e11d2e" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" class="stroke-draw" />
+          </svg>
+          <div data-hf-id="hf-nge6" id="parentBox" class="chrome-frame" style="width:780px;padding:36px 40px;text-align:center;background:#0c0f13;">
+            <div data-hf-id="hf-rgn8" class="mono" style="font-size:26px;color:#94a3b8;letter-spacing:.2em;">DITERIMA OLEH INDUKNYA SENDIRI:</div>
+            <div data-hf-id="hf-33s1" class="oswald" style="font-weight:700;font-size:76px;color:#fff;margin-top:12px;text-transform:uppercase;">GMUM + Yayasan UGM</div>
+          </div>
+          <div data-hf-id="hf-5zqg" id="flowLabel" class="mono tnum" style="margin-top:34px;background:#e11d2e;color:#fff;font-weight:700;font-size:34px;padding:14px 30px;border-radius:10px;letter-spacing:.08em;">DANA PUBLIK → UTANG INDUK SENDIRI</div>
+        </div>
+        <div data-hf-id="hf-8zut" id="stamp2" class="stamp" style="right:56px;top:300px;transform:rotate(9deg);">
+          <span data-hf-id="hf-okb9" class="stamp-flag">RED FLAG #02</span>
+          <span data-hf-id="hf-x2ex" class="stamp-word">BAILOUT<br data-hf-id="hf-p0mm">AFILIASI</span>
+        </div>
+      </div>
+      </section>
+
+      <!-- ================= S5 VERDICT FRAME 40.76–52.53s ================= -->
+      <section data-hf-id="hf-n0cs" id="s5a" class="clip full board-bg" style="z-index:15;" data-start="40.76" data-duration="3.24" data-track-index="4">
+        <div data-hf-id="hf-22n2" class="si full" id="w-s5a">
+        <span data-hf-id="hf-35zh" class="mono" style="position:absolute;left:70px;top:300px;font-size:27px;color:#94a3b8;letter-spacing:.22em;">TIMBANGAN KASUS:</span>
+        <div data-hf-id="hf-ahsq" id="halfGood" class="split-half" style="left:50px;background:linear-gradient(180deg,#07160c,#03240f);border:3px solid #22c55e;box-shadow:inset 0 0 90px rgba(34,197,94,.28), 0 0 70px rgba(34,197,94,.22);">
+          <div data-hf-id="hf-humc" style="text-align:center;padding:0 24px;">
+            <div data-hf-id="hf-ptiu" class="oswald" style="font-weight:700;font-size:56px;color:#4ade80;text-transform:uppercase;line-height:1.1;">Inovasi ✓<br data-hf-id="hf-ombl">Berharga</div>
+            <div data-hf-id="hf-frah" class="mono" style="margin-top:24px;font-size:25px;color:#86efac;">implan otak · material<br data-hf-id="hf-qsyj">tulang halal dunia</div>
+          </div>
+        </div>
+        <div data-hf-id="hf-ure4" id="halfBad" class="split-half" style="right:50px;background:linear-gradient(180deg,#1a0305,#330308);border:3px solid #e11d2e;box-shadow:inset 0 0 90px rgba(225,29,46,.3), 0 0 70px rgba(225,29,46,.25);">
+          <div data-hf-id="hf-px9h" class="black-display" style="font-size:340px;color:#ff2438;text-shadow:0 0 90px rgba(225,29,46,.55);">?</div>
+        </div>
+      </div>
+      </section>
+
+      <section data-hf-id="hf-1h2q" id="s5b" class="clip full board-bg" style="z-index:15;" data-start="44" data-duration="4.5" data-track-index="4">
+        <div data-hf-id="hf-y4j1" class="si full" id="w-s5b">
+        <div data-hf-id="hf-86i5" id="priceBoard" class="chrome-frame" style="width:940px;padding:0;position:relative;">
+          <div data-hf-id="hf-w3xu" class="chrome-bar">
+            <span data-hf-id="hf-c6j5" class="dot" style="background:#ff5f57;"></span><span data-hf-id="hf-ji79" class="dot" style="background:#febc2e;"></span><span data-hf-id="hf-lhxn" class="dot" style="background:#28c840;"></span>
+            <span data-hf-id="hf-o3on" class="url-pill">Papan Penawaran · SWAP</span>
+          </div>
+          <div data-hf-id="hf-7xiy" style="padding:44px 52px;">
+            <div data-hf-id="hf-iz3r" class="mono" style="font-size:26px;color:#94a3b8;letter-spacing:.24em;">HARGA PENAWARAN PER SAHAM</div>
+            <div data-hf-id="hf-ew07" id="priceDigits" class="black-display tnum" style="font-size:118px;color:#fff;line-height:1.05;margin-top:18px;">Rp130–140</div>
+            <svg data-hf-id="hf-ctfj" width="830" height="330" viewBox="0 0 830 330" style="margin-top:26px;">
+              <line data-hf-id="hf-3707" x1="0" y1="320" x2="830" y2="320" stroke="#232833" stroke-width="3" />
+              <polyline data-hf-id="hf-6n61" id="growthLine" points="10,300 150,290 290,255 430,205 570,135 700,55 820,12" fill="none" stroke="#e11d2e" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" class="stroke-draw" />
+              <text data-hf-id="hf-8p46" x="640" y="110" fill="#ff5a67" font-family="JetBrains Mono, monospace" font-weight="700" font-size="34">SYARATNYA:</text>
+              <text data-hf-id="hf-1ezu" x="560" y="60" fill="#fff" font-family="JetBrains Mono, monospace" font-weight="700" font-size="38">NAIK TERUS</text>
+            </svg>
+            <div data-hf-id="hf-yse5" class="mono" style="margin-top:20px;font-size:28px;color:#94a3b8;">Ekspektasi pertumbuhan laba yang harus ditebus investor</div>
+          </div>
+        </div>
+      </div>
+      </section>
+
+      <section data-hf-id="hf-79ds" id="s5c" class="clip full board-bg" style="z-index:15;" data-start="48.5" data-duration="4.03" data-track-index="4">
+        <div data-hf-id="hf-v59g" class="si full" id="w-s5c">
+        <div data-hf-id="hf-f3av" style="text-align:center;padding:0 50px;">
+          <div data-hf-id="hf-qrmu" class="mono" style="font-size:29px;color:#94a3b8;letter-spacing:.26em;margin-bottom:30px;">ARTINYA HARGA INI MENUNTUT</div>
+          <div data-hf-id="hf-t5ci" id="superWord" class="k-line" style="font-size:150px;color:#fff;text-shadow:0 0 70px rgba(225,29,46,.35);">SUPER<br data-hf-id="hf-r79k"><span data-hf-id="hf-uer3" style="color:#ff2438;">AGRESIF.</span></div>
+        </div>
+        <div data-hf-id="hf-pnds" id="stamp3" class="stamp" style="left:50%;margin-left:-340px;top:1150px;width:680px;transform:rotate(-6deg);">
+          <span data-hf-id="hf-oyma" class="stamp-flag">RED FLAG #03</span>
+          <span data-hf-id="hf-5mgd" class="stamp-word" style="font-size:46px;">90% OMZET DARI 1 UNIT BISNIS ·<br data-hf-id="hf-q0ch">DEPENDENSI E-KATALOG LKPP</span>
+        </div>
+      </div>
+      </section>
+
+      <!-- ================= S6 CTA OUTRO 52.53–62.95s ================= -->
+      <section data-hf-id="hf-mxya" id="s6a" class="clip full board-bg" style="z-index:15;" data-start="52.53" data-duration="3.47" data-track-index="4">
+        <div data-hf-id="hf-pty3" class="si full" id="w-s6a">
+        <div data-hf-id="hf-aiex" id="listCard" class="chrome-frame" style="width:880px;padding:56px 60px;text-align:center;">
+          <div data-hf-id="hf-o20h" style="display:flex;justify-content:center;gap:26px;margin-bottom:44px;">
+            <div data-hf-id="hf-yzg3" class="chrome-frame" style="border-radius:14px;padding:14px 30px;background:#f5f6f7;"><img data-hf-id="hf-snsv" src="assets/img/idx_logo.png" alt="Bursa Efek Indonesia" style="height:92px;object-fit:contain;display:block;"></div>
+            <div data-hf-id="hf-psur" class="chrome-frame" style="border-radius:14px;padding:14px 30px;background:#f5f6f7;"><img data-hf-id="hf-5n6w" src="assets/img/ojk_logo.png" alt="OJK" style="height:92px;object-fit:contain;display:block;"></div>
+          </div>
+          <div data-hf-id="hf-xu01" class="mono" style="font-size:28px;color:#94a3b8;letter-spacing:.26em;">SAHAM SWAP RESMI DIPERDAGANGKAN</div>
+          <div data-hf-id="hf-42dl" id="listDate" class="black-display tnum" style="font-size:104px;color:#fff;line-height:1.08;margin-top:20px;">LISTING<br data-hf-id="hf-qeni"><span data-hf-id="hf-ofl8" style="color:#ff2438;">10 SEPTEMBER</span><br data-hf-id="hf-p7qf">2026</div>
+        </div>
+      </div>
+      </section>
+
+      <section data-hf-id="hf-xyjh" id="s6b" class="clip full board-bg" style="z-index:15;" data-start="56" data-duration="4" data-track-index="4">
+        <div data-hf-id="hf-h628" class="si full" id="w-s6b">
+        <div data-hf-id="hf-mpgq" style="text-align:center;">
+          <div data-hf-id="hf-xk8f" class="k-line" style="font-size:84px;color:#fff;">KAMU PILIH<br data-hf-id="hf-pm1g"><span data-hf-id="hf-02nq" style="color:#ff2438;">MANA?</span></div>
+          <div data-hf-id="hf-kls6" style="display:flex;gap:40px;justify-content:center;margin-top:70px;">
+            <div data-hf-id="hf-c6uw" id="btnBuy" class="btn-capsule btn-buy">PESAN 🔥</div>
+            <div data-hf-id="hf-c716" id="btnSkip" class="btn-capsule btn-skip">SKIP 🚫</div>
+          </div>
+        </div>
+      </div>
+      </section>
+
+      <section data-hf-id="hf-tfuf" id="s6c" class="clip full board-bg" style="z-index:15;" data-start="60" data-duration="2.95" data-track-index="4">
+        <div data-hf-id="hf-dojg" style="display:flex;flex-direction:column;align-items:center;gap:44px;">
+          <div data-hf-id="hf-wvdc" id="logoChip" style="width:360px;height:360px;border-radius:50%;background:#f5f6f7;display:grid;place-items:center;box-shadow:0 0 90px rgba(225,29,46,.3);">
+            <img data-hf-id="hf-l5ox" src="assets/img/swayasa_logo.jpg" alt="Logo swayasa" style="width:280px;height:280px;object-fit:contain;">
+          </div>
+          <div data-hf-id="hf-x1ml" id="followLine" class="oswald" style="font-weight:700;font-size:74px;text-transform:uppercase;text-align:center;line-height:1.12;">FOLLOW untuk<br data-hf-id="hf-of4d">bedah IPO berikutnya</div>
+          <div data-hf-id="hf-uacz" id="commentChip" class="mono" style="background:#e11d2e;color:#fff;font-weight:700;font-size:38px;padding:16px 38px;border-radius:999px;letter-spacing:.06em;">TULIS ANALISISMU DI KOMENTAR</div>
+        </div>
+      </section>
+
+      <style>
+        .pill-green { border-color: #22c55e !important; color: #4ade80 !important; }
+      </style>
+
+      <!-- ================= BURNED-IN CAPTIONS (lower third, 1564–1700) ================= -->
+      <div data-hf-id="hf-ulhi" id="cap-1" class="clip caption-bar" data-start="0" data-duration="3.2" data-track-index="5" data-layout-allow-caption-zone="true"><div data-hf-id="hf-53fq" class="caption-text cap-box">UNTUK <span data-hf-id="hf-jvcj" class="cap-hl">PERTAMA KALINYA</span> DALAM SEJARAH,</div></div>
+      <div data-hf-id="hf-sf49" id="cap-2" class="clip caption-bar" data-start="3.2" data-duration="4.8" data-track-index="5" data-layout-allow-caption-zone="true"><div data-hf-id="hf-4sjz" class="caption-text cap-box">KAMPUS UGM RESMI LEPAS ANAK USAHANYA KE BURSA — IPO SAHAM <span data-hf-id="hf-o2zr" class="cap-hl">SWAP</span>.</div></div>
+      <div data-hf-id="hf-5a0t" id="cap-3" class="clip caption-bar" data-start="8" data-duration="3.5" data-track-index="5" data-layout-allow-caption-zone="true"><div data-hf-id="hf-vqlj" class="caption-text cap-box">PRODUKNYA <span data-hf-id="hf-w0q6" class="cap-hl">BUKAN KALENG-KALENG</span>.</div></div>
+      <div data-hf-id="hf-tll1" id="cap-4" class="clip caption-bar" data-start="11.5" data-duration="5.5" data-track-index="5" data-layout-allow-caption-zone="true"><div data-hf-id="hf-97np" class="caption-text cap-box">MEREKA BIKIN <span data-hf-id="hf-bsa4" class="cap-hl">IMPLAN OTAK</span> DAN MATERIAL TULANG HALAL PERTAMA DI DUNIA.</div></div>
+      <div data-hf-id="hf-m2id" id="cap-5" class="clip caption-bar" data-start="17" data-duration="2" data-track-index="5" data-layout-allow-caption-zone="true"><div data-hf-id="hf-ofhy" class="caption-text cap-box"><span data-hf-id="hf-0p4v" class="cap-hl">TAPI INI MASALAHNYA.</span></div></div>
+      <div data-hf-id="hf-vk3d" id="cap-6" class="clip caption-bar" data-start="19" data-duration="4.9" data-track-index="5" data-layout-allow-caption-zone="true"><div data-hf-id="hf-it58" class="caption-text cap-box">DI SAAT LABA <span data-hf-id="hf-mo56" class="cap-hl">ANJLOK 59%</span> DAN RUGI Rp570 JUTA DI AWAL 2 BULAN 2026,</div></div>
+      <div data-hf-id="hf-pb40" id="cap-7" class="clip caption-bar" data-start="23.9" data-duration="5.06" data-track-index="5" data-layout-allow-caption-zone="true"><div data-hf-id="hf-qj7r" class="caption-text cap-box">SAHAM INI DIJUAL DENGAN VALUASI <span data-hf-id="hf-u8yn" class="cap-hl">105 KALI LABA</span>.</div></div>
+      <div data-hf-id="hf-fhy4" id="cap-8" class="clip caption-bar" data-start="28.96" data-duration="4.54" data-track-index="5" data-layout-allow-caption-zone="true"><div data-hf-id="hf-7mca" class="caption-text cap-box"><span data-hf-id="hf-jnsx" class="cap-hl">GAK CUMA ITU.</span></div></div>
+      <div data-hf-id="hf-ok3p" id="cap-9" class="clip caption-bar" data-start="33.5" data-duration="7.26" data-track-index="5" data-layout-allow-caption-zone="true"><div data-hf-id="hf-irdb" class="caption-text cap-box">DARI DANA Rp45 MILIAR, <span data-hf-id="hf-vye8" class="cap-hl">Rp12 MILIAR (30%)</span> DIPAKAI LUNAS UTANG KE INDUKNYA SENDIRI.</div></div>
+      <div data-hf-id="hf-kfkk" id="cap-10" class="clip caption-bar" data-start="40.76" data-duration="3.74" data-track-index="5" data-layout-allow-caption-zone="true"><div data-hf-id="hf-hfmo" class="caption-text cap-box">INOVASINYA MEMANG BERHARGA,</div></div>
+      <div data-hf-id="hf-xr3e" id="cap-11" class="clip caption-bar" data-start="44.5" data-duration="8.03" data-track-index="5" data-layout-allow-caption-zone="true"><div data-hf-id="hf-ke6b" class="caption-text cap-box">TAPI HARGA Rp130–Rp140 MENUNTUT EKSPEKTASI PERTUMBUHAN YANG <span data-hf-id="hf-2pry" class="cap-hl">SUPER AGRESIF</span>.</div></div>
+      <div data-hf-id="hf-64s3" id="cap-12" class="clip caption-bar" data-start="52.53" data-duration="3.97" data-track-index="5" data-layout-allow-caption-zone="true"><div data-hf-id="hf-2ie5" class="caption-text cap-box">SAHAM SWAP <span data-hf-id="hf-6umo" class="cap-hl">LISTING 10 SEPTEMBER INI</span>.</div></div>
+      <div data-hf-id="hf-mrcc" id="cap-13" class="clip caption-bar" data-start="56.5" data-duration="3.5" data-track-index="5" data-layout-allow-caption-zone="true"><div data-hf-id="hf-jape" class="caption-text cap-box">KAMU BAKAL IKUTAN PESAN ATAU <span data-hf-id="hf-ztf5" class="cap-hl">SKIP DULU</span>?</div></div>
+      <div data-hf-id="hf-j5m9" id="cap-14" class="clip caption-bar" data-start="60" data-duration="2.95" data-track-index="5" data-layout-allow-caption-zone="true"><div data-hf-id="hf-6r6p" class="caption-text cap-box">TULIS ANALISISMU DI KOMENTAR — FOLLOW UNTUK BEDAH IPO BERIKUTNYA.</div></div>
+
+<!-- END SCENES -->
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const $q = (s) => document.querySelector(s);
+      const tl = gsap.timeline({ paused: true });
+
+      /* ---------- running ticker (loops through whole video) ---------- */
+      tl.to("#ticker .ticker-track", { xPercent: -50, duration: 10.5, ease: "none", repeat: 5 }, 0);
+
+      /* ---------- S1 HOOK 0–8 ---------- */
+      tl.from("#s1a .k-line", { opacity: 0, y: 150, duration: 0.3, ease: "power4.out", stagger: 0.16 }, 0.02);
+      [[10, 1.45], [-8, 1.56], [6, 1.67], [0, 1.78]].forEach(([dx, t]) =>
+        tl.to("#s1a .kinetic", { x: dx, duration: 0.06, ease: "power1.inOut" }, t));
+      tl.to("#w-s1a", { opacity: 0, x: -80, duration: 0.22, ease: "power2.in" }, 1.78);
+
+      tl.from("#s1b .mono", { opacity: 0, duration: 0.3 }, 2.2);
+      tl.from("#ugmChip", { scale: 0, rotation: -25, duration: 0.5, ease: "back.out(1.7)" }, 2.05);
+      tl.from("#s1b h1", { opacity: 0, y: 70, duration: 0.4, ease: "power3.out" }, 2.35);
+      tl.to("#w-s1b", { opacity: 0, scale: 0.94, duration: 0.22, ease: "power2.in" }, 4.23);
+
+      tl.from("#swapCard", { y: 220, opacity: 0, duration: 0.45, ease: "power3.out" }, 4.55);
+      tl.from("#s1c .pill-badge", { opacity: 0, y: 30, duration: 0.25, stagger: 0.09, ease: "back.out(1.8)" }, 4.95);
+      tl.from("#swapDate", { scale: 0.6, opacity: 0, duration: 0.35, ease: "back.out(2)" }, 5.4);
+      tl.to("#w-s1c", { opacity: 0, duration: 0.25, ease: "power2.in" }, 7.75);
+
+      /* ---------- S2 PRODUCT WOW 8–17 ---------- */
+      tl.from("#s2w1", { opacity: 0, scale: 1.7, duration: 0.3, ease: "power4.out" }, 8.05);
+      tl.from("#s2w2wrap", { opacity: 0, scale: 1.5, duration: 0.32, ease: "power4.out" }, 8.42);
+      tl.from("#strikeLine", { scaleX: 0, duration: 0.3, ease: "power4.in" }, 8.85);
+      tl.from("#s2a .mono", { opacity: 0, y: 24, duration: 0.25 }, 9.2);
+      tl.to("#w-s2a", { opacity: 0, duration: 0.2, ease: "power2.in" }, 10.3);
+
+      tl.fromTo("#s2bImg", { scale: 1.15, y: -30 }, { scale: 1.02, y: 14, duration: 3.3, ease: "none" }, 10.5);
+      tl.from("#s2b .tag-red", { opacity: 0, x: -60, duration: 0.3, ease: "power3.out" }, 10.8);
+      tl.from("#implantTitle", { opacity: 0, x: -90, duration: 0.4, ease: "power3.out" }, 11.1);
+      tl.to("#w-s2b", { opacity: 0, duration: 0.25 }, 13.55);
+
+      tl.from("#s2c .chrome-frame", { x: 320, opacity: 0, duration: 0.4, ease: "power3.out" }, 13.85);
+      tl.fromTo("#s2cImg", { x: -40 }, { x: 30, duration: 3.2, ease: "none" }, 13.8);
+      tl.from("#s2c .mono", { opacity: 0, duration: 0.25 }, 14.8);
+      tl.fromTo("#halalStamp",
+        { scale: 2.6, opacity: 0, rotation: -38 },
+        { scale: 1, opacity: 1, rotation: -7, duration: 0.24, ease: "power4.in", transformOrigin: "50% 50%" }, 14.5);
+      tl.from("#s2c p", { opacity: 0, y: 40, duration: 0.3 }, 15.05);
+      tl.to("#w-s2c", { opacity: 0, duration: 0.22 }, 16.78);
+
+      /* ---------- S3 THE PROBLEM 17–28.96 ---------- */
+      tl.fromTo("#flashA", { opacity: 1 }, { opacity: 0, duration: 0.5, ease: "power2.out" }, 17.02);
+      tl.from("#gText", { opacity: 0, scale: 1.35, duration: 0.18, ease: "power4.out" }, 17.02);
+      [-14, 10, -8, 12, -6, 0].forEach((dx, i) =>
+        tl.to("#gText", { x: dx, duration: 0.06, ease: "none" }, 17.3 + i * 0.08));
+      [1, 0, 1, 0].forEach((op, i) =>
+        tl.to("#gText .glitch-layer:first-of-type", { opacity: op === 1 ? 0.15 : 0.85, duration: 0.05, ease: "none" }, 17.35 + i * 0.09));
+      tl.to("#w-s3a", { opacity: 0, y: -60, duration: 0.2, ease: "power2.in" }, 18.75);
+
+      tl.from("#s3b .tag-red", { opacity: 0, x: -50, duration: 0.25 }, 19.15);
+      tl.from("#wfChart .wf-col", { scaleY: 0, duration: 0.4, ease: "power3.out", stagger: 0.12 }, 19.25);
+      const crash = { v: 0 };
+      tl.to(crash,
+        { v: -59, duration: 1.7, ease: "none",
+          onUpdate: () => { $q("#crashNum").textContent = Math.round(crash.v) + "%"; } }, 19.5);
+      tl.from("#s3b .mono", { opacity: 0, duration: 0.25 }, 21.1);
+      tl.to("#w-s3b", { opacity: 0, duration: 0.2 }, 21.5);
+
+      tl.fromTo("#s3cImg", { y: -20 }, { y: 16, duration: 2.2, ease: "none" }, 21.7);
+      tl.from("#rugiSmall", { opacity: 0, y: 60, duration: 0.25, ease: "power4.out" }, 21.8);
+      tl.fromTo("#rugiBig", { opacity: 0, scale: 1.8 }, { opacity: 1, scale: 1, duration: 0.3, ease: "power4.out" }, 22.0);
+      tl.from("#s3c .mono", { opacity: 0, duration: 0.25 }, 22.3);
+      tl.to("#w-s3c", { opacity: 0, duration: 0.2 }, 23.7);
+
+      const odo = { v: 1 };
+      tl.to(odo,
+        { v: 105, duration: 2.45, ease: "none",
+          onUpdate: () => { $q("#odoNum").textContent = Math.round(odo.v); } }, 23.95);
+      tl.to("#odoNum", { color: "#ff2438", duration: 0.18 }, 26.42);
+      tl.to("#odoNum", { scale: 1.06, duration: 0.07, yoyo: true, repeat: 3 }, 26.42);
+      tl.fromTo("#stamp1",
+        { scale: 2.4, opacity: 0, rotation: -14 },
+        { scale: 1, opacity: 1, rotation: 11, duration: 0.22, ease: "power4.in", transformOrigin: "50% 50%" }, 26.6);
+      tl.to("#w-s3d", { opacity: 0, duration: 0.2 }, 28.71);
+
+      /* ---------- S4 FUND FLOW 28.96–40.76 ---------- */
+      tl.fromTo("#s4aImg", { scale: 1.12, y: -16 }, { scale: 1.03, y: 10, duration: 3.5, ease: "none" }, 28.96);
+      tl.from("#s4word", { opacity: 0, scale: 1.5, duration: 0.3, ease: "power4.out" }, 29.05);
+      tl.from("#fundChip", { opacity: 0, y: 90, duration: 0.35, ease: "back.out(1.6)" }, 30.1);
+      const fund = { v: 0 };
+      tl.to(fund,
+        { v: 45, duration: 1.6, ease: "none",
+          onUpdate: () => { $q("#fundNum").textContent = "Rp" + Math.round(fund.v) + " MILIAR"; } }, 30.35);
+      tl.to("#w-s4a", { opacity: 0, duration: 0.2 }, 32.25);
+
+      tl.from("#s4b .tag-red", { opacity: 0, x: -50, duration: 0.25 }, 32.65);
+      tl.from("#allocChart .bar-fill", { scaleX: 0, duration: 0.55, ease: "power3.out", stagger: 0.18 }, 32.85);
+      tl.from("#allocChart .bar-pct", { opacity: 0, duration: 0.3, stagger: 0.18 }, 33.55);
+      tl.to("#debtBar", { filter: "brightness(1.5)", duration: 0.3, yoyo: true, repeat: 5, ease: "sine.inOut" }, 34.3);
+      tl.from("#s4b .mono", { opacity: 0, y: 24, duration: 0.25 }, 34.9);
+      tl.to("#w-s4b", { opacity: 0, duration: 0.2 }, 36.25);
+
+      tl.from("#flowChip", { opacity: 0, y: -40, duration: 0.3, ease: "power3.out" }, 36.6);
+      tl.to("#flowArrow", { strokeDashoffset: 0, duration: 0.7, ease: "power2.inOut" }, 36.75);
+      tl.from("#parentBox", { opacity: 0, scale: 0.7, duration: 0.35, ease: "back.out(1.7)" }, 37.15);
+      tl.from("#flowLabel", { opacity: 0, y: 30, duration: 0.3 }, 37.55);
+      tl.to("#flowArrow", { opacity: 0.45, duration: 0.25, yoyo: true, repeat: 3 }, 38.0);
+      tl.fromTo("#stamp2",
+        { scale: 2.4, opacity: 0, rotation: -12 },
+        { scale: 1, opacity: 1, rotation: 9, duration: 0.22, ease: "power4.in", transformOrigin: "50% 50%" }, 38.4);
+      tl.to("#w-s4c", { opacity: 0, duration: 0.2 }, 40.51);
+
+      /* ---------- S5 VERDICT FRAME 40.76–52.53 ---------- */
+      tl.from("#s5a .mono", { opacity: 0, duration: 0.25 }, 40.86);
+      tl.from("#halfGood", { opacity: 0, y: 120, duration: 0.4, ease: "power3.out" }, 40.95);
+      tl.from("#halfBad", { opacity: 0, y: 120, duration: 0.4, ease: "power3.out" }, 41.2);
+      tl.from("#halfBad > div", { scale: 2, duration: 0.25, ease: "power4.out" }, 41.55);
+      tl.to("#halfGood", { scale: 1.03, duration: 0.35, yoyo: true, repeat: 1 }, 42.2);
+      tl.to("#w-s5a", { opacity: 0, duration: 0.2 }, 43.75);
+
+      tl.from("#priceBoard", { y: 180, opacity: 0, duration: 0.45, ease: "power3.out" }, 44.05);
+      tl.from("#priceDigits", { opacity: 0, scale: 1.4, duration: 0.3, ease: "power4.out" }, 44.4);
+      tl.to("#growthLine", { strokeDashoffset: 0, duration: 1.6, ease: "power2.inOut" }, 44.75);
+      tl.from("#s5b svg text", { opacity: 0, duration: 0.2, stagger: 0.15 }, 45.75);
+      tl.to("#priceBoard", { borderColor: "#e11d2e", duration: 0.4, yoyo: true, repeat: 3 }, 46.5);
+      tl.to("#w-s5b", { opacity: 0, duration: 0.2 }, 48.3);
+
+      tl.from("#superWord", { opacity: 0, scale: 1.9, rotation: -3, duration: 0.3, ease: "power4.out" }, 48.55);
+      tl.fromTo("#stamp3",
+        { scale: 2.6, opacity: 0, rotation: -30 },
+        { scale: 1, opacity: 1, rotation: -6, duration: 0.22, ease: "power4.in", transformOrigin: "50% 50%" }, 49.8);
+      tl.to("#superWord", { textShadow: "0 0 110px rgba(225,29,46,.75)", duration: 0.3, yoyo: true, repeat: 3 }, 49.85);
+      tl.to("#w-s5c", { opacity: 0, duration: 0.2 }, 52.28);
+
+      /* ---------- S6 CTA OUTRO 52.53–63 ---------- */
+      tl.from("#listCard", { y: 160, opacity: 0, duration: 0.45, ease: "power3.out" }, 52.58);
+      tl.from("#listCard img", { opacity: 0, scale: 0.6, duration: 0.3, stagger: 0.12, ease: "back.out(1.8)" }, 52.95);
+      tl.from("#listDate", { opacity: 0, scale: 0.75, duration: 0.35, ease: "back.out(1.9)" }, 53.45);
+      tl.to("#listDate span", { opacity: 0.35, duration: 0.09, yoyo: true, repeat: 3 }, 54.3);
+      tl.to("#w-s6a", { opacity: 0, duration: 0.2 }, 55.8);
+
+      tl.from("#s6b .k-line", { opacity: 0, y: 70, duration: 0.3, ease: "power4.out" }, 56.05);
+      tl.from("#btnBuy", { opacity: 0, y: 130, duration: 0.35, ease: "back.out(1.6)" }, 56.35);
+      tl.from("#btnSkip", { opacity: 0, y: 130, duration: 0.35, ease: "back.out(1.6)" }, 56.6);
+      tl.to("#btnBuy",  { scale: 1.06, duration: 0.3, yoyo: true, repeat: 1 }, 57.4);
+      tl.to("#btnSkip", { scale: 1.06, duration: 0.3, yoyo: true, repeat: 1 }, 58.05);
+      tl.to("#btnBuy",  { scale: 1.08, duration: 0.25, yoyo: true, repeat: 1 }, 58.7);
+      tl.to("#btnSkip", { scale: 1.08, duration: 0.25, yoyo: true, repeat: 1 }, 59.15);
+      tl.to("#w-s6b", { opacity: 0, duration: 0.2 }, 59.8);
+
+      tl.from("#logoChip", { scale: 0, rotation: -180, duration: 0.5, ease: "back.out(1.5)" }, 60.05);
+      tl.from("#followLine", { opacity: 0, y: 60, duration: 0.35, ease: "power3.out" }, 60.45);
+      tl.from("#commentChip", { scale: 0.6, opacity: 0, duration: 0.3, ease: "back.out(2)" }, 60.75);
+      tl.to("#commentChip", { scale: 1.05, duration: 0.35, yoyo: true, repeat: 4 }, 61.2);
+
+      /* ---------- exit hard kills (non-linear seek safety) ---------- */
+      tl.set("#w-s1a", { opacity: 0 }, 2);
+      tl.set("#w-s1b", { opacity: 0 }, 4.45);
+      tl.set("#w-s1c", { opacity: 0 }, 8);
+      tl.set("#w-s2a", { opacity: 0 }, 10.5);
+      tl.set("#w-s2b", { opacity: 0 }, 13.8);
+      tl.set("#w-s2c", { opacity: 0 }, 17);
+      tl.set("#w-s3a", { opacity: 0 }, 18.95);
+      tl.set("#w-s3b", { opacity: 0 }, 21.7);
+      tl.set("#w-s3c", { opacity: 0 }, 23.9);
+      tl.set("#w-s3d", { opacity: 0 }, 28.91);
+      tl.set("#w-s4a", { opacity: 0 }, 32.45);
+      tl.set("#w-s4b", { opacity: 0 }, 36.45);
+      tl.set("#w-s4c", { opacity: 0 }, 40.71);
+      tl.set("#w-s5a", { opacity: 0 }, 43.95);
+      tl.set("#w-s5b", { opacity: 0 }, 48.5);
+      tl.set("#w-s5c", { opacity: 0 }, 52.48);
+      tl.set("#w-s6a", { opacity: 0 }, 56);
+      tl.set("#w-s6b", { opacity: 0 }, 60);
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

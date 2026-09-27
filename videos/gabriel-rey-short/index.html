@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1080, height=1920" />
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      margin: 0; width: 1080px; height: 1920px;
+      overflow: hidden; background: #050810;
+      font-family: -apple-system, "Inter", "Segoe UI", sans-serif;
+    }
+    #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: #050810; }
+
+    /* B-roll (native B-roll from source, full-frame) */
+    .broll {
+      position: absolute; left: 0; top: 0; width: 1080px; height: 1920px;
+      object-fit: cover; display: block;
+    }
+    .beatvid {
+      position: absolute; left: 0; top: 220px; width: 1080px; height: 1180px;
+      object-fit: cover; display: block; z-index: 2;
+    }
+
+    /* shade to anchor captions */
+    .shadegrad {
+      position: absolute; left: 0; right: 0; bottom: 0; height: 520px;
+      background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.78) 100%);
+      z-index: 1;
+    }
+
+    /* caption rail */
+    .rail {
+      position: absolute; left: 60px; right: 60px; bottom: 170px;
+      text-align: center; font-size: 52px; font-weight: 800; line-height: 1.32;
+      color: #fff; background: rgba(0, 0, 0, 0.66);
+      border-radius: 26px; padding: 22px 28px;
+      z-index: 5;
+    }
+    .rail .hl { color: #ffb400; text-shadow: 0 0 24px rgba(255,180,0,0.55); }
+
+    /* name / credibility lower-third */
+    .nameplate {
+      position: absolute; left: 50px; bottom: 320px; z-index: 6;
+      background: rgba(8, 12, 24, 0.9); border-left: 8px solid #ffb400;
+      border-radius: 14px; padding: 22px 30px; max-width: 760px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.55);
+    }
+    .nameplate .nm { font-size: 58px; font-weight: 900; color: #fff; line-height: 1; }
+    .nameplate .tt { font-size: 34px; font-weight: 700; color: #ffb400; margin-top: 10px; letter-spacing: 0.02em; }
+
+    /* point callouts (top / mid, since intro has space) */
+    .pt {
+      position: absolute; z-index: 6;
+      background: rgba(8, 12, 24, 0.9); border-radius: 14px;
+      padding: 16px 26px; max-width: 620px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .pt .lbl { font-size: 30px; font-weight: 700; color: #ffb400; letter-spacing: 0.03em; }
+    .pt .val { font-size: 46px; font-weight: 900; color: #fff; margin-top: 4px; line-height: 1.15; }
+    .pt-top1 { left: 50px; top: 150px; }
+    .pt-top2 { left: 50px; top: 300px; }
+    .pt-top3 { left: 50px; top: 450px; }
+
+    /* end card */
+    .endcard {
+      position: absolute; inset: 0;
+      background: linear-gradient(180deg, rgba(5,5,12,0.55) 0%, rgba(5,5,12,0.94) 70%);
+    }
+    .endcard .inner { position: absolute; left: 80px; right: 80px; top: 760px; text-align: center; }
+    .endcard .t1 { font-size: 64px; font-weight: 900; color: #ffb400; }
+    .endcard .t2 { font-size: 48px; font-weight: 700; color: #fff; margin-top: 22px; line-height: 1.3; }
+    .endcard .t3 { font-size: 38px; font-weight: 600; color: #7fd0ff; margin-top: 28px; }
+  </style>
+</head>
+<body>
+<div id="root"
+  data-composition-id="main"
+  data-start="0"
+  data-duration="73.4"
+  data-width="1080"
+  data-height="1920"
+  style="width:1080px; height:1920px;">
+
+    <!-- ============================================================
+         B0 — INTRO / TRACK RECORD  0–10.4s
+         His own words (audio) over native B-roll that SHOWS his track record:
+         the Trif ecosystem slides + press cards + his on-camera shot.
+         Point callouts name each achievement.
+         ============================================================ -->
+    <video id="B0-broll" class="clip broll" data-start="0" data-duration="10.4" data-track-index="0"
+           muted playsinline preload="auto" src="assets/B0-broll-talking.mp4"></video>
+    <div class="clip" id="b0-nameplate-wrap" data-start="0" data-duration="10.4" data-track-index="1" data-layout-allow-occlusion="true">
+      <div id="nameplate" class="nameplate">
+        <div class="nm">GABRIEL REY</div>
+        <div class="tt">CEO &amp; FOUNDER TRIF GROUP</div>
+      </div>
+    </div>
+    <div class="clip" id="b0-pt1-wrap" data-start="1.6" data-duration="3.4" data-track-index="2" data-layout-allow-occlusion="true">
+      <div id="pt1" class="pt pt-top1">
+        <div class="lbl">EKOSISTEM YANG DIA BANGUN</div>
+        <div class="val">Trif Exchange &middot; ISX Bursa &middot; Rata Kanan Capital</div>
+      </div>
+    </div>
+    <div class="clip" id="b0-pt2-wrap" data-start="5.2" data-duration="4.6" data-track-index="2" data-layout-allow-occlusion="true">
+      <div id="pt2" class="pt pt-top1">
+        <div class="lbl">MEDIA CRYPTO #1 DI INDONESIA</div>
+        <div class="val">Crypto Wave Media</div>
+      </div>
+    </div>
+
+    <!-- B1 altcoin not to hold 10.4–17.2s -->
+    <video id="B1v" class="clip beatvid" data-start="10.4" data-duration="6.8" data-track-index="3" muted playsinline preload="auto" src="assets/B1.mp4"></video>
+  <div id="b1-cap" class="clip" data-start="10.8" data-duration="6" data-track-index="4" data-layout-allow-occlusion="true">
+    <div id="cap-b1" class="rail">Altcoin itu bukan untuk <span class="hl">hold jangka panjang.</span></div>
+  </div>
+
+    <!-- B2 why people lose 17.2–24.3s -->
+    <video id="B2v" class="clip beatvid" data-start="17.2" data-duration="7.1" data-track-index="3" muted playsinline preload="auto" src="assets/B2.mp4"></video>
+    <div id="cap-b2-wrap" class="clip" data-start="17.6" data-duration="6.4" data-track-index="4" data-layout-allow-occlusion="true">
+      <div id="cap-b2" class="rail">Orang rugi karena <span class="hl">terlalu nafsu</span> sama altcoin.</div>
+    </div>
+
+    <!-- B3 irresponsible influencers 24.3–29.7s -->
+    <video id="B3v" class="clip beatvid" data-start="24.3" data-duration="5.4" data-track-index="3" muted playsinline preload="auto" src="assets/B3.mp4"></video>
+    <div id="cap-b3-wrap" class="clip" data-start="24.7" data-duration="4.8" data-track-index="4" data-layout-allow-occlusion="true">
+      <div id="cap-b3" class="rail">Influencer <span class="hl">nggak bertanggung jawab</span> bilang bakal next Bitcoin.</div>
+    </div>
+
+    <!-- B4 gap is too far 29.7–35.2s -->
+    <video id="B4v" class="clip beatvid" data-start="29.7" data-duration="5.5" data-track-index="3" muted playsinline preload="auto" src="assets/B4.mp4"></video>
+    <div id="cap-b4-wrap" class="clip" data-start="30.1" data-duration="4.9" data-track-index="4" data-layout-allow-occlusion="true">
+      <div id="cap-b4" class="rail">Gap altcoin ke Bitcoin <span class="hl">terlalu jauh. Impossible.</span></div>
+    </div>
+
+    <!-- B5 blacklist 35.2–39.8s -->
+    <video id="B5v" class="clip beatvid" data-start="35.2" data-duration="4.6" data-track-index="3" muted playsinline preload="auto" src="assets/B5.mp4"></video>
+    <div class="clip" data-start="35.6" data-duration="4" data-track-index="4" data-layout-allow-occlusion="true">
+      <div id="cap-b5" class="rail">Kalau negara <span class="hl">blacklist</span> Bitcoin, uang besar nggak masuk.</div>
+    </div>
+
+    <!-- B6 anti-government 39.8–45.4s -->
+    <video id="B6v" class="clip beatvid" data-start="39.8" data-duration="5.6" data-track-index="3" muted playsinline preload="auto" src="assets/B6.mp4"></video>
+    <div class="clip" data-start="40.2" data-duration="5" data-track-index="4" data-layout-allow-occlusion="true">
+      <div id="cap-b6" class="rail">Kita <span class="hl">nggak bisa anti-government</span> — regulasi lebih penting.</div>
+    </div>
+
+    <!-- B7 whitelist / Eric Trump 45.4–53.3s -->
+    <video id="B7v" class="clip beatvid" data-start="45.4" data-duration="7.9" data-track-index="3" muted playsinline preload="auto" src="assets/B7.mp4"></video>
+    <div id="cap-b7-wrap" class="clip" data-start="45.8" data-duration="7.1" data-track-index="4" data-layout-allow-occlusion="true">
+      <div id="cap-b7" class="rail">Pemerintah bikin <span class="hl">whitelist</span> — bahkan keluarga Trump beli Bitcoin.</div>
+    </div>
+
+    <!-- B8 regulated 53.3–59.6s -->
+    <video id="B8v" class="clip beatvid" data-start="53.3" data-duration="6.3" data-track-index="3" muted playsinline preload="auto" src="assets/B8.mp4"></video>
+    <div id="cap-b8-wrap" class="clip" data-start="53.7" data-duration="5.7" data-track-index="4" data-layout-allow-occlusion="true">
+      <div id="cap-b8" class="rail">Bukan scam. <span class="hl">Sudah regulated</span>, pajaknya final.</div>
+    </div>
+
+    <!-- B9 outro 59.6–73.4s -->
+    <video id="B9v" class="clip beatvid" data-start="59.6" data-duration="13.8" data-track-index="3" muted playsinline preload="auto" src="assets/B9.mp4"></video>
+    <div id="cap-end-wrap" class="clip" data-start="67.8" data-duration="5.6" data-track-index="4" data-layout-allow-occlusion="true">
+      <div id="endcard" class="endcard" style="pointer-events:none;">
+        <div class="inner">
+          <div class="t1">Terima kasih so much, bro</div>
+          <div class="t2">Saksikan — <span style="color:#ffb400;">Astronacci x Trif Group</span></div>
+          <div class="t3">Buka cabang crypto di tempat kamu</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- shade bottom (all beats, sits below captions) -->
+    <div id="shade" class="clip" data-start="0" data-duration="73.4" data-track-index="5">
+      <div class="shadegrad"></div>
+    </div>
+
+    <!-- per-beat audio -->
+    <audio id="B0a" class="clip" data-start="0"    data-duration="10.4"  data-track-index="6" src="assets/B0.m4a"></audio>
+    <audio id="B1a" class="clip" data-start="10.4" data-duration="6.8"  data-track-index="6" src="assets/B1.m4a"></audio>
+    <audio id="B2a" class="clip" data-start="17.2" data-duration="7.1"  data-track-index="6" src="assets/B2.m4a"></audio>
+    <audio id="B3a" class="clip" data-start="24.3" data-duration="5.4"  data-track-index="6" src="assets/B3.m4a"></audio>
+    <audio id="B4a" class="clip" data-start="29.7" data-duration="5.5"  data-track-index="6" src="assets/B4.m4a"></audio>
+    <audio id="B5a" class="clip" data-start="35.2" data-duration="4.6"  data-track-index="6" src="assets/B5.m4a"></audio>
+    <audio id="B6a" class="clip" data-start="39.8" data-duration="5.6"  data-track-index="6" src="assets/B6.m4a"></audio>
+    <audio id="B7a" class="clip" data-start="45.4" data-duration="7.9"  data-track-index="6" src="assets/B7.m4a"></audio>
+    <audio id="B8a" class="clip" data-start="53.3" data-duration="6.3"  data-track-index="6" src="assets/B8.m4a"></audio>
+    <audio id="B9a" class="clip" data-start="59.6" data-duration="12.67" data-track-index="6" src="assets/B9.m4a"></audio>
+
+    <!-- BGM bed -->
+    <audio id="bgm" class="clip" data-start="0" data-duration="70" data-track-index="7" src="assets/BGM-70.wav"></audio>
+</div>
+
+<script>
+  window.__timelines = window.__timelines || {};
+  const tl = gsap.timeline({ paused: true });
+
+  // B0: slow push on his on-camera intro B-roll (cut-the-curve entry)
+  tl.fromTo("#B0-broll", { scale: 1.02 }, { scale: 1.1, duration: 10.4, ease: "power1.out" }, 0);
+
+  // nameplate + point callouts
+  tl.fromTo("#nameplate", { autoAlpha: 0, x: -30 }, { autoAlpha: 1, x: 0, duration: 0.5, ease: "power2.out" }, 0.3);
+  tl.fromTo("#pt1", { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, duration: 0.4, ease: "power2.out" }, 1.6);
+  tl.to("#pt1", { autoAlpha: 0, duration: 0.3 }, 8.6);
+  tl.fromTo("#pt2", { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, duration: 0.4, ease: "power2.out" }, 5.2);
+  tl.to("#nameplate", { autoAlpha: 0, duration: 0.4 }, 6.4);
+  tl.to("#pt2", { autoAlpha: 0, duration: 0.3 }, 9.4);
+
+  // captions pop-in (B1–B8)
+  const capSel   = ["#cap-b1","#cap-b2","#cap-b3","#cap-b4","#cap-b5","#cap-b6","#cap-b7","#cap-b8"];
+  const capStart = [10.8, 17.6, 24.7, 30.1, 35.6, 40.2, 45.8, 53.7];
+  const capDur   = [6, 6.4, 4.8, 4.9, 4, 5, 7.1, 5.7];
+  capSel.forEach((sel, i) => {
+    tl.fromTo(sel, { autoAlpha: 0, y: 22 }, { autoAlpha: 1, y: 0, duration: 0.32, ease: "power2.out" }, capStart[i]);
+    tl.to(sel, { autoAlpha: 0, duration: 0.3, ease: "power1.in" }, capStart[i] + capDur[i] - 0.3);
+  });
+
+  // end card fade in
+  tl.fromTo("#endcard", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.8, ease: "power1.out" }, 67.8);
+
+  window.__timelines["main"] = tl;
+</script>
+</body>
+</html>

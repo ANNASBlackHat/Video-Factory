@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body {
+        margin: 0; width: 1080px; height: 1920px;
+        overflow: hidden; background: #000;
+        font-family: -apple-system, "Inter", "Segoe UI", sans-serif;
+      }
+      #bgfill {
+        position: absolute; inset: 0;
+        background: radial-gradient(120% 90% at 50% 30%, #1b1035 0%, #0a0a12 60%, #000 100%);
+      }
+      .covervid { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+      .blurbg { filter: blur(48px) brightness(0.55); }
+      .fitwrap {
+        position: absolute; left: 0; width: 1080px; top: 656px;
+      }
+      .fitwrap video { width: 1080px; height: 608px; object-fit: fill; display: block; }
+      .framecard {
+        border: 3px solid rgba(255, 214, 10, 0.85); border-radius: 28px; overflow: hidden;
+        box-shadow: 0 0 60px rgba(255, 214, 10, 0.25);
+      }
+      .rail {
+        position: absolute; left: 60px; right: 60px; bottom: 190px;
+        text-align: center; font-size: 46px; font-weight: 700; line-height: 1.35;
+        color: #fff; background: rgba(0, 0, 0, 0.62);
+        border-radius: 24px; padding: 20px 28px;
+      }
+      .rail .hl { color: #ffd60a; }
+      .embedpeak {
+        position: absolute; left: 50px; right: 50px; top: 300px;
+        text-align: center; font-size: 104px; font-weight: 900; line-height: 1.12;
+        color: #ffd60a; -webkit-text-stroke: 2px #000;
+        text-shadow: 0 6px 0 #000, 0 0 44px rgba(255, 60, 60, 0.65);
+      }
+      .embedsub {
+        position: absolute; left: 80px; right: 80px; top: 640px;
+        text-align: center; font-size: 44px; font-weight: 800; color: #fff;
+        text-shadow: 0 3px 0 #000;
+      }
+      .callout {
+        position: absolute; left: 90px; right: 90px; top: 180px;
+        background: rgba(10, 14, 30, 0.88); border: 2px solid #4cc9f0; border-radius: 20px;
+        padding: 22px 28px; text-align: center;
+      }
+      .callout .big { font-size: 52px; font-weight: 900; color: #4cc9f0; }
+      .callout .small { font-size: 36px; font-weight: 600; color: #fff; margin-top: 6px; }
+      .statcard {
+        position: absolute; left: 140px; right: 140px; top: 700px; text-align: center;
+        background: rgba(60, 0, 0, 0.82); border: 3px solid #ff3b3b; border-radius: 26px;
+        padding: 30px 20px;
+      }
+      .statcard .num { font-size: 150px; font-weight: 900; color: #ff3b3b; line-height: 1; }
+      .statcard .lbl { font-size: 44px; font-weight: 800; color: #fff; margin-top: 8px; }
+      .endcard {
+        position: absolute; inset: 0;
+        background: linear-gradient(180deg, rgba(5,5,12,0.55) 0%, rgba(5,5,12,0.94) 70%);
+      }
+      .endcard .inner { position: absolute; left: 80px; right: 80px; top: 720px; text-align: center; }
+      .endcard .t1 { font-size: 56px; font-weight: 900; color: #ffd60a; }
+      .endcard .t2 { font-size: 48px; font-weight: 700; color: #fff; margin-top: 18px; line-height: 1.3; }
+      .endcard .t3 { font-size: 38px; font-weight: 600; color: #4cc9f0; margin-top: 26px; }
+      .shadebottom {
+        position: absolute; left: 0; right: 0; bottom: 0; height: 560px;
+        background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.72) 100%);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="78"
+      data-width="1080"
+      data-height="1920"
+      style="width:1080px; height:1920px; position:relative; overflow:hidden;">
+      <div id="bgfill" class="clip" data-start="0" data-duration="78"></div>
+
+      <!-- dialogue blurred base (full run, keeps lip-sync: picture runs under overlays) -->
+      <div id="dlgblur-pos" style="position:absolute; inset:0;">
+        <video id="dlgblur-v" class="clip covervid blurbg" data-start="0" data-duration="78" data-track-index="0" muted playsinline preload="auto"
+          src="assets/dialogue-0845-1003.mp4"></video>
+      </div>
+      <!-- dialogue main, fit-width -->
+      <div id="dlgmain-pos" class="fitwrap">
+        <video id="dlgmain-v" class="clip" data-start="0" data-duration="78" data-track-index="1" style="width:1080px; height:608px; display:block;" muted playsinline preload="auto"
+          src="assets/dialogue-0845-1003.mp4"></video>
+      </div>
+
+      <!-- HOOK 0-8s: CBS missile-bounce-UFO over dialogue -->
+      <div id="cbsblur-pos" style="position:absolute; inset:0;">
+        <video id="cbsblur-v" class="clip covervid blurbg" data-start="0" data-duration="8" data-track-index="2" muted playsinline preload="auto"
+          src="assets/native-cbs-missile.mp4"></video>
+      </div>
+      <div id="cbsmain-pos" class="fitwrap framecard" style="overflow:hidden;">
+        <video id="cbsmain-v" class="clip" data-start="0" data-duration="8" data-track-index="3" style="width:1080px; height:608px; display:block;" muted playsinline preload="auto"
+          src="assets/native-cbs-missile.mp4"></video>
+      </div>
+      <div id="embed1" class="clip" data-start="0.4" data-duration="7.2" data-track-index="4">
+        <div id="embed1-wrap">
+          <div class="embedpeak">MISIL MENTAL<br />DITANGKIS UFO</div>
+          <div class="embedsub">Rekaman asli CBS News</div>
+        </div>
+      </div>
+
+      <!-- PROOF 38-58s: IR football UAP full-bleed -->
+      <div id="irmain-pos" style="position:absolute; inset:0;">
+        <video id="irmain-v" class="clip covervid" data-start="38" data-duration="20" data-track-index="2" muted playsinline preload="auto"
+          src="assets/native-ir-football.mp4" data-media-start="14"></video>
+      </div>
+      <div id="irshade" class="clip" data-start="38" data-duration="20" data-track-index="3">
+        <div class="shadebottom"></div>
+      </div>
+      <div id="embed2" class="clip" data-start="39" data-duration="7" data-track-index="4">
+        <div id="embed2-wrap">
+          <div class="embedpeak">MAU PERANG<br />SAMA SIAPA?</div>
+          <div class="embedsub">Space Force lawan siapa di atas sana?</div>
+        </div>
+      </div>
+
+      <!-- war.gov callout -->
+      <div id="card-war" class="clip" data-start="8.5" data-duration="8" data-track-index="4">
+        <div id="card-war-wrap" class="callout">
+          <div class="big">www.war.gov/UFO</div>
+          <div class="small">situs resmi Department of Defense</div>
+        </div>
+      </div>
+
+      <!-- 162 stat -->
+      <div id="card-162" class="clip" data-start="64" data-duration="8" data-track-index="4">
+        <div id="card-162-wrap" class="statcard">
+          <div class="num">162</div>
+          <div class="lbl">FILE UAP RESMI DIRILIS AS</div>
+        </div>
+      </div>
+
+      <!-- end card -->
+      <div id="endcard" class="clip" data-start="72" data-duration="6" data-track-index="5">
+        <div id="endcard-wrap" class="endcard">
+          <div class="inner">
+            <div class="t1">SIAP HIDUP BERSAMA ALIEN? 👽</div>
+            <div class="t2">Full podcast:<br />Astronacci x Beta UFO</div>
+            <div class="t3">Follow untuk part 2</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- rail captions -->
+      <div class="clip" data-start="0" data-duration="4.5" data-track-index="6"><div id="cap01-wrap" class="rail">Government sudah buka. <span class="hl">Bahkan resmi.</span></div></div>
+      <div class="clip" data-start="4.5" data-duration="4" data-track-index="6"><div id="cap02-wrap" class="rail">Coba lihat di mana dia upload itu.</div></div>
+      <div class="clip" data-start="8.5" data-duration="4" data-track-index="6"><div id="cap03-wrap" class="rail">Di departemen peperangan — <span class="hl">www.war.gov/UFO</span></div></div>
+      <div class="clip" data-start="12.5" data-duration="4" data-track-index="6"><div id="cap04-wrap" class="rail">Kok ditaruh di sana? <span class="hl">This is a threat.</span></div></div>
+      <div class="clip" data-start="16.5" data-duration="4.5" data-track-index="6"><div id="cap05-wrap" class="rail">Departemen ini dipimpin <span class="hl">Donald Trump</span> langsung.</div></div>
+      <div class="clip" data-start="21" data-duration="6" data-track-index="6"><div id="cap06-wrap" class="rail">2019, habis mancing di Florida…</div></div>
+      <div class="clip" data-start="27" data-duration="6" data-track-index="6"><div id="cap07-wrap" class="rail">Lihat emblemnya: hah, <span class="hl">Space Force?!</span></div></div>
+      <div class="clip" data-start="33" data-duration="6" data-track-index="6"><div id="cap08-wrap" class="rail">2019 Space Force dibuka. Jepang, Cina, Rusia ikut.</div></div>
+      <div class="clip" data-start="46" data-duration="5" data-track-index="6"><div id="cap10-wrap" class="rail">Perang sama Rusia nggak mungkin <span class="hl">di atas sana.</span></div></div>
+      <div class="clip" data-start="51" data-duration="6" data-track-index="6"><div id="cap11-wrap" class="rail">Buzz Aldrin: ada <span class="hl">laser</span> di orbit bulan.</div></div>
+      <div class="clip" data-start="57" data-duration="6" data-track-index="6"><div id="cap12-wrap" class="rail">Laser di luar angkasa itu <span class="hl">lasernya siapa?</span></div></div>
+      <div class="clip" data-start="63" data-duration="7" data-track-index="6"><div id="cap13-wrap" class="rail">Kenapa ditutup 57 tahun, baru dibuka sekarang?</div></div>
+      <div class="clip" data-start="70" data-duration="2" data-track-index="6"><div id="cap14-wrap" class="rail"><span class="hl">162 file</span> sudah dirilis.</div></div>
+
+      <!-- dialogue audio -->
+      <audio id="dlg-audio" data-start="0" data-duration="78" src="assets/dialogue-0845-1003.m4a"></audio>
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+      // hook punch-in
+      tl.fromTo("#cbsmain-v", { scale: 1.1 }, { scale: 1, duration: 8, ease: "power1.out" }, 0);
+      // embed peaks
+      tl.fromTo("#embed1-wrap", { autoAlpha: 0, scale: 0.7 }, { autoAlpha: 1, scale: 1, duration: 0.55, ease: "back.out(1.5)" }, 0.4);
+      tl.to("#embed1-wrap", { autoAlpha: 0, duration: 0.4, ease: "power1.in" }, 7.2);
+      tl.fromTo("#embed2-wrap", { autoAlpha: 0, scale: 0.7 }, { autoAlpha: 1, scale: 1, duration: 0.55, ease: "back.out(1.5)" }, 39);
+      tl.to("#embed2-wrap", { autoAlpha: 0, duration: 0.4, ease: "power1.in" }, 45.2);
+      // IR slow push
+      tl.fromTo("#irmain-v", { scale: 1 }, { scale: 1.12, duration: 20, ease: "none" }, 38);
+      // cards
+      tl.fromTo("#card-war-wrap", { autoAlpha: 0, y: -30 }, { autoAlpha: 1, y: 0, duration: 0.5, ease: "power2.out" }, 8.5);
+      tl.fromTo("#card-162-wrap", { autoAlpha: 0, scale: 0.8 }, { autoAlpha: 1, scale: 1, duration: 0.5, ease: "back.out(1.4)" }, 64);
+      tl.fromTo("#endcard-wrap", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.6, ease: "power1.out" }, 72);
+      // caption pops
+      const caps = ["#cap01-wrap","#cap02-wrap","#cap03-wrap","#cap04-wrap","#cap05-wrap","#cap06-wrap","#cap07-wrap","#cap08-wrap","#cap10-wrap","#cap11-wrap","#cap12-wrap","#cap13-wrap","#cap14-wrap"];
+      const at = [0, 4.5, 8.5, 12.5, 16.5, 21, 27, 33, 46, 51, 57, 63, 70];
+      caps.forEach(function (sel, i) {
+        tl.fromTo(sel, { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: 0.28, ease: "power1.out" }, at[i] + 0.03);
+      });
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

@@ -1,0 +1,88 @@
+**Title:** Warm Minimalist Podcast: Community Radar & Timeline Motion
+
+---
+
+### 1. Visual Theme & Layout Architecture
+
+* **Color Palette:** Warm monochrome cream-to-orange gradient 
+(`linear-gradient(180deg, #FDE6D2 0%, #FF8C38 100%)`).
+* **Frame Style:** Floating cards with soft drop shadows (`box-shadow: 0 
+20px 40px rgba(0,0,0,0.2)`) and heavy corner rounding (`border-radius: 
+28px`).
+* **Multi-Speaker Swap:** Seamless hard cuts between the two podcast hosts 
+while maintaining the consistent card frame container.
+
+---
+
+### 2. Scene-by-Scene Motion Breakdown
+
+**00:00 - 00:04 | Radar / Orbit Network (Full Card Mode)**
+
+* **Header Typography:** Large bold header with italic serif subtext 
+(*"Aussie creators / is finding community"*).
+* **Radar Disc & Scanning Animation:**
+* Central circular avatar (host) pulses gently at the core.
+* Thin concentric orbit rings expand outwards (`scale: 0.8 -> 1.0`, 
+`opacity: 0 -> 1`).
+* A semi-transparent rotating radar sweep line sweeps clockwise (360° 
+rotation looped).
+
+
+* **Avatar Pins:** Memoji/3D avatar pins pop into the orbit tracks one by 
+one using a spring bounce (`scale: 0 -> 1.2 -> 1.0`) as the sweep line 
+passes over their positions.
+
+**00:05 - 00:08 | 3D Stepped Podium Chart**
+
+* **3D Isometric Columns:**
+* Two orange rectangular prisms (labeled "4 years" and "5 years") rise 
+sequentially from the base.
+* **Choreography:** Linear height growth with a subtle spring overshoot at 
+the top. The "5 years" block triggers ~0.3s after the "4 years" block.
+
+
+
+**00:08 - 00:11 | Floating Message Bubble & Custom Cursor**
+
+* **Chat Bubble:** Rounded iOS-style chat bubble slides in from the right 
+(`translateX(40px) -> 0`, with soft deceleration).
+* **Cursor Motion:** A custom vector cursor glides along a smooth bezier 
+curve path toward the bottom-right action icon (`+`), simulating an 
+interactive tap (`scale: 1 -> 0.85 -> 1`).
+
+**00:12 - 00:14 | Blind Shutter / Line Wipe Transition**
+
+* **Transition Effect:** Speaker 2 introduces a full-card transition using 
+a vertical blind slice wipe (vertical linear mask reveal across the card).
+
+**00:14 - 00:16 | Upward Particle Avatars (Dark Mode)**
+
+* **Visual Shift:** Card background flips to deep charcoal black.
+* **Choreography:** 3 circular avatar badges launch vertically upward with 
+a glowing orange light trail/comet tail, decelerating into place at 
+different vertical offsets (staggered depth).
+
+**00:16 - 00:18 | 3D Question Mark Float**
+
+* **Overlay:** Three golden extruded 3D question marks (`? ? ?`) pop above 
+the speaker's chest with a floating idle bob (`translateY: ±6px` sine wave 
+loop).
+
+**00:19 - 00:23 | Bold Highlight Kinetic Typography**
+
+* **Kinetic Captions:** Word-level color highlights (bold orange font for 
+"poppy syndrome", "Australia") synced tightly to speaker cadence.
+
+---
+
+### 3. Programmatic Motion Specs (For Remotion / Hyperframes)
+
+* **Radar Sweep (GSAP / Remotion):** Continuous rotation: `(frame * 2.5) % 
+360` degrees applied to `transform: rotate(...)`.
+* **Avatar Spring Profile:** Bouncy overshoot (`stiffness: 180`, `damping: 
+12`, `mass: 0.7`) to emphasize the playful emoji/avatar aesthetic.
+* **Podium Growth:** Interpolate height directly via `interpolate(frame, 
+[start, start + 18], [0, targetHeight], { extrapolateRight: 'clamp', 
+easing: Easing.out(Easing.cubic) })`.
+
+

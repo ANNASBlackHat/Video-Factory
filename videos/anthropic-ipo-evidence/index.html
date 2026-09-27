@@ -1,0 +1,530 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>ANTHROPIC IPO — The Evidence File</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #0b0e13; }
+      body { font-family: "Inter", sans-serif; color: #eef1f5; }
+      .mono { font-family: "JetBrains Mono", monospace; }
+      .display { font-family: "Oswald", "Inter", sans-serif; font-weight: 700; }
+      .heavy { font-family: "Archivo Black", "Inter", sans-serif; font-weight: 400; }
+
+      #root { position: relative; width: 100%; height: 100%; overflow: hidden; background: #0b0e13; }
+      .clip, .pane { position: absolute; inset: 0; }
+
+      /* ---------- backdrop ---------- */
+      #bg { background: linear-gradient(180deg, #0e1219 0%, #0b0e13 45%, #080b0f 100%); }
+      #bg .rules {
+        position: absolute; inset: 0;
+        background-image: repeating-linear-gradient(180deg, rgba(255,255,255,.03) 0 1px, transparent 1px 86px);
+      }
+      #bg .vig { position: absolute; inset: 0; background: radial-gradient(120% 78% at 50% 40%, transparent 44%, rgba(0,0,0,.72) 100%); }
+
+      /* ---------- persistent chrome ---------- */
+      #progress { z-index: 6; position: absolute; left: 0; right: 0; top: 0; height: 6px; background: rgba(255,255,255,.07); }
+      #progressBar { display: block; width: 100%; height: 100%; background: #f5b301; transform-origin: left center; transform: scaleX(0); }
+
+      #topbar {
+        z-index: 5; position: absolute; left: 0; right: 0; top: 0; height: 116px;
+        display: flex; align-items: center; gap: 28px; padding: 0 44px;
+        background: rgba(8,10,14,.94); border-bottom: 1px solid rgba(255,255,255,.09);
+      }
+      .tb-left { display: flex; align-items: center; gap: 14px; }
+      .rec { width: 17px; height: 17px; border-radius: 50%; background: #e5484d; box-shadow: 0 0 16px rgba(229,72,77,.75); }
+      .tb-t { font-size: 26px; font-weight: 700; letter-spacing: .22em; color: #fff; }
+      .tb-mid { font-size: 21px; font-weight: 600; letter-spacing: .14em; color: #98a2b0; margin-left: auto; }
+      .tb-right { font-size: 21px; font-weight: 700; letter-spacing: .1em; color: #f5b301; }
+
+      #rail { z-index: 5; position: absolute; left: 18px; top: 150px; bottom: 200px; width: 30px; }
+      #rail .rail-line { position: absolute; left: 13px; top: 0; bottom: 0; width: 2px; background: linear-gradient(180deg, rgba(245,179,1,.6), rgba(245,179,1,.08)); }
+      #rail .rail-txt {
+        position: absolute; left: -4px; top: 50%; transform: translateY(-50%) rotate(180deg);
+        writing-mode: vertical-rl; font-size: 17px; font-weight: 700; letter-spacing: .34em;
+        color: rgba(245,179,1,.72); white-space: nowrap;
+      }
+
+      #footer {
+        z-index: 5; position: absolute; left: 0; right: 0; top: 1768px; height: 152px;
+        display: flex; align-items: center; justify-content: space-between; gap: 30px;
+        padding: 0 44px; background: #070a0d; border-top: 1px solid rgba(255,255,255,.09);
+      }
+      .ft-src { font-size: 19px; font-weight: 600; line-height: 1.55; letter-spacing: .05em; color: #8d97a6; max-width: 700px; }
+      .ft-r { font-size: 19px; font-weight: 700; letter-spacing: .12em; color: #f5b301; text-align: right; }
+
+      /* ---------- captions ---------- */
+      .capband {
+        z-index: 7; position: absolute; left: 44px; right: 44px; top: 1502px; bottom: auto;
+        padding: 24px 28px; background: rgba(10,13,18,.92);
+        border-left: 8px solid #f5b301; border-radius: 10px;
+        font-weight: 800; font-size: 42px; line-height: 1.3; color: #ffffff;
+        text-shadow: 0 3px 16px rgba(0,0,0,.85);
+      }
+      .capband b { color: #f5b301; font-weight: 800; }
+
+      /* ---------- evidence cards ---------- */
+      .win {
+        position: absolute; background: #11151c; border: 1px solid #262d38; border-radius: 16px;
+        overflow: hidden; box-shadow: 0 34px 80px rgba(0,0,0,.62), 0 4px 18px rgba(0,0,0,.5);
+      }
+      .winbar { height: 52px; display: flex; align-items: center; gap: 14px; padding: 0 18px; background: #171c24; border-bottom: 1px solid #262d38; }
+      .dots { display: flex; gap: 9px; }
+      .dots i { width: 13px; height: 13px; border-radius: 50%; display: block; background: #3a4351; }
+      .winbar .url {
+        font: 600 20px/1 "JetBrains Mono", monospace; color: #93a0b1;
+        background: #0d1117; border: 1px solid #262d38; border-radius: 999px;
+        padding: 8px 16px; white-space: nowrap;
+      }
+      .winbar .tag {
+        margin-left: auto; font: 700 17px/1 "JetBrains Mono", monospace; letter-spacing: .1em;
+        color: #f5b301; border: 1.5px solid rgba(245,179,1,.6); border-radius: 7px;
+        padding: 8px 12px; white-space: nowrap;
+      }
+      .winbody { position: relative; overflow: hidden; background: #0a0c10; }
+      .winbody img, .winbody video { display: block; width: 100%; height: auto; }
+      .srcbar {
+        display: flex; justify-content: space-between; align-items: center; gap: 16px;
+        padding: 15px 18px; background: #0d1117; border-top: 1px solid #262d38;
+        font: 700 19px/1.15 "JetBrains Mono", monospace; letter-spacing: .05em; color: #aab4c2;
+      }
+      .srcbar .ev { color: #f5b301; white-space: nowrap; }
+
+      .evlabel {
+        position: absolute; font: 700 22px/1 "JetBrains Mono", monospace;
+        letter-spacing: .2em; color: #f5b301;
+      }
+
+      /* ---------- chips / pills / stamps ---------- */
+      .chip {
+        position: absolute; display: inline-flex; align-items: center; justify-content: center;
+        border: 1.5px solid currentColor; border-radius: 999px; padding: 13px 26px;
+        font: 700 26px/1 "JetBrains Mono", monospace; letter-spacing: .06em; white-space: nowrap;
+      }
+      .c-amber { color: #f5b301; background: rgba(245,179,1,.10); }
+      .c-red { color: #ff7a7e; background: rgba(229,72,77,.13); }
+      .c-white { color: #e9edf3; background: rgba(255,255,255,.06); }
+
+      .qpill {
+        position: absolute; display: inline-flex; align-items: center; gap: 14px;
+        font: 700 24px/1 "JetBrains Mono", monospace; letter-spacing: .08em; color: #f5b301;
+        border: 2px solid rgba(245,179,1,.55); border-radius: 10px; padding: 14px 22px; white-space: nowrap;
+        background: rgba(245,179,1,.08);
+      }
+      .stamp {
+        position: absolute; border: 5px solid #e5484d; color: #ff8b8e; border-radius: 12px;
+        padding: 20px 30px; font: 400 36px/1.15 "Archivo Black", "Inter", sans-serif;
+        letter-spacing: .01em; background: rgba(229,72,77,.10);
+        box-shadow: 0 0 46px rgba(229,72,77,.28); transform: rotate(-6deg);
+      }
+
+      /* ---------- close scene ---------- */
+      #b12 .plate { position: absolute; inset: 0; overflow: hidden; }
+      #b12 .plate img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .44; }
+      #b12 .scrim { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(8,10,14,.58) 0%, rgba(8,10,14,.84) 58%, #080b0f 100%); }
+      .close-kicker { position: absolute; left: 0; right: 0; top: 420px; text-align: center; font: 700 24px/1 "JetBrains Mono", monospace; letter-spacing: .26em; color: #f5b301; }
+      .close-line { position: absolute; left: 0; right: 0; text-align: center; font-size: 88px; line-height: 1.06; color: #ffffff; }
+      .close-sub { position: absolute; left: 70px; right: 70px; top: 762px; text-align: center; font: 600 25px/1.5 "JetBrains Mono", monospace; letter-spacing: .05em; color: #9fa9b8; }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="72.3"
+      data-width="1080"
+      data-height="1920"
+    >
+      <!-- ================= PERSISTENT CHROME ================= -->
+      <section id="bg" class="clip" data-start="0" data-duration="72.3" aria-hidden="true">
+        <div class="rules"></div>
+        <div class="vig"></div>
+      </section>
+
+      <section id="rail" class="clip" data-start="0" data-duration="72.3" aria-hidden="true">
+        <div class="rail-line"></div>
+        <div class="rail-txt">CASE FILE · ANTHROPIC IPO · SEC S-1</div>
+      </section>
+
+      <section id="topbar" class="clip" data-start="0" data-duration="72.3">
+        <div class="tb-left"><span class="rec"></span><span class="tb-t mono">EVIDENCE DESK</span></div>
+        <div class="tb-mid mono">ANTHROPIC IPO · S-1 WATCH</div>
+        <div class="tb-right mono">26 SEP 2026</div>
+      </section>
+
+      <section id="progress" class="clip" data-start="0" data-duration="72.3" aria-hidden="true">
+        <i id="progressBar"></i>
+      </section>
+
+      <section id="footer" class="clip" data-start="0" data-duration="72.3">
+        <div class="ft-src mono">
+          SUMBER: SEC EDGAR · ANTHROPIC.COM · WSJ · REUTERS · CNBC · FORBES · FORKAST<br />
+          TECHCRUNCH · POMEGRA · MIXED NEWS · CRYPTO BRIEFING · YAHOO FINANCE
+        </div>
+        <div class="ft-r mono">EVIDENCE DESK<br />26 SEP 2026</div>
+      </section>
+
+      <!-- ================= B1 · FILING POST [0 – 4.35] ================= -->
+      <section id="b1" class="clip" data-start="0" data-duration="4.35">
+        <div class="evlabel" style="left:70px; top:491px;">BUKTI 01 · FILING RAHASIA</div>
+        <div id="b1card" class="win" style="left:70px; top:545px; width:940px;">
+          <div class="winbar">
+            <span class="dots"><i></i><i></i><i></i></span>
+            <span class="url">anthropic.com/news</span>
+            <span class="tag">CONFIDENTIAL FILING</span>
+          </div>
+          <div class="winbody" data-layout-allow-overflow><img id="b1img" src="assets/img/anthropic-own-s1-announcement.png" alt="" /></div>
+          <div class="srcbar"><span>ANTHROPIC.COM · SITUS RESMI</span><span class="ev">BUKTI 01 · 1 JUN 2026</span></div>
+        </div>
+        <span id="b1chip" class="chip c-red" style="left:70px; top:1055px;">DRAFT S-1 · DIKIRIM DIAM-DIAM</span>
+      </section>
+
+      <!-- ================= B2 · CNBC CLIP [4.35 – 8.36] ================= -->
+      <section id="b2" class="pane">
+        <div class="evlabel" style="left:262px; top:158px;">BUKTI 01B · SIARAN LANGSUNG</div>
+        <div id="b2card" class="win" style="left:262px; top:212px; width:556px;">
+          <div class="winbar">
+            <span class="dots"><i></i><i></i><i></i></span>
+            <span class="url">cnbc-television</span>
+            <span class="tag">CLIP · MUTED</span>
+          </div>
+          <div class="winbody" data-layout-allow-overflow>
+            <video
+              id="b2vid"
+              src="assets/footage/cnbc-jun1-filing.mp4"
+              data-start="4.35"
+              data-duration="4.01"
+              data-track-index="0"
+              muted
+              playsinline
+              preload="auto"
+            ></video>
+          </div>
+          <div class="srcbar"><span>CNBC TELEVISION</span><span class="ev">BUKTI 01B · 1 JUN 2026</span></div>
+        </div>
+      </section>
+
+      <!-- ================= B3 · OCTOBER PROMISE [8.36 – 11.74] ================= -->
+      <section id="b3" class="clip" data-start="8.36" data-duration="3.38">
+        <div class="evlabel" style="left:70px; top:491px;">BUKTI 02 · EKSPEKTASI PASAR</div>
+        <div id="b3card" class="win" style="left:70px; top:545px; width:940px;">
+          <div class="winbar">
+            <span class="dots"><i></i><i></i><i></i></span>
+            <span class="url">fortune.com</span>
+            <span class="tag">TARGET OKTOBER</span>
+          </div>
+          <div class="winbody" data-layout-allow-overflow><img id="b3img" src="assets/img/fortune-october-2t-promise.png" alt="" /></div>
+          <div class="srcbar"><span>FORTUNE · JIM BOSMAN</span><span class="ev">BUKTI 02 · 13 AGU 2026</span></div>
+        </div>
+        <span id="b3chip" class="chip c-amber" style="left:70px; top:1055px;">$2 TRILIUN · OKTOBER 2026</span>
+      </section>
+
+      <!-- ================= B4 · YAHOO CLIP [11.74 – 15.41] ================= -->
+      <section id="b4" class="pane">
+        <div class="evlabel" style="left:70px; top:374px;">BUKTI 02B · DISKUSI VALUASI</div>
+        <div id="b4card" class="win" style="left:70px; top:428px; width:940px;">
+          <div class="winbar">
+            <span class="dots"><i></i><i></i><i></i></span>
+            <span class="url">finance.yahoo.com</span>
+            <span class="tag">CLIP · MUTED</span>
+          </div>
+          <div class="winbody" data-layout-allow-overflow>
+            <video
+              id="b4vid"
+              src="assets/footage/yahoo-2t-question.mp4"
+              data-start="11.74"
+              data-duration="3.67"
+              data-track-index="1"
+              muted
+              playsinline
+              preload="auto"
+            ></video>
+          </div>
+          <div class="srcbar"><span>YAHOO FINANCE · MARKET DOMINATION</span><span class="ev">BUKTI 02B · 13 AGU 2026</span></div>
+        </div>
+        <span id="b4chip" class="chip c-white" style="left:70px; top:1110px;">INVESTOR: “LARGEST IPO IN HISTORY”</span>
+      </section>
+
+      <!-- ================= B5 · SLIP 1 · MID-OCTOBER [15.41 – 22.83] ================= -->
+      <section id="b5" class="clip" data-start="15.41" data-duration="7.42">
+        <div class="evlabel" style="left:70px; top:436px;">BUKTI 03 · GESER PERTAMA</div>
+        <div id="b5card" class="win" style="left:70px; top:490px; width:940px;">
+          <div class="winbar">
+            <span class="dots"><i></i><i></i><i></i></span>
+            <span class="url">cnbc.com</span>
+            <span class="tag">SINDIKASI REUTERS</span>
+          </div>
+          <div class="winbody" data-layout-allow-overflow><img id="b5img" src="assets/img/cnbc-mid-october-slip.png" alt="" /></div>
+          <div class="srcbar"><span>CNBC · MENGUTIP REUTERS (ECHO WANG)</span><span class="ev">BUKTI 03 · 4 SEP 2026</span></div>
+        </div>
+        <span id="b5chip1" class="chip c-white" style="left:70px; top:1010px;">4 SEP 2026</span>
+        <span id="b5chip2" class="chip c-amber" style="left:330px; top:1010px;">ROADSHOW → PERTENGAHAN OKTOBER</span>
+        <span id="b5chip3" class="chip c-red" style="left:70px; top:1110px;">PROSPEKTUS: TELAT</span>
+      </section>
+
+      <!-- ================= B6 · SLIP 2 · NOVEMBER [22.83 – 31.15] ================= -->
+      <section id="b6" class="clip" data-start="22.83" data-duration="8.32">
+        <div class="evlabel" style="left:70px; top:306px;">BUKTI 04 · GESER KEDUA</div>
+        <div id="b6card" class="win" style="left:70px; top:360px; width:940px;">
+          <div class="winbar">
+            <span class="dots"><i></i><i></i><i></i></span>
+            <span class="url">finance.yahoo.com</span>
+            <span class="tag">MENGUTIP WSJ</span>
+          </div>
+          <div class="winbody" data-layout-allow-overflow><img id="b6img" src="assets/img/yahoo-investing-wsj-november-delay.png" alt="" /></div>
+          <div class="srcbar"><span>YAHOO / INVESTING.COM · WSJ</span><span class="ev">BUKTI 04 · 18 SEP 2026</span></div>
+        </div>
+        <div id="b6strip" class="win" style="left:70px; top:896px; width:940px;">
+          <div class="winbar">
+            <span class="dots"><i></i><i></i><i></i></span>
+            <span class="url">cryptobriefing.com</span>
+            <span class="tag">PUSHING BACK</span>
+          </div>
+          <div class="winbody" data-layout-allow-overflow><img id="b6stripimg" src="assets/img/cryptobriefing-november-slip.png" alt="" /></div>
+          <div class="srcbar"><span>CRYPTO BRIEFING</span><span class="ev">BUKTI 04B · 19 SEP 2026</span></div>
+        </div>
+        <span id="b6chip" class="chip c-red" style="left:70px; top:1236px;">2× SLIP DALAM 6 MINGGU</span>
+      </section>
+
+      <!-- ================= B7 · THE REASON [31.15 – 39.99] ================= -->
+      <section id="b7" class="clip" data-start="31.15" data-duration="8.84">
+        <div class="evlabel" style="left:70px; top:216px;">BUKTI 05 · ALASAN PENUNDAAN</div>
+        <div id="b7card" class="win" style="left:70px; top:270px; width:940px;">
+          <div class="winbar">
+            <span class="dots"><i></i><i></i><i></i></span>
+            <span class="url">mixed-news.com</span>
+            <span class="tag">LAPORAN KUARTAL 3</span>
+          </div>
+          <div class="winbody" data-layout-allow-overflow><img id="b7img" src="assets/img/mixednews-q3-rationale.png" alt="" /></div>
+          <div class="srcbar"><span>MIXED NEWS · MENGUTIP WSJ</span><span class="ev">BUKTI 05 · 21 SEP 2026</span></div>
+        </div>
+        <div id="b7photo" class="win" style="left:220px; top:800px; width:640px;">
+          <div class="winbar">
+            <span class="dots"><i></i><i></i><i></i></span>
+            <span class="url">file photo</span>
+            <span class="tag">DARIO AMODEI</span>
+          </div>
+          <div class="winbody" data-layout-allow-overflow><img id="b7photoimg" src="assets/img/amodei-stage.jpg" alt="" /></div>
+          <div class="srcbar"><span>TECHCRUNCH DISRUPT · CC BY 2.0</span><span class="ev">FILE · 2023</span></div>
+        </div>
+        <span id="b7chip" class="chip c-amber" style="left:220px; top:1370px;">AMODEI: MINTA AI MELAMBAT</span>
+      </section>
+
+      <!-- ================= B8 · EDGAR IS EMPTY [39.99 – 45.46] ================= -->
+      <section id="b8" class="clip" data-start="39.99" data-duration="5.47">
+        <div id="b8pill" class="qpill" style="left:50%; top:352px; transform:translateX(-50%);">
+          SEARCH: anthropic pbc · TYPE: S-1 · SEC EDGAR
+        </div>
+        <div id="b8card" class="win" style="left:160px; top:446px; width:760px;">
+          <div class="winbar">
+            <span class="dots"><i></i><i></i><i></i></span>
+            <span class="url">sec.gov / edgar</span>
+            <span class="tag">26 SEP 2026</span>
+          </div>
+          <div class="winbody" data-layout-allow-overflow><img id="b8img" src="assets/img/sec-edgar-no-s1.png" alt="" /></div>
+          <div class="srcbar"><span>SEC.GOV · EDGAR COMPANY SEARCH</span><span class="ev">BUKTI 06 · 26 SEP 2026</span></div>
+        </div>
+        <div id="b8stamp" class="stamp" style="left:50%; top:1100px; transform:translateX(-50%) rotate(-6deg);">
+          NO PUBLIC S-1 ON EDGAR
+        </div>
+      </section>
+
+      <!-- ================= B9 · BLOOMBERG CLIP [45.46 – 50.95] ================= -->
+      <section id="b9" class="pane">
+        <div class="evlabel" style="left:70px; top:374px;">BUKTI 06B · “BELUM ADA HARGA”</div>
+        <div id="b9card" class="win" style="left:70px; top:428px; width:940px;">
+          <div class="winbar">
+            <span class="dots"><i></i><i></i><i></i></span>
+            <span class="url">bloomberg-television</span>
+            <span class="tag">CLIP · MUTED</span>
+          </div>
+          <div class="winbody" data-layout-allow-overflow>
+            <video
+              id="b9vid"
+              src="assets/footage/bloomberg-no-price-965b.mp4"
+              data-start="45.46"
+              data-duration="5.49"
+              data-track-index="2"
+              muted
+              playsinline
+              preload="auto"
+            ></video>
+          </div>
+          <div class="srcbar"><span>BLOOMBERG TV · ED LUDLOW</span><span class="ev">BUKTI 06B · 1 JUN 2026</span></div>
+        </div>
+        <span id="b9chip" class="chip c-red" style="left:70px; top:1110px;">TANPA JUMLAH LEMBAR · TANPA RENTANG HARGA</span>
+      </section>
+
+      <!-- ================= B10 · THE ASK [50.95 – 54.71] ================= -->
+      <section id="b10" class="clip" data-start="50.95" data-duration="3.76">
+        <div class="evlabel" style="left:70px; top:486px;">BUKTI 07 · YANG DIMINTA</div>
+        <div id="b10card" class="win" style="left:70px; top:540px; width:940px;">
+          <div class="winbar">
+            <span class="dots"><i></i><i></i><i></i></span>
+            <span class="url">forbes.com</span>
+            <span class="tag">ANGKA BEREDAR</span>
+          </div>
+          <div class="winbody" data-layout-allow-overflow><img id="b10img" src="assets/img/forbes-2t-public-last.png" alt="" /></div>
+          <div class="srcbar"><span>FORBES · JON MARKMAN</span><span class="ev">BUKTI 07 · 17 SEP 2026</span></div>
+        </div>
+        <span id="b10chip" class="chip c-amber" style="left:70px; top:1060px;">HINGGA $100 MILIAR · ~$2 T</span>
+      </section>
+
+      <!-- ================= B11 · THE RATE WINDOW [54.71 – 63.70] ================= -->
+      <section id="b11" class="clip" data-start="54.71" data-duration="8.99">
+        <div class="evlabel" style="left:70px; top:436px;">BUKTI 08 · JENDELA PASAR MENYEMPIT</div>
+        <div id="b11card" class="win" style="left:70px; top:490px; width:940px;">
+          <div class="winbar">
+            <span class="dots"><i></i><i></i><i></i></span>
+            <span class="url">pomegra.io</span>
+            <span class="tag">IMBAL HASIL 30 TAHUN</span>
+          </div>
+          <div class="winbody" data-layout-allow-overflow><img id="b11img" src="assets/img/pomegra-yields-window.png" alt="" /></div>
+          <div class="srcbar"><span>POMEGRA · IPO PIPELINE BRIEF</span><span class="ev">BUKTI 08 · 25 SEP 2026</span></div>
+        </div>
+        <span id="b11chip1" class="chip c-red" style="left:70px; top:1010px;">30 THN · 5,44%</span>
+        <span id="b11chip2" class="chip c-white" style="left:370px; top:1010px;">TERTINGGI DALAM 22 TAHUN</span>
+        <span id="b11chip3" class="chip c-white" style="left:70px; top:1110px;">2 IPO BATAL DI MINGGU YANG SAMA</span>
+      </section>
+
+      <!-- ================= B12 · CLOSE [63.70 – 72.30] ================= -->
+      <section id="b12" class="clip" data-start="63.7" data-duration="8.6">
+        <div class="plate" data-layout-allow-occlusion><img id="b12img" src="assets/img/nasdaq-tower-2026.jpg" alt="" data-layout-allow-overflow /></div>
+        <div class="scrim" data-layout-allow-occlusion></div>
+        <div id="b12kicker" class="close-kicker">POSISI HARI INI · 26 SEP 2026</div>
+        <div id="b12line1" class="close-line display" style="top:490px;">ANGKA: $2 TRILIUN</div>
+        <div id="b12line2" class="close-line display" style="top:610px; color:#f5b301;">TANGGAL: BELUM ADA</div>
+        <div id="b12sub" class="close-sub">EDGAR BELUM MENAMPILKAN S-1 PUBLIK MANAPUN DARI ANTHROPIC</div>
+        <div id="b12stamp" class="stamp" style="left:50%; top:890px; transform:translateX(-50%) rotate(-6deg);">
+          EDGAR · 26 SEP 2026 · EMPTY
+        </div>
+        <span id="b12chip" class="chip c-white" style="left:50%; top:1120px; transform:translateX(-50%);">LANGKAH BERIKUTNYA · PANTAU EDGAR</span>
+      </section>
+
+      <!-- ================= BURNED-IN CAPTIONS ================= -->
+      <div id="cap1" class="capband clip" data-start="0.15" data-duration="8.05" data-layout-allow-caption-zone="true">Juni lalu: draft S-1 dikirim <b>diam-diam</b> ke regulator AS</div>
+      <div id="cap2" class="capband clip" data-start="8.5" data-duration="6.75" data-layout-allow-caption-zone="true">Ekspektasinya cuma Oktober — valuasi <b>2 triliun dolar</b></div>
+      <div id="cap3" class="capband clip" data-start="15.55" data-duration="7.1" data-layout-allow-caption-zone="true">4 Sep: Reuters — roadshow <b>bergeser ke pertengahan Oktober</b></div>
+      <div id="cap4" class="capband clip" data-start="22.95" data-duration="8.05" data-layout-allow-caption-zone="true">18 Sep: WSJ — targetnya kini <b>November</b>. Dua kali mundur</div>
+      <div id="cap5" class="capband clip" data-start="31.3" data-duration="8.55" data-layout-allow-caption-zone="true">Bankir ingin <b>laporan kuartal 3</b> yang tuntas sebelum harga</div>
+      <div id="cap6" class="capband clip" data-start="40.15" data-duration="10.65" data-layout-allow-caption-zone="true">EDGAR kosong. Tanpa dokumen: <b>tanpa kode, lembar, harga</b></div>
+      <div id="cap7" class="capband clip" data-start="51.1" data-duration="12.45" data-layout-allow-caption-zone="true">Permintaan naik 100 miliar — imbal hasil 30 tahun <b>5,44%</b></div>
+      <div id="cap8" class="capband clip" data-start="63.9" data-duration="8.25" data-layout-allow-caption-zone="true">Angkanya 2 triliun. <b>Tanggalnya belum ada.</b></div>
+
+      <!-- ================= AUDIO ================= -->
+      <audio id="voTrack" src="assets/vo/final_full_voiceover.wav" data-start="0" data-track-index="10"></audio>
+
+      <audio id="sfx01" class="clip" src="assets/audio/sfx/paper_rustle.wav" data-start="0" data-duration="0.6" data-track-index="11"></audio>
+      <audio id="sfx02" class="clip" src="assets/audio/sfx/page_flip.wav" data-start="4.35" data-duration="0.22" data-track-index="12"></audio>
+      <audio id="sfx03" class="clip" src="assets/audio/sfx/page_flip.wav" data-start="8.36" data-duration="0.22" data-track-index="13"></audio>
+      <audio id="sfx04" class="clip" src="assets/audio/sfx/ui_blip.wav" data-start="11.74" data-duration="0.15" data-track-index="14"></audio>
+      <audio id="sfx05" class="clip" src="assets/audio/sfx/page_flip.wav" data-start="15.41" data-duration="0.22" data-track-index="15"></audio>
+      <audio id="sfx06" class="clip" src="assets/audio/sfx/page_flip.wav" data-start="22.83" data-duration="0.22" data-track-index="16"></audio>
+      <audio id="sfx07" class="clip" src="assets/audio/sfx/page_flip.wav" data-start="31.15" data-duration="0.22" data-track-index="17"></audio>
+      <audio id="sfx08" class="clip" src="assets/audio/sfx/stamp_thud.wav" data-start="39.99" data-duration="0.4" data-track-index="18"></audio>
+      <audio id="sfx09" class="clip" src="assets/audio/sfx/ui_blip.wav" data-start="45.46" data-duration="0.15" data-track-index="19"></audio>
+      <audio id="sfx10" class="clip" src="assets/audio/sfx/page_flip.wav" data-start="50.95" data-duration="0.22" data-track-index="20"></audio>
+      <audio id="sfx11" class="clip" src="assets/audio/sfx/deep_hit.wav" data-start="54.71" data-duration="0.6" data-track-index="21"></audio>
+      <audio id="sfx12" class="clip" src="assets/audio/sfx/confirm_click.wav" data-start="58.51" data-duration="0.2" data-track-index="22"></audio>
+      <audio id="sfx13" class="clip" src="assets/audio/sfx/bass_riser.wav" data-start="63.7" data-duration="2.5" data-track-index="23"></audio>
+      <audio id="sfx14" class="clip" src="assets/audio/sfx/stamp_thud.wav" data-start="68.57" data-duration="0.4" data-track-index="24"></audio>
+
+      <script>
+        window.__timelines = window.__timelines || {};
+        const tl = gsap.timeline({ paused: true });
+        const $ = (s) => document.querySelector(s);
+
+        /* progress line */
+        tl.fromTo("#progressBar", { scaleX: 0 }, { scaleX: 1, duration: 72.3, ease: "none" }, 0);
+
+        /* captions pop in */
+        document.querySelectorAll(".capband").forEach((el) => {
+          const st = parseFloat(el.getAttribute("data-start")) || 0;
+          tl.fromTo(el, { autoAlpha: 0, y: 18 }, { autoAlpha: 1, y: 0, duration: 0.22, ease: "power2.out" }, st);
+        });
+
+        /* card settle + slow Ken Burns push (content motion, no idle wobble) */
+        function beat(cardSel, imgSel, at, dur, kb) {
+          tl.from(cardSel, { y: 42, autoAlpha: 0, duration: 0.38, ease: "power3.out" }, at);
+          if (imgSel && kb !== false) {
+            tl.fromTo(imgSel, { scale: 1 }, { scale: 1.045, duration: dur - 0.35, ease: "none" }, at + 0.35);
+          }
+        }
+
+        /* B1 filing post */
+        beat("#b1card", "#b1img", 0, 4.35);
+        tl.from("#b1chip", { scale: 0.6, autoAlpha: 0, duration: 0.34, ease: "back.out(1.8)" }, 2.3);
+
+        /* B2 CNBC clip — wrapper untimed, the video owns the timing; GSAP gates in/out */
+        tl.from("#b2", { y: 42, autoAlpha: 0, duration: 0.38, ease: "power3.out" }, 4.35);
+        tl.fromTo("#b2card", { scale: 1 }, { scale: 1.018, duration: 3.66, ease: "none" }, 4.7);
+        tl.to("#b2", { autoAlpha: 0, duration: 0.2, ease: "power2.in" }, 8.16);
+
+        /* B3 Fortune */
+        beat("#b3card", "#b3img", 8.36, 3.38);
+        tl.from("#b3chip", { scale: 0.6, autoAlpha: 0, duration: 0.34, ease: "back.out(1.8)" }, 9.95);
+
+        /* B4 Yahoo clip — wrapper untimed, GSAP gates in/out */
+        tl.from("#b4", { y: 42, autoAlpha: 0, duration: 0.38, ease: "power3.out" }, 11.74);
+        tl.fromTo("#b4card", { scale: 1 }, { scale: 1.018, duration: 3.32, ease: "none" }, 12.09);
+        tl.to("#b4", { autoAlpha: 0, duration: 0.2, ease: "power2.in" }, 15.21);
+        tl.from("#b4chip", { scale: 0.6, autoAlpha: 0, duration: 0.34, ease: "back.out(1.8)" }, 13.52);
+
+        /* B5 slip 1 */
+        beat("#b5card", "#b5img", 15.41, 7.42);
+        tl.from("#b5chip1", { y: 26, autoAlpha: 0, duration: 0.3, ease: "power3.out" }, 17.1);
+        tl.from("#b5chip2", { x: -30, autoAlpha: 0, duration: 0.3, ease: "power3.out" }, 17.8);
+        tl.from("#b5chip3", { scale: 0.6, autoAlpha: 0, duration: 0.34, ease: "back.out(1.8)" }, 20.3);
+
+        /* B6 slip 2 — press pile-on */
+        beat("#b6card", "#b6img", 22.83, 8.32);
+        tl.from("#b6strip", { y: 60, autoAlpha: 0, duration: 0.4, ease: "power3.out" }, 25.36);
+        tl.fromTo("#b6stripimg", { scale: 1 }, { scale: 1.04, duration: 5.32, ease: "none" }, 25.78);
+        tl.from("#b6chip", { scale: 0.6, autoAlpha: 0, duration: 0.34, ease: "back.out(1.8)" }, 28.29);
+
+        /* B7 reason */
+        beat("#b7card", "#b7img", 31.15, 8.84);
+        tl.from("#b7photo", { y: 60, autoAlpha: 0, duration: 0.4, ease: "power3.out" }, 35.51);
+        tl.fromTo("#b7photoimg", { scale: 1 }, { scale: 1.05, duration: 4.05, ease: "none" }, 35.91);
+        tl.from("#b7chip", { scale: 0.6, autoAlpha: 0, duration: 0.34, ease: "back.out(1.8)" }, 37.6);
+
+        /* B8 EDGAR */
+        beat("#b8card", "#b8img", 39.99, 5.47);
+        tl.from("#b8pill", { y: -24, autoAlpha: 0, duration: 0.3, ease: "power3.out" }, 40.29);
+        tl.from("#b8stamp", { scale: 2.4, autoAlpha: 0, duration: 0.3, ease: "power4.out" }, 41.64);
+        tl.to("#b8stamp", { scale: 1.06, duration: 0.14, yoyo: true, repeat: 1, ease: "power1.inOut" }, 41.94);
+
+        /* B9 Bloomberg clip — wrapper untimed, GSAP gates in/out */
+        tl.from("#b9", { y: 42, autoAlpha: 0, duration: 0.38, ease: "power3.out" }, 45.46);
+        tl.fromTo("#b9card", { scale: 1 }, { scale: 1.018, duration: 5.14, ease: "none" }, 45.81);
+        tl.to("#b9", { autoAlpha: 0, duration: 0.2, ease: "power2.in" }, 50.75);
+        tl.from("#b9chip", { scale: 0.6, autoAlpha: 0, duration: 0.34, ease: "back.out(1.8)" }, 47.76);
+
+        /* B10 the ask */
+        beat("#b10card", "#b10img", 50.95, 3.76);
+        tl.from("#b10chip", { scale: 0.6, autoAlpha: 0, duration: 0.34, ease: "back.out(1.8)" }, 52.48);
+
+        /* B11 rate window */
+        beat("#b11card", "#b11img", 54.71, 8.99);
+        tl.from("#b11chip1", { y: 26, autoAlpha: 0, duration: 0.3, ease: "power3.out" }, 58.51);
+        tl.from("#b11chip2", { y: 26, autoAlpha: 0, duration: 0.3, ease: "power3.out" }, 58.81);
+        tl.from("#b11chip3", { scale: 0.6, autoAlpha: 0, duration: 0.34, ease: "back.out(1.8)" }, 60.51);
+
+        /* B12 close */
+        tl.fromTo("#b12img", { scale: 1.0 }, { scale: 1.07, duration: 8.6, ease: "none" }, 63.7);
+        tl.from("#b12kicker", { y: -18, autoAlpha: 0, duration: 0.35, ease: "power3.out" }, 64.07);
+        tl.from("#b12line1", { y: 46, autoAlpha: 0, duration: 0.42, ease: "power3.out" }, 64.37);
+        tl.from("#b12line2", { y: 46, autoAlpha: 0, duration: 0.42, ease: "power3.out" }, 64.87);
+        tl.from("#b12sub", { autoAlpha: 0, duration: 0.35 }, 65.67);
+        tl.from("#b12stamp", { scale: 2.4, autoAlpha: 0, duration: 0.3, ease: "power4.out" }, 68.57);
+        tl.to("#b12stamp", { scale: 1.06, duration: 0.14, yoyo: true, repeat: 1, ease: "power1.inOut" }, 68.87);
+        tl.from("#b12chip", { y: 26, autoAlpha: 0, duration: 0.34, ease: "power3.out" }, 69.57);
+
+        window.__timelines["main"] = tl;
+      </script>
+    </div>
+  </body>
+</html>

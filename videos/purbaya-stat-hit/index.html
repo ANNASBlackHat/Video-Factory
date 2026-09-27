@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #061020; }
+      #root {
+        width: 100%; height: 100%;
+        position: relative;
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+        color: #f4f4f5;
+        overflow: hidden;
+      }
+      .bg-grid {
+        position: absolute; inset: 0;
+        background-image:
+          linear-gradient(rgba(22,242,194,0.05) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(22,242,194,0.05) 1px, transparent 1px);
+        background-size: 60px 60px;
+      }
+      .bg-scan {
+        position: absolute; left: 0; right: 0; height: 2px;
+        background: linear-gradient(90deg, transparent, rgba(22,242,194,0.6), transparent);
+        top: 0;
+      }
+      .ticker-tape {
+        position: absolute; top: 0; left: 0; right: 0; height: 70px;
+        background: #0a1830;
+        border-bottom: 2px solid rgba(22,242,194,0.3);
+        display: flex; align-items: center; justify-content: center;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 30px; font-weight: 700;
+        letter-spacing: 0.2em;
+        color: #16f2c2;
+      }
+      .scene {
+        position: absolute; inset: 0;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        text-align: center;
+        padding: 120px 60px;
+      }
+      .kicker {
+        font-size: 32px; font-weight: 700;
+        color: #ffb020;
+        letter-spacing: 0.25em;
+        text-transform: uppercase;
+        margin-bottom: 24px;
+      }
+      .stat-num {
+        font-family: "Inter", "Archivo Black", sans-serif;
+        font-size: 260px; font-weight: 900;
+        line-height: 0.9;
+        letter-spacing: -0.04em;
+        color: #16f2c2;
+        text-shadow: 0 0 40px rgba(22,242,194,0.5);
+      }
+      .stat-num.neg { color: #ff3b5c; text-shadow: 0 0 40px rgba(255,59,92,0.5); }
+      .stat-num.amber { color: #ffb020; text-shadow: 0 0 40px rgba(255,176,32,0.5); }
+      .stat-label {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 40px; font-weight: 700;
+        color: #a3c5d8;
+        margin-top: 28px;
+        letter-spacing: 0.05em;
+      }
+      .title-main {
+        font-family: "Inter", sans-serif;
+        font-size: 130px; font-weight: 900;
+        letter-spacing: -0.04em;
+        line-height: 0.95;
+      }
+      .title-sub {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 46px; font-weight: 700;
+        color: #16f2c2;
+        margin-top: 24px;
+        letter-spacing: 0.15em;
+      }
+      .close-num {
+        font-family: "Inter", sans-serif;
+        font-size: 200px; font-weight: 900;
+        letter-spacing: -0.04em;
+        color: #f4f4f5;
+      }
+      .close-cap {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 44px; font-weight: 700;
+        color: #ffb020;
+        margin-top: 24px;
+        letter-spacing: 0.1em;
+      }
+      .glitch-bar {
+        position: absolute; left: 0; right: 0; height: 40px;
+        background: rgba(255,59,92,0.4);
+        mix-blend-mode: screen;
+        opacity: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="82.5" data-width="1080" data-height="1920">
+
+      <!-- VO tracks -->
+      <audio id="vo-1" src="assets/vo/scene_1.wav" data-start="0" data-duration="11.32" data-track-index="60" muted></audio>
+      <audio id="vo-2" src="assets/vo/scene_2.wav" data-start="11.32" data-duration="15.64" data-track-index="61" muted></audio>
+      <audio id="vo-3" src="assets/vo/scene_3.wav" data-start="26.96" data-duration="12.56" data-track-index="62" muted></audio>
+      <audio id="vo-4" src="assets/vo/scene_4.wav" data-start="39.52" data-duration="17.24" data-track-index="63" muted></audio>
+      <audio id="vo-5" src="assets/vo/scene_5.wav" data-start="56.76" data-duration="13.24" data-track-index="64" muted></audio>
+      <audio id="vo-6" src="assets/vo/scene_6.wav" data-start="70.00" data-duration="10.56" data-track-index="65" muted></audio>
+
+      <!-- SFX (re-time to new scene boundaries: 0, 11.32, 26.96, 39.52, 56.76, 70.00) -->
+      <audio id="fx-1" src="assets/audio/deep_hit.wav" data-start="0.2" data-duration="0.6" data-track-index="70" muted></audio>
+      <audio id="fx-2" src="assets/audio/tick_counter.wav" data-start="11.12" data-duration="0.5" data-track-index="71" muted></audio>
+      <audio id="fx-3" src="assets/audio/ui_blip.wav" data-start="26.76" data-duration="0.4" data-track-index="72" muted></audio>
+      <audio id="fx-4" src="assets/audio/deep_hit.wav" data-start="39.32" data-duration="0.6" data-track-index="73" muted></audio>
+      <audio id="fx-5" src="assets/audio/glitch_stutter.wav" data-start="56.56" data-duration="0.6" data-track-index="74" muted></audio>
+      <audio id="fx-6" src="assets/audio/ui_blip.wav" data-start="70.0" data-duration="0.4" data-track-index="75" muted></audio>
+      <audio id="fx-7" src="assets/audio/strobe_hit.wav" data-start="80.0" data-duration="0.6" data-track-index="76" muted></audio>
+      <audio id="fx-8" src="assets/audio/whoosh_hard.wav" data-start="81.5" data-duration="0.5" data-track-index="77" muted></audio>
+
+      <!-- Shared background -->
+      <div class="bg-grid" data-start="0" data-duration="82.5" data-track-index="0"></div>
+      <div class="ticker-tape" data-start="0" data-duration="82.5" data-track-index="1">MENKEU RESHUFFLE · 1 TH 6 HARI</div>
+      <div class="bg-scan" id="scan" data-start="0" data-duration="82.5" data-track-index="2"></div>
+      <div class="glitch-bar" id="g1" style="top: 40%" data-start="0" data-duration="82.5" data-track-index="3"></div>
+      <div class="glitch-bar" id="g2" style="top: 60%" data-start="0" data-duration="82.5" data-track-index="3"></div>
+
+      <!-- TITLE (0–11.32s, matches vo-1) -->
+      <div class="scene clip" id="sc-title" data-start="0" data-duration="11.32" data-track-index="10">
+        <div class="kicker">ECONOMY · INDONESIA</div>
+        <div class="title-main" id="t1">MENKEU<br><span style="color:#ff3b5c;">RESHUFFLE</span></div>
+        <div class="title-sub">1 TH 6 HARI · KEPPRES 97 P/2026</div>
+      </div>
+
+      <!-- HIT 1 (11.32–26.96s, matches vo-2) -->
+      <div class="scene clip" id="sc-h1" data-start="11.32" data-duration="15.64" data-track-index="10">
+        <div class="kicker">LIQUIDITAS + PERTUMBUHAN</div>
+        <div class="stat-num" id="n1">Rp200T</div>
+        <div class="stat-label">SAL → HIMPUNAN BANK HIMBARA · GDP 5.61%</div>
+      </div>
+
+      <!-- HIT 2 (26.96–39.52s, matches vo-3) -->
+      <div class="scene clip" id="sc-h2" data-start="26.96" data-duration="12.56" data-track-index="10">
+        <div class="kicker">KRONOLOGI</div>
+        <div class="stat-num amber" id="n2">1 TH 6 HARI</div>
+        <div class="stat-label">8 SEP 2025 → 14 SEP 2026 · SRI MULYANI → PURBAYA → SUAHASIL</div>
+      </div>
+
+      <!-- HIT 3 (39.52–56.76s, matches vo-4) -->
+      <div class="scene clip" id="sc-h3" data-start="39.52" data-duration="17.24" data-track-index="10">
+        <div class="kicker">SIAPA SUAHASIL</div>
+        <div class="stat-num" id="n3">PhD</div>
+        <div class="stat-label">UIUC '03 · Guru Besar UI '09 · Ka BKF '16 · Wamenkeu '19<br>Arahan: APBN sehat · defisit &lt; 3%</div>
+      </div>
+
+      <!-- HIT 4 (56.76–70.0s, matches vo-5) -->
+      <div class="scene clip" id="sc-h4" data-start="56.76" data-duration="13.24" data-track-index="10">
+        <div class="kicker">SOSMED · VIRAL</div>
+        <div class="stat-num neg" id="n4">4.8J</div>
+        <div class="stat-label">VIEWS · "UDAH SIAP BELUM?"</div>
+      </div>
+
+      <!-- HIT 5 (70.0–82.5s, matches vo-6) -->
+      <div class="scene clip" id="sc-close" data-start="70.0" data-duration="12.5" data-track-index="10">
+        <div class="kicker">TIGA KONSEP</div>
+        <div class="close-num" id="n5">3<br>KONSEP</div>
+        <div class="close-cap">Investigasi · Statistik · Jejak Dokumenter</div>
+      </div>
+
+    </div>
+    <script>
+      const tl = gsap.timeline({ paused: true });
+
+      // ambient scanline
+      tl.fromTo("#scan", { y: 0 }, { y: 1920, duration: 4.0, ease: "none", repeat: 20 }, 0);
+      // bg ticker pulse
+      tl.to(".ticker-tape", { opacity: 0.85, duration: 0.8, ease: "sine.inOut", repeat: 60, yoyo: true }, 0);
+
+      // TITLE (0 – 11.32s, matches vo-1)
+      tl.fromTo("#sc-title .kicker", { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.3 }, 0.1);
+      tl.fromTo("#t1", { opacity: 0, scale: 1.4 }, { opacity: 1, scale: 1, duration: 0.5, ease: "power4.out" }, 0.2);
+      tl.fromTo("#sc-title .title-sub", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.4 }, 0.7);
+      tl.to("#sc-title", { opacity: 0, duration: 0.3 }, 11.0);
+
+      // helper to slam a hit scene
+      function slam(id, t0, dur, numId) {
+        tl.fromTo("#" + id + " .kicker", { opacity: 0 }, { opacity: 1, duration: 0.2 }, t0 + 0.05);
+        tl.fromTo("#" + numId, { opacity: 0, scale: 0.5 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(1.6)" }, t0 + 0.15);
+        tl.fromTo("#" + id + " .stat-label, #" + id + " .close-cap", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.3 }, t0 + 0.4);
+        tl.to("#" + id, { opacity: 0, duration: 0.2 }, t0 + dur - 0.2);
+      }
+      slam("sc-h1", 11.32, 15.64, "n1");
+      slam("sc-h2", 26.96, 12.56, "n2");
+      slam("sc-h3", 39.52, 17.24, "n3");
+      slam("sc-h4", 56.76, 13.24, "n4");
+      // close (70.0 – 82.5s, matches vo-6)
+      tl.fromTo("#sc-close .kicker", { opacity: 0 }, { opacity: 1, duration: 0.2 }, 70.05);
+      tl.fromTo("#n5", { opacity: 0, scale: 0.4, rotation: -6 }, { opacity: 1, scale: 1, rotation: 0, duration: 0.5, ease: "back.out(1.8)" }, 70.15);
+      tl.fromTo("#sc-close .close-cap", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 70.6);
+
+      // glitch bars on scene transitions (new timing)
+      [["#g1", 11.12, 0.3], ["#g2", 26.76, 0.3], ["#g1", 39.32, 0.3], ["#g2", 56.56, 0.3], ["#g1", 70.0, 0.3]].forEach(function (g) {
+        tl.fromTo(g[0], { opacity: 0, x: -100 }, { opacity: 0.9, x: 100, duration: g[2], ease: "steps(4)" }, g[1]);
+        tl.to(g[0], { opacity: 0, duration: 0.1 }, g[1] + g[2]);
+      });
+
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>

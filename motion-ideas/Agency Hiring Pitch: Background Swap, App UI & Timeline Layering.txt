@@ -1,0 +1,112 @@
+**Title:** Agency Hiring Test: Glassmorphic Cards, Glow Rings & Linear 
+Slices
+
+---
+
+### 1. Visual Theme & Layout Architecture
+
+* **Brand & Aesthetic:** Sleek modern tech/agency showcase (@render.rush) 
+utilizing a faint gray isometric/square grid background, pure white 
+floating cards, bright yellow highlight badges, and subtle lime/cyan 
+accent lines.
+* **Structural Layout:**
+* **Before / After Comparison Cards:** Left card holds the "Before" raw 
+talking head (smaller scale); right primary card houses the "After" 
+sequence with an arched yellow header tag (`"After"`).
+* **Static Callout Footer:** The bottom of the canvas features a fixed 
+sticky CTA (*"Comment 'Raw' / And I'll send you the raw video"*).
+
+
+
+---
+
+### 2. Scene-by-Scene Motion Breakdown
+
+**00:00 - 00:02 | Office Background Swap & Circular Orbit Line**
+
+* **Background Cutout Replacement:** The speaker is rotoscoped out of her 
+room background and composited onto a bright, modern corporate office 
+background.
+* **Vector Accent:** A thin neon-yellow glowing circular vector line 
+traces an arc around the speaker (`pathLength` draw from 0% to 100%) while 
+floating brand name tags pop below.
+
+**00:03 - 00:05 | Instagram Profile Card Mockup (Full Card Mode)**
+
+* **Visual:** Instagram Dark Mode profile screen (`@personalbrandlaunch`) 
+fills the primary right card.
+* **Choreography:** Smooth vertical scroll that reveals the follower count 
+badge, bio text, and bottom grid tiles with staggered subtle opacity 
+fades.
+
+**00:05 - 00:08 | Progress Line Reveal & Staggered Trait Badges**
+
+* **Interactive Line:** A horizontal slider line draws across the 
+speaker's chest with a floating hand cursor snapping across the bar.
+* **Floating Tag Stacks:**
+* Stacked dark translucent pills (`"Talented"`, `"Hardworking"`) enter 
+sequentially with yellow square accent icons.
+* Followed by 3D emoji bubbles (folded hands / team emojis) springing in 
+with slight rotation (`scale: 0 -> 1.15 -> 1.0`, `rotate: -5deg -> 0deg`).
+
+
+
+**00:08 - 00:11 | Video Editing Timeline Overlay**
+
+* **UI Asset:** Multi-track NLE timeline layers (color-coded cyan, purple, 
+and green tracks representing video/audio layers).
+* **Motion:** The tracks expand horizontally from `scaleX: 0` to `1` 
+(origin at left) and slide onto the lower third of the speaker.
+
+**00:11 - 00:13 | Animated Keyword Tag Pop**
+
+* **Kinetic Text:** High-contrast yellow headline tag (*"The Editing 
+Test"*) springs into view with high damping, locked directly under the 
+speaker's hand gesture.
+
+**00:15 - 00:19 | iOS Notification Toast & Vertical Line-Slice 
+Transition**
+
+* **Notification Pill (00:15):** Top-center iOS Messages banner 
+(*"MESSAGES / Here's some position information"*) drops down from 
+`translateY(-30px)` with a smooth ease-out.
+* **Vertical Blind Wipe (00:16):** Full-card transition using vertical 
+linear slit masks expanding horizontally to reveal B-roll footage.
+* **B-Roll UI Bubbles (00:17 - 00:19):** Remote desk work footage paired 
+with staggered right-aligned blue chat bubbles (*"This is a remote job"*, 
+*"You can expect to work 5-8 hours a day"*).
+
+---
+
+### 3. Programmatic Motion Specs (For Remotion / Hyperframes)
+
+* **Multi-Track Timeline Growth (Hyperframes / GSAP):**
+```javascript
+gsap.from(".timeline-track", {
+  scaleX: 0,
+  transformOrigin: "left center",
+  stagger: 0.1,
+  duration: 0.6,
+  ease: "power3.out"
+});
+
+```
+
+
+* **SVG Circular Path Tracing (Remotion):**
+```jsx
+const pathProgress = interpolate(frame, [0, 20], [100, 0], {
+  extrapolateRight: "clamp",
+  easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+});
+// strokeDasharray="100" strokeDashoffset={pathProgress}
+
+```
+
+
+* **Notification Toast Physics:**
+* Entry: `translateY: [-40, 0]`, `opacity: [0, 1]`, duration: 8 frames.
+* Hold: 40 frames.
+* Exit: `translateY: [0, -30]`, `opacity: [1, 0]`, duration: 6 frames.
+
+

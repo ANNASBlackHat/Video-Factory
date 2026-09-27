@@ -1,0 +1,116 @@
+**Title:** Editorial Luxury B2B: Barcode Tags, Carousel Shifts & 3D Chess 
+Motion
+
+---
+
+### 1. Visual Theme & Layout Architecture
+
+* **Brand & Aesthetic:** High-end editorial/luxury agency aesthetic 
+(@bydualmodestudio) pairing a warm off-white minimalist background with 
+crisp serif display typography (*Playfair Display / Bodoni* style) and 
+gold/dark-tone accents.
+* **Structural Layout:**
+* **Dual Card Comparison:** Left "5$ edit" thumbnail alongside the primary 
+right-hand "our work" container.
+* **Brand Anchor:** Centered bottom branding badge (`@bydualmodestudio` 
+with an infinity-style icon mark).
+
+
+* **Typography Style:** Centered, elegant serif kinetic headings combined 
+with bold yellow/white sub-captions.
+
+---
+
+### 2. Scene-by-Scene Motion Breakdown
+
+**00:00 - 00:02 | Intro Tag & Floating B-Roll Frame**
+
+* **Name Tag Pill:** Minimal translucent pill tag (`"Sham"`) glides down 
+and pins to the upper shoulder line.
+* **3D Money Particles:** High-depth blurred $100 dollar bills float 
+downward across the z-axis.
+* **Framed Media Entrance:** Rectangular media card with a dark bezel (*"• 
+Sales Manager"*) scales up smoothly into the center of the white card.
+
+**00:03 - 00:07 | Dynamic Vertical Carousel & Barcode Badge**
+
+* **Barcode Stamp:** A clean retail/editorial barcode graphic sits fixed 
+in the upper-right corner of the white card.
+* **Vertical Slide Carousel:**
+* Displays distinct industry niches as the speaker lists them (*FinTech, 
+Paris Machine System, SAAS, Cosmetic*).
+* **Transition Motion:** Each industry card (circular/isometric 
+illustration + serif text) slides vertically upward (`translateY(120%) -> 
+0 -> -120%`) with an elastic cubic ease, holding for ~0.8s before the next 
+card snaps into place.
+
+
+
+**00:08 - 00:13 | Light Bulb Idea Pop & Pill Row Stack**
+
+* **Kinetic Text:** Animated emoji sunglasses head-bob on the text 
+highlight (*"AND HERE'S WHAT / I HAVE LEARNED"*).
+* **Light Bulb Vector:** A glowing minimalist light bulb icon snaps in 
+over the speaker's chest with a circular white flash.
+* **Horizontal Badge Row:** Three circular badge cutouts (*FinTech, 
+Machine, Cosmetic*) pop in side-by-side along the bottom chest line using 
+a fast horizontal stagger.
+
+**00:13 - 00:15 | 3D Golden Chess King (Full Card Mode)**
+
+* **Visual Asset:** Highly reflective metallic 3D golden chess king and 
+pawn piece.
+* **Entrance & Camera Motion:**
+* The king piece slides in smoothly from the right with a subtle scale 
+breathing motion.
+* Left-aligned bold serif text (*"3 rules / that never fail"*) slides up 
+line-by-line.
+
+
+
+**00:16 - 00:21 | Translucent Glass Notification Bar**
+
+* **Rule Reveal:** Bold yellow headline (*"ASK BEFORE YOU PITCH"*) snaps 
+centered over the speaker.
+* **Notification Banner:** A slim, dark glassmorphic pill banner with a 
+red accent icon (*"Don't assume the pain point"*) slides down from 
+`translateY(-20px)` with a smooth ease-out hold.
+
+---
+
+### 3. Programmatic Motion Specs (For Remotion / Hyperframes)
+
+* **Vertical Carousel Item Snap (Remotion):**
+```javascript
+const cardIndex = Math.floor(frame / framesPerItem);
+const localFrame = frame % framesPerItem;
+
+// Snap in, hold, and slide out
+const translateY = interpolate(
+  localFrame,
+  [0, 8, 20, 26],
+  [80, 0, 0, -80],
+  { extrapolateRight: "clamp", easing: Easing.out(Easing.cubic) }
+);
+
+```
+
+
+* **Serif Kinetic Typography Mask:**
+* Container: `overflow: hidden`.
+* Text element: `translateY: interpolate(frame, [0, 10], [100, 0])` 
+percent-based reveal.
+
+
+* **Staggered Pill Row Physics:**
+```javascript
+// Stagger 3 frames per icon
+const iconScale = spring({
+  frame: frame - index * 3,
+  fps: 30,
+  config: { stiffness: 240, damping: 18 }
+});
+
+```
+
+

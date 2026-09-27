@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #f6f3ec; }
+      #root {
+        width: 100%; height: 100%;
+        position: relative;
+        font-family: "EB Garamond", Georgia, serif;
+        color: #1a1a1a;
+        background:
+          radial-gradient(circle at 30% 20%, #fbf9f2 0%, #f6f3ec 60%, #efe9dd 100%);
+        overflow: hidden;
+      }
+      .paper-texture {
+        position: absolute; inset: 0;
+        background-image:
+          repeating-linear-gradient(0deg, rgba(26,26,26,0.02) 0 1px, transparent 1px 40px);
+        opacity: 0.6;
+      }
+      .red-thread {
+        position: absolute; left: 0; right: 0; height: 4px;
+        background: #c0392b;
+        top: 0;
+      }
+      .scene {
+        position: absolute; inset: 0;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        text-align: center;
+        padding: 100px 60px;
+      }
+      .eyebrow {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 28px; font-weight: 700;
+        color: #c0392b;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        margin-bottom: 30px;
+      }
+      .display {
+        font-family: "Playfair Display", Georgia, serif;
+        font-size: 160px; font-weight: 900;
+        line-height: 0.9;
+        letter-spacing: -0.03em;
+        color: #1a1a1a;
+      }
+      .display .red { color: #c0392b; }
+      .doc {
+        width: 720px;
+        background: #fffdf7;
+        border: 2px solid #d8d2c4;
+        border-radius: 4px;
+        box-shadow: 0 18px 40px rgba(26,26,26,0.14);
+        padding: 44px 40px;
+        text-align: left;
+        position: relative;
+      }
+      .doc::before {
+        content: "";
+        position: absolute; top: 0; left: 0; right: 0; height: 14px;
+        background: repeating-linear-gradient(90deg, #c0392b 0 26px, transparent 26px 34px);
+        opacity: 0.85;
+        border-radius: 4px 4px 0 0;
+      }
+      .doc-title {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 26px; font-weight: 700;
+        color: #8a8371;
+        letter-spacing: 0.1em;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+      }
+      .doc-line {
+        font-family: "EB Garamond", serif;
+        font-size: 40px; font-weight: 400;
+        color: #1a1a1a;
+        line-height: 1.35;
+      }
+      .stamp {
+        position: absolute; top: 120px; right: 100px;
+        border: 6px solid #c0392b;
+        color: #c0392b;
+        font-family: "Playfair Display", serif;
+        font-size: 56px; font-weight: 900;
+        padding: 18px 28px;
+        transform: rotate(-12deg);
+        border-radius: 8px;
+        opacity: 0;
+        letter-spacing: 0.04em;
+        background: rgba(255,253,247,0.85);
+      }
+      .cards-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        width: 100%;
+      }
+      .pcard {
+        background: #fffdf7;
+        border: 2px solid #d8d2c4;
+        border-radius: 4px;
+        box-shadow: 0 12px 28px rgba(26,26,26,0.12);
+        padding: 34px 26px;
+        text-align: center;
+        opacity: 0;
+      }
+      .pcard .num {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 70px; font-weight: 700;
+        color: #c0392b;
+        line-height: 1;
+      }
+      .pcard .num.ink { color: #1a1a1a; }
+      .pcard .num.amber { color: #b8860b; }
+      .pcard .lbl {
+        font-family: "EB Garamond", serif;
+        font-size: 32px; font-weight: 400;
+        color: #5a5346;
+        margin-top: 14px;
+        line-height: 1.25;
+      }
+      .resume {
+        width: 720px;
+        background: #fffdf7;
+        border: 2px solid #d8d2c4;
+        border-radius: 4px;
+        box-shadow: 0 18px 40px rgba(26,26,26,0.14);
+        padding: 40px;
+        text-align: left;
+      }
+      .resume .h {
+        font-family: "Playfair Display", serif;
+        font-size: 64px; font-weight: 900;
+        color: #1a1a1a;
+        letter-spacing: -0.02em;
+        margin-bottom: 6px;
+      }
+      .resume .sub {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 26px; font-weight: 700;
+        color: #8a8371;
+        letter-spacing: 0.08em;
+        margin-bottom: 24px;
+      }
+      .resume .row {
+        font-family: "EB Garamond", serif;
+        font-size: 38px; font-weight: 400;
+        color: #1a1a1a;
+        padding: 8px 0;
+        border-bottom: 1px solid #e5decf;
+        display: flex;
+        justify-content: space-between;
+      }
+      .resume .row .yr {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 28px; color: #8a8371;
+      }
+      .quote {
+        font-family: "EB Garamond", serif;
+        font-style: italic;
+        font-size: 46px; font-weight: 400;
+        color: #5a5346;
+        margin-top: 28px;
+        line-height: 1.3;
+      }
+      .note-torn {
+        width: 620px;
+        background: #fffdf7;
+        border: 2px solid #d8d2c4;
+        border-radius: 4px;
+        box-shadow: 0 14px 30px rgba(26,26,26,0.12);
+        padding: 40px;
+        text-align: center;
+        position: relative;
+        clip-path: polygon(0 4%, 6% 0, 14% 3%, 30% 0, 46% 2%, 60% 0, 78% 3%, 92% 0, 100% 6%, 100% 96%, 94% 100%, 80% 97%, 60% 100%, 42% 98%, 24% 100%, 8% 97%, 0 100%);
+      }
+      .note-torn .big {
+        font-family: "Playfair Display", serif;
+        font-size: 90px; font-weight: 900;
+        color: #1a1a1a;
+        letter-spacing: -0.02em;
+        line-height: 1;
+      }
+      .note-torn .sm {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 30px; font-weight: 700;
+        color: #c0392b;
+        margin-top: 18px;
+        letter-spacing: 0.06em;
+      }
+      .caption {
+        position: absolute;
+        bottom: 200px; left: 0; right: 0;
+        display: flex; justify-content: center;
+        opacity: 0;
+      }
+      .caption .pill {
+        font-family: "EB Garamond", serif;
+        font-style: italic;
+        font-size: 44px; font-weight: 400;
+        color: #1a1a1a;
+        background: #fffdf7;
+        border: 2px solid #c0392b;
+        border-radius: 50px;
+        padding: 12px 34px;
+        max-width: 920px;
+        line-height: 1.2;
+      }
+      .watermark {
+        position: absolute; bottom: 70px; left: 0; right: 0;
+        text-align: center;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 24px; font-weight: 700;
+        color: #8a8371;
+        letter-spacing: 0.15em;
+      }
+      .pie {
+        position: absolute; top: 240px; right: 140px;
+        width: 220px; height: 220px;
+        border-radius: 50%;
+        background: conic-gradient(#c0392b 0 40%, #b8860b 40% 70%, #1a1a1a 70% 100%);
+        opacity: 0;
+        border: 6px solid #fffdf7;
+        box-shadow: 0 14px 30px rgba(26,26,26,0.2);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="90" data-width="1080" data-height="1920">
+
+      <!-- VO (OmniVoice, slow documentary pace) -->
+      <audio id="vo-1" src="assets/vo/scene_1.wav" data-start="0" data-duration="9.48" data-track-index="40" muted></audio>
+      <audio id="vo-2" src="assets/vo/scene_2.wav" data-start="9.48" data-duration="14.96" data-track-index="41" muted></audio>
+      <audio id="vo-3" src="assets/vo/scene_3.wav" data-start="24.44" data-duration="21.48" data-track-index="42" muted></audio>
+      <audio id="vo-4" src="assets/vo/scene_4.wav" data-start="45.92" data-duration="22.52" data-track-index="43" muted></audio>
+      <audio id="vo-5" src="assets/vo/scene_5.wav" data-start="68.44" data-duration="18.92" data-track-index="44" muted></audio>
+
+      <!-- SFX (re-time to VO scene boundaries) -->
+      <audio id="fx-1" src="assets/audio/page_flip.wav" data-start="0.3" data-duration="0.5" data-track-index="50" muted></audio>
+      <audio id="fx-2" src="assets/audio/stamp_thud.wav" data-start="10.0" data-duration="0.4" data-track-index="51" muted></audio>
+      <audio id="fx-3" src="assets/audio/paper_rustle.wav" data-start="24.8" data-duration="0.6" data-track-index="52" muted></audio>
+      <audio id="fx-4" src="assets/audio/pen_scratch.wav" data-start="46.3" data-duration="0.7" data-track-index="53" muted></audio>
+      <audio id="fx-5" src="assets/audio/page_flip.wav" data-start="68.8" data-duration="0.5" data-track-index="54" muted></audio>
+      <audio id="fx-6" src="assets/audio/seal_pop.wav" data-start="69.4" data-duration="0.12" data-track-index="55" muted></audio>
+      <audio id="fx-7" src="assets/audio/whoosh_hard.wav" data-start="88.0" data-duration="0.5" data-track-index="56" muted></audio>
+
+      <div class="paper-texture" data-start="0" data-duration="90" data-track-index="0"></div>
+      <div class="red-thread" data-start="0" data-duration="90" data-track-index="1"></div>
+      <div class="watermark clip" data-start="0" data-duration="90" data-track-index="50">REKAM JEJAK · MENKEU 2026</div>
+
+      <!-- 1. OPEN (0–9.48s, vo-1) -->
+      <div class="scene clip" id="sc-open" data-start="0" data-duration="9.48" data-track-index="10">
+        <div class="eyebrow" id="o-e">INVESTIGASI FISKAL</div>
+        <div class="display" id="o-d">REKAM<br><span class="red">JEJAK</span></div>
+        <div class="caption" id="o-cap"><div class="pill">Kronologi: dari kepres ke kursi menkeu.</div></div>
+      </div>
+
+      <!-- 2. THE SWAP (9.48–24.44s, vo-2) -->
+      <div class="scene clip" id="sc-swap" data-start="9.48" data-duration="14.96" data-track-index="10">
+        <div class="pie" id="s-pie"></div>
+        <div class="doc" id="s-doc">
+          <div class="doc-title">KEPPRES NO 97 P / 2026</div>
+          <div class="doc-line">Pemberhentian Purbaya Yudhi Sadewa &amp; pengangkatan Suahasil Nazara sebagai Menteri Keuangan, sisa masa jabatan 2024–2029.</div>
+        </div>
+        <div class="stamp" id="s-stamp">DICOPOT<br>1 TH 6 HARI</div>
+        <div class="caption" id="s-cap"><div class="pill">8 Sep 2025 → 14 Sep 2026.</div></div>
+      </div>
+
+      <!-- 3. THE NUMBERS (24.44–45.92s, vo-3) -->
+      <div class="scene clip" id="sc-numbers" data-start="24.44" data-duration="21.48" data-track-index="10">
+        <div class="eyebrow">BILANGAN YANG BERBINCANG</div>
+        <div class="cards-grid">
+          <div class="pcard" id="p1"><div class="num">Rp200T</div><div class="lbl">SAL → Himbara</div></div>
+          <div class="pcard" id="p2"><div class="num ink">5.61%</div><div class="lbl">Pertumbuhan Q1 2026</div></div>
+          <div class="pcard" id="p3"><div class="num">Rp18.015</div><div class="lbl">Rupiah ATH / USD</div></div>
+          <div class="pcard" id="p4"><div class="num amber">MOODY'S</div><div class="lbl">Outlook → Negatif</div></div>
+        </div>
+        <div class="caption" id="n-cap"><div class="pill">Kredit naik, rupiah &amp; rating tergerus.</div></div>
+      </div>
+
+      <!-- 4. SUAHASIL PROFILE (45.92–68.44s, vo-4) -->
+      <div class="scene clip" id="sc-profile" data-start="45.92" data-duration="22.52" data-track-index="10">
+        <div class="resume" id="r-doc">
+          <div class="h">Suahasil Nazara</div>
+          <div class="sub">EKONOM · TEKNOKRAT</div>
+          <div class="row"><span>PhD Economics, UIUC</span><span class="yr">'03</span></div>
+          <div class="row"><span>MSc, Cornell</span><span class="yr">'97</span></div>
+          <div class="row"><span>Guru Besar UI</span><span class="yr">'09</span></div>
+          <div class="row"><span>Kepala BKF</span><span class="yr">2016</span></div>
+          <div class="row"><span>Wamenkeu</span><span class="yr">2019</span></div>
+        </div>
+        <div class="quote" id="r-q">"Jaga kredibilitas APBN. Defisit di bawah 3 persen."</div>
+        <div class="caption" id="p-cap"><div class="pill">Pilihan insider untuk kestabilan.</div></div>
+      </div>
+
+      <!-- 5. CLOSE (68.44–90s, vo-5) -->
+      <div class="scene clip" id="sc-close" data-start="68.44" data-duration="21.56" data-track-index="10">
+        <div class="note-torn" id="c-note">
+          <div class="big">"Udah siap<br>belum?"</div>
+          <div class="sm">TIKTOK · 4.8J VIEWS</div>
+        </div>
+        <div class="caption" id="c-cap"><div class="pill">Kursi menkeu, pergantian kedua tahun ini.</div></div>
+      </div>
+
+    </div>
+    <script>
+      const tl = gsap.timeline({ paused: true });
+
+      // 1. OPEN (0–9.48s)
+      tl.fromTo("#o-e", { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.5 }, 0.2);
+      tl.fromTo("#o-d", { opacity: 0, scale: 0.92, y: 30 }, { opacity: 1, scale: 1, y: 0, duration: 0.8, ease: "power3.out" }, 0.4);
+      tl.fromTo("#o-cap", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.5 }, 1.4);
+      tl.to("#sc-open", { opacity: 0, duration: 0.4 }, 9.0);
+
+      // 2. THE SWAP (9.48–24.44s)
+      tl.fromTo("#s-doc", { opacity: 0, rotation: -6, y: 60 }, { opacity: 1, rotation: 0, y: 0, duration: 0.8, ease: "power3.out" }, 9.8);
+      tl.fromTo("#s-pie", { opacity: 0, scale: 0.5, rotation: -180 }, { opacity: 0.9, scale: 1, rotation: 0, duration: 0.7, ease: "back.out(1.3)" }, 10.5);
+      tl.fromTo("#s-stamp", { opacity: 0, scale: 2.2, rotation: 40 }, { opacity: 0.92, scale: 1, rotation: -12, duration: 0.4, ease: "power4.out" }, 11.2);
+      tl.fromTo("#s-cap", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 }, 12.0);
+      tl.to("#sc-swap", { opacity: 0, duration: 0.4 }, 24.0);
+
+      // 3. THE NUMBERS (24.44–45.92s)
+      tl.fromTo("#sc-numbers .eyebrow", { opacity: 0, y: -16 }, { opacity: 1, y: 0, duration: 0.4 }, 24.6);
+      tl.fromTo("#p1", { opacity: 0, x: -50, rotation: -3 }, { opacity: 1, x: 0, rotation: 0, duration: 0.5, ease: "power2.out" }, 25.0);
+      tl.fromTo("#p2", { opacity: 0, x: 50, rotation: 3 }, { opacity: 1, x: 0, rotation: 0, duration: 0.5, ease: "power2.out" }, 27.0);
+      tl.fromTo("#p3", { opacity: 0, x: -50, rotation: -3 }, { opacity: 1, x: 0, rotation: 0, duration: 0.5, ease: "power2.out" }, 29.0);
+      tl.fromTo("#p4", { opacity: 0, x: 50, rotation: 3 }, { opacity: 1, x: 0, rotation: 0, duration: 0.5, ease: "power2.out" }, 31.0);
+      tl.fromTo("#n-cap", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 }, 34.0);
+      tl.to("#sc-numbers", { opacity: 0, duration: 0.4 }, 45.5);
+
+      // 4. SUAHASIL PROFILE (45.92–68.44s)
+      tl.fromTo("#r-doc", { opacity: 0, y: 50, rotationX: 8 }, { opacity: 1, y: 0, rotationX: 0, duration: 0.8, ease: "power3.out" }, 46.3);
+      tl.fromTo("#r-doc .row", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.4, stagger: 1.8 }, 48.0);
+      tl.fromTo("#r-q", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6 }, 58.0);
+      tl.fromTo("#p-cap", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 }, 61.0);
+      tl.to("#sc-profile", { opacity: 0, duration: 0.4 }, 68.0);
+
+      // 5. CLOSE (68.44–90s)
+      tl.fromTo("#c-note", { opacity: 0, scale: 0.8, rotation: -4 }, { opacity: 1, scale: 1, rotation: 0, duration: 0.7, ease: "back.out(1.4)" }, 68.8);
+      tl.fromTo("#c-cap", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 }, 70.0);
+      tl.to("#sc-close", { opacity: 0, duration: 0.6 }, 89.0);
+
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+      tl.fromTo("#o-cap", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.5 }, 1.4);
+      tl.to("#sc-open", { opacity: 0, duration: 0.4 }, 7.4);
+
+      // 2. THE SWAP
+      tl.fromTo("#s-doc", { opacity: 0, rotation: -6, y: 60 }, { opacity: 1, rotation: 0, y: 0, duration: 0.8, ease: "power3.out" }, 8.3);
+      tl.fromTo("#s-pie", { opacity: 0, scale: 0.5, rotation: -180 }, { opacity: 0.9, scale: 1, rotation: 0, duration: 0.7, ease: "back.out(1.3)" }, 9.0);
+      tl.fromTo("#s-stamp", { opacity: 0, scale: 2.2, rotation: 40 }, { opacity: 0.92, scale: 1, rotation: -12, duration: 0.4, ease: "power4.out" }, 9.6);
+      tl.fromTo("#s-cap", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 }, 10.6);
+      tl.to("#sc-swap", { opacity: 0, duration: 0.4 }, 17.4);
+
+      // 3. THE NUMBERS
+      tl.fromTo("#sc-numbers .eyebrow", { opacity: 0, y: -16 }, { opacity: 1, y: 0, duration: 0.4 }, 18.2);
+      tl.fromTo("#p1", { opacity: 0, x: -50, rotation: -3 }, { opacity: 1, x: 0, rotation: 0, duration: 0.5, ease: "power2.out" }, 18.6);
+      tl.fromTo("#p2", { opacity: 0, x: 50, rotation: 3 }, { opacity: 1, x: 0, rotation: 0, duration: 0.5, ease: "power2.out" }, 19.4);
+      tl.fromTo("#p3", { opacity: 0, x: -50, rotation: -3 }, { opacity: 1, x: 0, rotation: 0, duration: 0.5, ease: "power2.out" }, 20.2);
+      tl.fromTo("#p4", { opacity: 0, x: 50, rotation: 3 }, { opacity: 1, x: 0, rotation: 0, duration: 0.5, ease: "power2.out" }, 21.0);
+      tl.fromTo("#n-cap", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 }, 22.4);
+      tl.to("#sc-numbers", { opacity: 0, duration: 0.4 }, 29.4);
+
+      // 4. SUAHASIL PROFILE
+      tl.fromTo("#r-doc", { opacity: 0, y: 50, rotationX: 8 }, { opacity: 1, y: 0, rotationX: 0, duration: 0.8, ease: "power3.out" }, 30.3);
+      tl.fromTo("#r-doc .row", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.4, stagger: 0.4 }, 31.2);
+      tl.fromTo("#r-q", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6 }, 34.0);
+      tl.fromTo("#p-cap", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 }, 35.4);
+      tl.to("#sc-profile", { opacity: 0, duration: 0.4 }, 41.4);
+
+      // 5. CLOSE
+      tl.fromTo("#c-note", { opacity: 0, scale: 0.8, rotation: -4 }, { opacity: 1, scale: 1, rotation: 0, duration: 0.7, ease: "back.out(1.4)" }, 42.3);
+      tl.fromTo("#c-cap", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 }, 43.6);
+      tl.to("#sc-close", { opacity: 0, duration: 0.6 }, 50.8);
+
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>

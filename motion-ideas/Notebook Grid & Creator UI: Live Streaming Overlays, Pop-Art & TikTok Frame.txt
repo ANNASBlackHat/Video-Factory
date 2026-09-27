@@ -1,0 +1,104 @@
+**Title:** Notebook Grid & Creator UI: Live Streaming Overlays, Pop-Art & TikTok Frame
+
+---
+
+### 1. Visual Theme & Layout Architecture
+
+* **Brand & Aesthetic:** Playful creator/graphic studio aesthetic (@psg.graphic) utilizing 
+a physical graph/notebook paper background split into light gray/white on top and vivid 
+yellow graph grid on the bottom.
+* **Structural Layout:**
+* **Dual Card Staging:** Left-hand smaller card tagged `"Raw"`, right-hand large elevated 
+container tagged `"My Edit"` with hand-drawn vector doodle accents (curved arrow, film 
+clapperboards, floating music/CD icons).
+* **Branding Bar:** Fixed bottom-right studio signature (`PSG PARSAI GRAPHIC`).
+
+
+* **Caption Style:** Centered, pill-backed sans-serif captions with bright green keyword 
+highlights.
+
+---
+
+### 2. Scene-by-Scene Motion Breakdown
+
+**00:00 - 00:02 | Mechanical Gear Pop**
+
+* **Kinetic Type:** Pill text snaps into view (*"I think the most / Powerful"*).
+* **3D Gear Elements:** Multiple 3D gray metallic gear assets slide and pop into the upper 
+right corner of the speaker card with continuous rotation.
+
+**00:02 - 00:04 | Smartphone Cutout & Social Fly-In**
+
+* **Hand Cutout:** Cutout of a hand holding a modern smartphone enters vertically with a 
+fast ease-out slide.
+* **Social Nodes:** App icons (Instagram, TikTok, X) bounce into position around the 
+device connected by dynamic thin line vectors.
+
+**00:05 - 00:07 | TikTok / IG Live UI Simulation**
+
+* **Live Badge:** Top-left red pill badge (`🔴 LIVE  👁 327`) pulses into the corner.
+* **Floating Reaction Hearts:** Stream of multi-colored reaction hearts (red, blue 
+thumbs-up, white hearts) floating continuously upward along the right edge with horizontal 
+sine-wave wobble (`translateX: sin(time) * 12px`, `translateY: float-up`).
+
+**00:09 - 00:13 | Falling Cash & Crowd Silhouette**
+
+* **Falling Dollar Bills:** Photorealistic 3D banknotes fall and tumble across the z-axis 
+above the speaker.
+* **Dynamic Counter:** Green text badge increments rapidly from `$662` to `$1,000` with 
+ease-out physics.
+* **Audience Silhouette Card (00:13):** A monochrome vector graphic card showing a 
+cheering concert/stadium crowd pops in with the bold label *"Millions"*.
+
+**00:16 - 00:18 | Pop-Art Magazine Card Reveal**
+
+* **Visual Asset:** Colorful comic/pop-art style vintage magazine mockup (*"MAGAZINE / 
+Comics 0.99"*).
+* **Motion:** Card snaps in with a dynamic spring tilt (`rotate: -6deg -> 0deg`, `scale: 
+0.85 -> 1.0`).
+
+**00:19 - 00:23 | TikTok Interface Frame Simulation**
+
+* **UI Shell Overlay:** The presenter is nested directly inside a native TikTok UI layout:
+* Bottom navigation dock (*Home, Friends, +, Inbox, Profile*).
+* Right-side vertical interaction column (animated avatar with follow plus, like heart, 
+comment bubble, bookmark, and share icon).
+* Music disc spinning in the bottom-right corner.
+
+
+* **Kinetic Accent:** Live typing text highlight: `"$0 and it can / go viral"`.
+
+**00:24 - 00:25 | Outro Card Flip**
+
+* **Closing Screen:** Both cards transition to a clean pitch-black card displaying the 
+white studio logo (`PSG PARSAI GRAPHIC`).
+
+---
+
+### 3. Programmatic Motion Specs (For Remotion / Hyperframes)
+
+* **Rising Live Stream Reactions (Particle Float):**
+```javascript
+const y = interpolate(frame - spawnFrame, [0, 45], [0, -220]);
+const x = Math.sin((frame - spawnFrame) * 0.15) * 14;
+const opacity = interpolate(frame - spawnFrame, [0, 10, 35, 45], [0, 1, 1, 0]);
+// style={{ transform: `translate(${x}px, ${y}px)`, opacity }}
+
+```
+
+
+* **TikTok Rotating Audio Disc:**
+```javascript
+const discRotation = (frame * 3) % 360;
+// style={{ transform: `rotate(${discRotation}deg)` }}
+
+```
+
+
+* **Card Snap & Tilt Entrance:**
+```javascript
+const scale = spring({ frame, fps: 30, config: { stiffness: 200, damping: 15 } });
+const rotation = interpolate(frame, [0, 12], [-8, 0], { extrapolateRight: "clamp" });
+
+```
+
